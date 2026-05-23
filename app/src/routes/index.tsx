@@ -89,6 +89,9 @@ export function HomePage() {
                 <Link to="/review" className="btn btn-primary">
                   Praticar versículos
                 </Link>
+                <Link to="/collections" className="btn btn-secondary">
+                  Coleções
+                </Link>
                 <Link to="/browse" className="btn btn-secondary">
                   + Memorizar novos
                 </Link>
@@ -97,6 +100,9 @@ export function HomePage() {
               <>
                 <Link to="/browse" className="btn btn-secondary">
                   + Adicionar Versículo
+                </Link>
+                <Link to="/collections" className="btn btn-secondary">
+                  Coleções
                 </Link>
                 <Link to="/stats" className="btn btn-secondary">
                   Ver Progresso

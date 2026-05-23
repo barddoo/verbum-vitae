@@ -16,6 +16,34 @@ export interface Progress {
   updatedAt: number
 }
 
+export interface Collection {
+  id?: number
+  name: string
+  description: string
+  icon: string
+  color?: string
+  isBuiltin: number
+  createdAt: number
+}
+
+export interface CollectionVerse {
+  id?: number
+  collectionId: number
+  verseId: string
+  translation: string
+  sortOrder: number
+}
+
+export interface WordStats {
+  id?: number
+  verseId: string
+  translation: string
+  wordIndex: number
+  word: string
+  correctCount: number
+  incorrectCount: number
+}
+
 export interface SyncLog {
   id?: number
   userId: string
@@ -30,12 +58,18 @@ export interface SyncLog {
 export const db = new Dexie('RememberBible') as Dexie & {
   verses: EntityTable<Verse, 'id'>
   progress: EntityTable<Progress, 'id'>
+  wordStats: EntityTable<WordStats, 'id'>
+  collections: EntityTable<Collection, 'id'>
+  collectionVerses: EntityTable<CollectionVerse, 'id'>
   syncLog: EntityTable<SyncLog, 'id'>
 }
 
-db.version(1).stores({
+db.version(3).stores({
   verses: '++id, &[bookNumber+chapter+verse+translation], [bookNumber+chapter], bookNumber, translation',
   progress: '++id, &[verseId+translation], dueDate, state, [dueDate+state]',
+  wordStats: '++id, &[verseId+translation+wordIndex], [verseId+translation]',
+  collections: '++id, &name, isBuiltin',
+  collectionVerses: '++id, &[collectionId+verseId+translation], collectionId',
   syncLog: '++id, userId, tableName, rowId, synced, createdAt',
 })
 
@@ -126,4 +160,94 @@ async function bulkInsert(
   for (let i = 0; i < verses.length; i += chunkSize) {
     await db.verses.bulkAdd(verses.slice(i, i + chunkSize))
   }
+}
+
+export async function getCollectionProgress(collectionId: number, translation: string) {
+  const cv = await db.collectionVerses.where({ collectionId }).toArray()
+  const total = cv.length
+  const memorized = await db.progress
+    .where('[verseId+translation]')
+    .anyOf(cv.map((c) => [c.verseId, c.translation] as [string, string]))
+    .count()
+  return { total, memorized, percent: total > 0 ? Math.round((memorized / total) * 100) : 0 }
+}
+
+export async function recordWordAccuracy(
+  verseId: string,
+  translation: string,
+  correctWords: Set<number>,
+  incorrectWords: Set<number>,
+  allWords: string[],
+) {
+  for (const idx of correctWords) {
+    const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
+    if (existing) {
+      await db.wordStats.update(existing.id!, { correctCount: existing.correctCount + 1 })
+    } else {
+      await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 1, incorrectCount: 0 })
+    }
+  }
+  for (const idx of incorrectWords) {
+    const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
+    if (existing) {
+      await db.wordStats.update(existing.id!, { incorrectCount: existing.incorrectCount + 1 })
+    } else {
+      await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 0, incorrectCount: 1 })
+    }
+  }
+}
+
+export async function getWordHeat(verseId: string, translation: string, wordCount: number): Promise<{ index: number; accuracy: number }[]> {
+  const stats = await db.wordStats.where({ verseId, translation }).toArray()
+  const map = new Map(stats.map((s) => [s.wordIndex, s]))
+  const result: { index: number; accuracy: number }[] = []
+  for (let i = 0; i < wordCount; i++) {
+    const s = map.get(i)
+    if (s && (s.correctCount + s.incorrectCount) > 0) {
+      result.push({ index: i, accuracy: s.correctCount / (s.correctCount + s.incorrectCount) })
+    } else {
+      result.push({ index: i, accuracy: -1 })
+    }
+  }
+  return result
+}
+
+export async function addCollectionToMemory(
+  collectionId: number,
+  translation: string,
+  progressIdFn: () => string,
+  logChange: (entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) => void,
+) {
+  const cv = await db.collectionVerses.where({ collectionId }).toArray()
+  let added = 0
+  for (const c of cv) {
+    const existing = await db.progress.where({ verseId: c.verseId, translation: c.translation }).first()
+    if (existing) continue
+    const { createEmptyCard } = await import('./srs')
+    const card = createEmptyCard()
+    await db.progress.put({
+      verseId: c.verseId,
+      translation: c.translation,
+      cardJson: JSON.stringify(card),
+      state: 0,
+      dueDate: card.due.getTime(),
+      streak: 0,
+      updatedAt: Date.now(),
+    })
+    logChange({
+      userId: localStorage.getItem('auth_token') ? 'user' : '',
+      tableName: 'progress',
+      rowId: c.verseId,
+      operation: 'create',
+      data: JSON.stringify({
+        verseId: c.verseId,
+        translation: c.translation,
+        cardJson: JSON.stringify(card),
+        nextReview: new Date(card.due.getTime()).toISOString(),
+        lastReview: new Date().toISOString(),
+      }),
+    })
+    added++
+  }
+  return added
 }

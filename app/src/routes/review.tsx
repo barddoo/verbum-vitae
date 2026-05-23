@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Link } from '@tanstack/react-router'
-import { db, fetchVersesForKey, parseVerseKey } from '../lib/db'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS } from 'shared/bible'
-import { getDueCards, getNextCard, Rating, parseCardJson, type Card } from '../lib/srs'
+import { db, fetchVersesForKey, getWordHeat, parseVerseKey, recordWordAccuracy } from '../lib/db'
+import { type Card, type Grade, getDueCards, getNextCard, Rating } from '../lib/srs'
 import { logProgressChange } from '../lib/sync'
 
-type ReviewMode = 'due' | 'free' | 'recent'
+type PracticeMode = 'flashcard' | 'fill-blank' | 'typing'
 
 interface DueItem {
   progressId: number
@@ -16,73 +15,95 @@ interface DueItem {
   translation: string
 }
 
-function readModeFromURL(): ReviewMode {
-  const p = new URLSearchParams(window.location.search)
-  const m = p.get('mode')
-  if (m === 'free' || m === 'recent') return m
-  return 'due'
-}
-
 export function ReviewPage() {
-  const [mode, setMode] = useState<ReviewMode>(readModeFromURL)
+  const [phase, setPhase] = useState<'queue' | 'session'>('queue')
   const [items, setItems] = useState<DueItem[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [completed, setCompleted] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>('flashcard')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'due'>('due')
+  const [filterCollection, setFilterCollection] = useState<number | null>(null)
+  const [filterBook, setFilterBook] = useState<number | null>(null)
+  const [totalAll, setTotalAll] = useState(0)
+  const [totalDue, setTotalDue] = useState(0)
+  const [collections, setCollections] = useState<{ id: number; name: string }[]>([])
 
-  const loadVerses = useCallback(async (currentMode: ReviewMode) => {
+  useEffect(() => {
+    loadQueueStats()
+    loadCollections()
+  }, [])
+
+  async function loadCollections() {
+    const cols = await db.collections.toArray()
+    setCollections(cols.map((c) => ({ id: c.id!, name: c.name })))
+  }
+
+  async function loadQueueStats() {
+    const allProgress = await db.progress.toArray()
+    const dueCards = getDueCards(allProgress)
+    setTotalAll(allProgress.length)
+    setTotalDue(dueCards.length)
+    setLoading(false)
+  }
+
+  async function startReview() {
     setLoading(true)
     const allProgress = await db.progress.toArray()
-    let selected: typeof allProgress = []
 
-    if (currentMode === 'due') {
+    let selected = allProgress
+    if (filterStatus === 'due') {
       const dueCards = getDueCards(allProgress)
-      selected = allProgress.filter(p => dueCards.some(dc => dc.verseId === p.verseId))
-    } else if (currentMode === 'recent') {
-      selected = allProgress.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 10)
-    } else {
-      selected = allProgress.sort(() => Math.random() - 0.5)
+      selected = allProgress.filter((p) => dueCards.some((dc) => dc.verseId === p.verseId))
+    }
+    if (filterBook !== null) {
+      selected = selected.filter((p) => {
+        const parsed = parseVerseKey(p.verseId)
+        return parsed.bookNumber === filterBook
+      })
+    }
+    if (filterCollection !== null) {
+      const cvs = await db.collectionVerses.where({ collectionId: filterCollection }).toArray()
+      const colSet = new Set(cvs.map((cv) => cv.verseId + cv.translation))
+      selected = selected.filter((p) => colSet.has(p.verseId + p.translation))
     }
 
     if (selected.length === 0) {
-      setItems([]); setLoading(false); return
+      setLoading(false)
+      return
     }
+
+    const cards = getDueCards(selected)
+    const cardMap = new Map(cards.map((c) => [c.verseId, c.card]))
 
     const loaded: DueItem[] = []
     for (const p of selected) {
-      try {
-        const card = parseCardJson(p.cardJson)
-        const text = await fetchVersesForKey(p.verseId, p.translation)
-        const parsed = parseVerseKey(p.verseId)
-        const bookName = BOOKS[parsed.bookNumber]
-        const ref = parsed.verseEnd
-          ? `${bookName} ${parsed.chapter}:${parsed.verseStart}-${parsed.verseEnd}`
-          : `${bookName} ${parsed.chapter}:${parsed.verseStart}`
+      const card = cardMap.get(p.verseId) || JSON.parse(p.cardJson || '{}')
+      const text = await fetchVersesForKey(p.verseId, p.translation)
+      const parsed = parseVerseKey(p.verseId)
+      const bookName = BOOKS[parsed.bookNumber]
+      const ref = parsed.verseEnd
+        ? `${bookName} ${parsed.chapter}:${parsed.verseStart}-${parsed.verseEnd}`
+        : `${bookName} ${parsed.chapter}:${parsed.verseStart}`
 
-        loaded.push({
-          progressId: p.id!,
-          verseId: p.verseId,
-          reference: ref,
-          verseText: text,
-          card,
-          translation: p.translation,
-        })
-      } catch {
-        // skip malformed
-      }
+      loaded.push({
+        progressId: p.id!,
+        verseId: p.verseId,
+        reference: ref,
+        verseText: text,
+        card: typeof card === 'string' ? JSON.parse(card) : card,
+        translation: p.translation,
+      })
     }
 
     setItems(loaded)
     setCurrentIndex(0)
     setCompleted(0)
+    setPhase('session')
     setLoading(false)
-  }, [])
+  }
 
-  useEffect(() => {
-    loadVerses(mode)
-  }, [mode, loadVerses])
-
-  async function handleGrade(rating: Rating) {
+  async function handleGrade(rating: Grade) {
     const item = items[currentIndex]
     if (!item) return
 
@@ -110,30 +131,140 @@ export function ReviewPage() {
       }),
     })
 
-    setCompleted(prev => prev + 1)
-    setTimeout(() => setCurrentIndex(prev => prev + 1), 100)
+    setCompleted((prev) => prev + 1)
+
+    setTimeout(() => {
+      setCurrentIndex((prev) => prev + 1)
+    }, 100)
   }
 
-  function switchMode(newMode: ReviewMode) {
-    setMode(newMode)
+  function goBack() {
+    setPhase('queue')
+    setItems([])
+    setCurrentIndex(0)
+    setCompleted(0)
   }
 
-  if (loading) return <div className="page"><div className="loading">Carregando...</div></div>
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="loading">Carregando...</div>
+      </div>
+    )
+  }
+
+  if (phase === 'queue') {
+    return (
+      <div className="page review-page">
+        <h2 className="review-queue-title">Revisão</h2>
+
+        <div className="queue-summary">
+          <div className="queue-stat">
+            <span className="queue-stat-value">{totalDue}</span>
+            <span className="queue-stat-label">para revisar</span>
+          </div>
+          <div className="queue-stat">
+            <span className="queue-stat-value">{totalAll}</span>
+            <span className="queue-stat-label">total</span>
+          </div>
+        </div>
+
+        <div className="queue-filters">
+          <div className="queue-filter-group">
+            <label className="queue-filter-label">Filtrar</label>
+            <div className="queue-filter-options">
+              <button
+                className={`filter-chip ${filterStatus === 'due' ? 'active' : ''}`}
+                onClick={() => setFilterStatus('due')}
+              >
+                Vencidos
+              </button>
+              <button
+                className={`filter-chip ${filterStatus === 'all' ? 'active' : ''}`}
+                onClick={() => setFilterStatus('all')}
+              >
+                Todos
+              </button>
+            </div>
+          </div>
+
+          <div className="queue-filter-group">
+            <label className="queue-filter-label">Coleção</label>
+            <select
+              className="queue-select"
+              value={filterCollection ?? ''}
+              onChange={(e) => setFilterCollection(e.target.value ? Number(e.target.value) : null)}
+            >
+              <option value="">Todas as coleções</option>
+              {collections.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="queue-filter-group">
+            <label className="queue-filter-label">Livro</label>
+            <select
+              className="queue-select"
+              value={filterBook ?? ''}
+              onChange={(e) => setFilterBook(e.target.value ? Number(e.target.value) : null)}
+            >
+              <option value="">Todos os livros</option>
+              {BOOKS.map((name, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="queue-filter-group">
+            <label className="queue-filter-label">Modo</label>
+            <div className="queue-filter-options">
+              {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
+                <button
+                  key={m}
+                  className={`filter-chip ${practiceMode === m ? 'active' : ''}`}
+                  onClick={() => setPracticeMode(m)}
+                >
+                  {m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <button
+          className="btn btn-primary btn-large btn-start"
+          onClick={startReview}
+          disabled={totalAll === 0 || (filterStatus === 'due' && totalDue === 0)}
+        >
+          {totalAll === 0
+            ? 'Nenhum versículo memorizado'
+            : `Iniciar Revisão (${filterStatus === 'due' ? totalDue : totalAll})`}
+        </button>
+
+        {totalAll === 0 && (
+          <p className="queue-empty-hint">
+            Adicione versículos na página <a href="/browse">Bíblia</a> para começar.
+          </p>
+        )}
+      </div>
+    )
+  }
 
   if (items.length === 0) {
     return (
-      <div className="page review-empty">
-        <ModeTabs currentMode={mode} onSwitch={switchMode} />
+      <div className="page review-page">
         <div className="empty-state">
-          <h2>🎉 Nada para revisar!</h2>
-          <p>Todos os versículos estão em dia.</p>
-          <div className="empty-actions" style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 300, margin: '0 auto' }}>
-            <button className="btn btn-primary" onClick={() => switchMode('free')}>
-              Praticar versículos
+          <h2>Nada para revisar!</h2>
+          <p>{filterStatus === 'due' ? 'Todos os versículos estão em dia.' : 'Nenhum versículo encontrado.'}</p>
+          <div className="empty-actions">
+            <button className="btn btn-secondary" onClick={goBack}>
+              Voltar
             </button>
-            <Link to="/browse" className="btn btn-secondary">
-              + Adicionar novos
-            </Link>
           </div>
         </div>
       </div>
@@ -142,14 +273,23 @@ export function ReviewPage() {
 
   if (currentIndex >= items.length) {
     return (
-      <div className="page review-done">
-        <div className="empty-state">
-          <h2>✅ Sessão concluída!</h2>
-          <p>{completed} versículos revisados.</p>
-          <div className="empty-actions" style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 300, margin: '0 auto' }}>
-            <Link to="/" className="btn btn-primary">Início</Link>
-            <button className="btn btn-secondary" onClick={() => switchMode('free')}>Nova sessão livre</button>
-            <button className="btn btn-secondary" onClick={() => switchMode('due')}>Nova revisão</button>
+      <div className="page review-page">
+        <div className="session-complete">
+          <h2>Sessão concluída!</h2>
+          <p className="session-complete-count">{completed} versículos revisados</p>
+          <div className="session-complete-actions">
+            <button className="btn btn-primary" onClick={goBack}>
+              Voltar ao painel
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                setCurrentIndex(0)
+                setCompleted(0)
+              }}
+            >
+              Nova sessão
+            </button>
           </div>
         </div>
       </div>
@@ -157,89 +297,311 @@ export function ReviewPage() {
   }
 
   return (
-    <div className="page review-page">
-      <ModeTabs currentMode={mode} onSwitch={switchMode} />
-
+    <div className="page review-page review-session">
       <div className="review-header">
-        <span className="review-counter">{currentIndex + 1} / {items.length}</span>
-        <span className="review-progress">{completed} concluídos</span>
+        <button className="btn-icon" onClick={goBack} aria-label="Voltar">
+          ←
+        </button>
+        <div className="review-header-center">
+          <span className="review-counter">
+            {currentIndex + 1}/{items.length}
+          </span>
+          <div className="practice-mode-selector">
+            {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
+              <button
+                key={m}
+                className={`mode-dot ${practiceMode === m ? 'active' : ''}`}
+                onClick={() => setPracticeMode(m)}
+                aria-label={m}
+                title={m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
+              />
+            ))}
+          </div>
+        </div>
+        <span className="review-completed">{completed}</span>
       </div>
 
-      <FlashcardItem
-        key={items[currentIndex].verseId}
-        reference={items[currentIndex].reference}
-        verseText={items[currentIndex].verseText}
-        translation={items[currentIndex].translation}
-        onGrade={handleGrade}
-      />
+      {practiceMode === 'flashcard' && (
+        <FlashcardView
+          key={items[currentIndex].verseId + currentIndex}
+          reference={items[currentIndex].reference}
+          verseText={items[currentIndex].verseText}
+          translation={items[currentIndex].translation}
+          verseId={items[currentIndex].verseId}
+          onGrade={handleGrade}
+        />
+      )}
+      {practiceMode === 'fill-blank' && (
+        <FillInBlankView
+          key={items[currentIndex].verseId + currentIndex}
+          reference={items[currentIndex].reference}
+          verseText={items[currentIndex].verseText}
+          translation={items[currentIndex].translation}
+          verseId={items[currentIndex].verseId}
+          onGrade={handleGrade}
+        />
+      )}
+      {practiceMode === 'typing' && (
+        <TypingPracticeView
+          key={items[currentIndex].verseId + currentIndex}
+          reference={items[currentIndex].reference}
+          verseText={items[currentIndex].verseText}
+          translation={items[currentIndex].translation}
+          verseId={items[currentIndex].verseId}
+          onGrade={handleGrade}
+        />
+      )}
     </div>
   )
 }
 
-function ModeTabs({ currentMode, onSwitch }: { currentMode: ReviewMode; onSwitch: (m: ReviewMode) => void }) {
-  const tabs: { mode: ReviewMode; label: string }[] = [
-    { mode: 'due', label: 'Revisão' },
-    { mode: 'free', label: 'Praticar' },
-    { mode: 'recent', label: 'Recentes' },
-  ]
+function levenshtein(a: string, b: string): number {
+  const m = a.length; const n = b.length
+  const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0))
+  for (let i = 0; i <= m; i++) dp[i][0] = i
+  for (let j = 0; j <= n; j++) dp[0][j] = j
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1
+  return dp[m][n]
+}
 
+function GradingButtons({ onGrade }: { onGrade: (r: Grade) => void }) {
   return (
-    <div className="mode-tabs">
-      {tabs.map(t => (
-        <button
-          key={t.mode}
-          className={`mode-tab ${currentMode === t.mode ? 'active' : ''}`}
-          onClick={() => onSwitch(t.mode)}
-        >
-          {t.label}
+    <div className="flashcard-grade">
+      <p className="grade-prompt">Como foi?</p>
+      <div className="grade-buttons">
+        <button className="btn grade-btn grade-1" onClick={() => onGrade(Rating.Again as Grade)}>
+          1<br /><small>Esqueci</small>
         </button>
-      ))}
+        <button className="btn grade-btn grade-2" onClick={() => onGrade(Rating.Hard as Grade)}>
+          2<br /><small>Difícil</small>
+        </button>
+        <button className="btn grade-btn grade-3" onClick={() => onGrade(Rating.Good as Grade)}>
+          3<br /><small>Bom</small>
+        </button>
+        <button className="btn grade-btn grade-4" onClick={() => onGrade(Rating.Easy as Grade)}>
+          4<br /><small>Fácil</small>
+        </button>
+      </div>
     </div>
   )
 }
 
-function FlashcardItem({ reference, verseText, translation, onGrade }: {
-  reference: string
-  verseText: string
-  translation: string
-  onGrade: (r: Rating) => void
+function HeatVerse({
+  words,
+  heat,
+}: {
+  words: string[]
+  heat: { index: number; accuracy: number }[]
 }) {
-  const [side, setSide] = useState<'front' | 'back'>('front')
+  return (
+    <p className="flashcard-verse heat-verse">
+      {words.map((w, i) => {
+        const h = heat.find((h) => h.index === i)
+        let cls = ''
+        if (h && h.accuracy >= 0) {
+          if (h.accuracy >= 0.8) cls = 'heat-good'
+          else if (h.accuracy >= 0.5) cls = 'heat-ok'
+          else cls = 'heat-bad'
+        }
+        return (
+          <span key={i} className={cls}>
+            {w}
+            {i < words.length - 1 ? ' ' : ''}
+          </span>
+        )
+      })}
+    </p>
+  )
+}
+
+function FlashcardView({
+  reference, verseText, translation, verseId, onGrade,
+}: {
+  reference: string; verseText: string; translation: string; verseId: string; onGrade: (r: Grade) => void
+}) {
+  const [flipped, setFlipped] = useState(false)
   const [hintLevel, setHintLevel] = useState(0)
+  const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
+
+  useEffect(() => {
+    getWordHeat(verseId, translation, verseText.split(' ').length).then(setHeat)
+    setFlipped(false)
+    setHintLevel(0)
+  }, [verseId, translation, verseText])
 
   function getHiddenText(): string {
     if (hintLevel === 0) return ''
     const words = verseText.split(' ')
     return words.map((w, i) => {
-      if (hintLevel === 1) {
-        if (i < 3) return w
-        return w[0] + '_'.repeat(Math.max(w.length - 1, 1))
-      }
+      if (hintLevel === 1) return i < 3 ? w : w[0] + '_'.repeat(Math.max(w.length - 1, 1))
       if (i < hintLevel) return w
       return '_ '.repeat(w.length).trim()
     }).join(' ')
   }
 
-  if (side === 'front') {
+  const words = useMemo(() => verseText.split(' '), [verseText])
+
+  return (
+    <div className="flashcard">
+      <div className={`flip-card ${flipped ? 'flipped' : ''}`}>
+        <div className="flip-card-inner">
+          <div className="flip-card-front">
+            <h2 className="flashcard-ref">{reference}</h2>
+            <p className="flashcard-hint">Tente recitar o versículo mentalmente...</p>
+            {hintLevel > 0 && (
+              <div className="flashcard-hint-text"><p>{getHiddenText()}</p></div>
+            )}
+            <div className="flashcard-actions">
+              <button className="btn btn-secondary" onClick={() => setHintLevel((h) => h + 1)}>
+                Dica {hintLevel === 0 ? '(1ª letra)' : '(palavras)'}
+              </button>
+              <button className="btn btn-primary" onClick={() => { setFlipped(true); setHintLevel(0) }}>
+                Revelar
+              </button>
+            </div>
+          </div>
+          <div className="flip-card-back">
+            <h3 className="flashcard-ref-back">{reference}</h3>
+            <HeatVerse words={words} heat={heat} />
+            <p className="flashcard-translation-label">{translation.toUpperCase()}</p>
+          </div>
+        </div>
+      </div>
+      {flipped && <GradingButtons onGrade={onGrade} />}
+    </div>
+  )
+}
+
+function FillInBlankView({
+  reference, verseText, translation, verseId, onGrade,
+}: {
+  reference: string; verseText: string; translation: string; verseId: string; onGrade: (r: Grade) => void
+}) {
+  const [revealed, setRevealed] = useState(false)
+  const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
+  const [hasRecorded, setHasRecorded] = useState(false)
+
+  const words = useMemo(() => verseText.split(' '), [verseText])
+
+  const blankIndices = useMemo(() => {
+    const count = Math.max(1, Math.floor(words.length * 0.35))
+    const indices = new Set<number>()
+    while (indices.size < count) indices.add(Math.floor(Math.random() * words.length))
+    return indices
+  }, [words])
+
+  const displayParts = useMemo(() => words.map((w, i) => (blankIndices.has(i) ? null : w)), [words, blankIndices])
+
+  useEffect(() => {
+    getWordHeat(verseId, translation, words.length).then(setHeat)
+    setRevealed(false)
+    setHasRecorded(false)
+  }, [verseId, translation, words.length])
+
+  useEffect(() => {
+    if (revealed && !hasRecorded) {
+      setHasRecorded(true)
+      const wrongWords = new Set(blankIndices)
+      recordWordAccuracy(verseId, translation, new Set(), wrongWords, words)
+    }
+  }, [revealed, hasRecorded, verseId, translation, blankIndices, words])
+
+  return (
+    <div className="flashcard">
+      <div className={`flip-card ${revealed ? 'flipped' : ''}`}>
+        <div className="flip-card-inner">
+          <div className="flip-card-front">
+            <h2 className="flashcard-ref">{reference}</h2>
+            <div className="fill-blank-text">
+              <p>
+                {displayParts.map((part, i) => (
+                  <span key={i}>
+                    {part === null ? <span className="blank-word">_____</span> : <span>{part}</span>}
+                    {i < displayParts.length - 1 ? ' ' : ''}
+                  </span>
+                ))}
+              </p>
+              <p className="blank-count">Preencha mentalmente {blankIndices.size} palavra(s)</p>
+            </div>
+            <div className="flashcard-actions">
+              <button className="btn btn-primary" onClick={() => setRevealed(true)}>Revelar</button>
+            </div>
+          </div>
+          <div className="flip-card-back">
+            <h3 className="flashcard-ref-back">{reference}</h3>
+            <HeatVerse words={words} heat={heat} />
+            <p className="flashcard-translation-label">{translation.toUpperCase()}</p>
+          </div>
+        </div>
+      </div>
+      {revealed && <GradingButtons onGrade={onGrade} />}
+    </div>
+  )
+}
+
+function TypingPracticeView({
+  reference, verseText, translation, verseId, onGrade,
+}: {
+  reference: string; verseText: string; translation: string; verseId: string; onGrade: (r: Grade) => void
+}) {
+  const [input, setInput] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [accuracy, setAccuracy] = useState(0)
+  const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
+  const [hasRecorded, setHasRecorded] = useState(false)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const words = useMemo(() => verseText.split(' '), [verseText])
+
+  useEffect(() => {
+    getWordHeat(verseId, translation, words.length).then(setHeat)
+    setSubmitted(false)
+    setHasRecorded(false)
+    setInput('')
+    inputRef.current?.focus()
+  }, [verseId, translation, words.length])
+
+  function handleSubmit() {
+    const cleanInput = input.trim().toLowerCase()
+    const cleanVerse = verseText.trim().toLowerCase()
+    const dist = levenshtein(cleanInput, cleanVerse)
+    const maxLen = Math.max(cleanInput.length, cleanVerse.length)
+    const acc = maxLen > 0 ? Math.round((1 - dist / maxLen) * 100) : 0
+    setAccuracy(acc)
+    setSubmitted(true)
+
+    if (!hasRecorded) {
+      setHasRecorded(true)
+      const typedWords = cleanInput.split(/\s+/)
+      const correctWords = cleanVerse.split(/\s+/)
+      const correct = new Set<number>()
+      const incorrect = new Set<number>()
+      correctWords.forEach((w, i) => {
+        if (typedWords[i] === w) correct.add(i)
+        else incorrect.add(i)
+      })
+      recordWordAccuracy(verseId, translation, correct, incorrect, words)
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (input.trim()) handleSubmit() }
+  }
+
+  if (!submitted) {
     return (
       <div className="flashcard">
-        <div className="flashcard-front">
+        <div className="typing-card">
           <h2 className="flashcard-ref">{reference}</h2>
-          <p className="flashcard-hint">Tente recitar o versículo mentalmente...</p>
-
-          {hintLevel > 0 && (
-            <div className="flashcard-hint-text">
-              <p>{getHiddenText()}</p>
-            </div>
-          )}
-
+          <textarea
+            ref={inputRef} className="typing-input" value={input}
+            onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown}
+            placeholder="Digite o versículo de memória..." rows={4}
+          />
           <div className="flashcard-actions">
-            <button className="btn btn-secondary" onClick={() => setHintLevel(h => h + 1)}>
-              Dica {hintLevel === 0 ? '(1ª letra)' : '(palavras)'}
-            </button>
-            <button className="btn btn-primary" onClick={() => setSide('back')}>
-              Revelar
-            </button>
+            <button className="btn btn-primary" onClick={handleSubmit} disabled={!input.trim()}>Verificar</button>
           </div>
         </div>
       </div>
@@ -248,29 +610,27 @@ function FlashcardItem({ reference, verseText, translation, onGrade }: {
 
   return (
     <div className="flashcard">
-      <div className="flashcard-back">
+      <div className="flashcard-back typing-result-card">
         <h3 className="flashcard-ref-back">{reference}</h3>
-        <p className="flashcard-verse">{verseText}</p>
+        <HeatVerse words={words} heat={heat} />
         <p className="flashcard-translation-label">{translation.toUpperCase()}</p>
-      </div>
-
-      <div className="flashcard-grade">
-        <p className="grade-prompt">Como foi?</p>
-        <div className="grade-buttons">
-          <button className="btn grade-btn grade-1" onClick={() => { setSide('front'); setHintLevel(0); onGrade(Rating.Again) }}>
-            1<br /><small>Esqueci</small>
-          </button>
-          <button className="btn grade-btn grade-2" onClick={() => { setSide('front'); setHintLevel(0); onGrade(Rating.Hard) }}>
-            2<br /><small>Difícil</small>
-          </button>
-          <button className="btn grade-btn grade-3" onClick={() => { setSide('front'); setHintLevel(0); onGrade(Rating.Good) }}>
-            3<br /><small>Bom</small>
-          </button>
-          <button className="btn grade-btn grade-4" onClick={() => { setSide('front'); setHintLevel(0); onGrade(Rating.Easy) }}>
-            4<br /><small>Fácil</small>
-          </button>
+        <div className="typing-accuracy-bar">
+          <div className={`typing-accuracy-fill ${accuracy >= 90 ? 'good' : accuracy >= 70 ? 'ok' : 'bad'}`} style={{ width: `${accuracy}%` }} />
         </div>
+        <span className={`typing-accuracy-label ${accuracy >= 90 ? 'good' : accuracy >= 70 ? 'ok' : 'bad'}`}>
+          {accuracy}% correto{accuracy >= 90 ? ' — Ótimo!' : accuracy >= 70 ? ' — Quase lá' : ' — Tente de novo'}
+        </span>
+        {accuracy < 100 && (
+          <details className="typing-diff">
+            <summary>Comparar</summary>
+            <div className="typing-diff-text">
+              <p><strong>Você:</strong> {input}</p>
+              <p><strong>Versículo:</strong> {verseText}</p>
+            </div>
+          </details>
+        )}
       </div>
+      <GradingButtons onGrade={onGrade} />
     </div>
   )
 }

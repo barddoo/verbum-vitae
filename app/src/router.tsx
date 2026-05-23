@@ -1,5 +1,6 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { ThemeToggle } from './components/theme-toggle'
 import { useAuth } from './lib/auth'
 import { seedVerses } from './lib/db'
 import { LoginPage } from './routes/auth.login'
@@ -8,6 +9,7 @@ import { BrowsePage } from './routes/browse'
 import { HomePage } from './routes/index'
 import { ReviewPage } from './routes/review'
 import { StatsPage } from './routes/stats'
+import { CollectionsListPage, CollectionDetailPage } from './routes/collections'
 
 function RootLayout() {
   const { user, isOnline } = useAuth()
@@ -29,6 +31,7 @@ function RootLayout() {
       <header className="top-bar">
         <h1 className="top-bar-title">Remember Bible</h1>
         <div className="top-bar-right">
+          <ThemeToggle />
           {!isOnline && <span className="offline-badge">Offline</span>}
           {user && <span className="user-badge">{user.email}</span>}
         </div>
@@ -46,6 +49,9 @@ function RootLayout() {
             </Link>
             <Link to="/review" className="nav-item" activeProps={{ className: 'nav-item active' }}>
               Revisar
+            </Link>
+            <Link to="/collections" className="nav-item" activeProps={{ className: 'nav-item active' }}>
+              Coleções
             </Link>
             <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
               Progresso
@@ -69,6 +75,9 @@ function RootLayout() {
           </Link>
           <Link to="/review" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             Revisar
+          </Link>
+          <Link to="/collections" className="nav-item" activeProps={{ className: 'nav-item active' }}>
+            Coleções
           </Link>
           <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             Stats
@@ -105,6 +114,18 @@ const statsRoute = createRoute({
   component: StatsPage,
 })
 
+const collectionsListRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/collections',
+  component: CollectionsListPage,
+})
+
+const collectionDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/collections/$id',
+  component: CollectionDetailPage,
+})
+
 const authLoginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
@@ -117,7 +138,7 @@ const authRegisterRoute = createRoute({
   component: RegisterPage,
 })
 
-const routeTree = rootRoute.addChildren([homeRoute, browseRoute, reviewRoute, statsRoute, authLoginRoute, authRegisterRoute])
+const routeTree = rootRoute.addChildren([homeRoute, browseRoute, reviewRoute, collectionsListRoute, collectionDetailRoute, statsRoute, authLoginRoute, authRegisterRoute])
 
 export const router = createRouter({ routeTree })
 
