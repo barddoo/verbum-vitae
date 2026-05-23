@@ -1,0 +1,23 @@
+{
+  "name": "remember-bible",
+  "private": true,
+  "workspaces": [
+    "app",
+    "worker",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "cd app && bun run dev",
+    "build": "cd app && bun run build",
+    "deploy": "cd app && bun run build && wrangler deploy",
+    "db:migrate": "cd worker && bun run db:migrate",
+    "db:generate": "cd worker && bun run db:generate",
+    "check": "bun run check:ts && bun run check:biome",
+    "check:biome": "biome check .",
+    "check:ts": "cd packages/shared && bunx tsc && cd ../../worker && bunx tsc && cd ../app && bunx tsc -b",
+    "fix": "biome check --write --unsafe ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15"
+  }
+}

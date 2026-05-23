@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1a1a2e"/>
+  <text x="256" y="220" font-size="200" text-anchor="middle" fill="#6c63ff" font-family="serif" font-weight="bold">RB</text>
+  <path d="M160 340 Q256 280 352 340 L352 400 Q256 360 160 400 Z" fill="#6c63ff" opacity="0.6"/>
+</svg>

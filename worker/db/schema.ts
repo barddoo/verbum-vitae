@@ -1,0 +1,37 @@
+import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  createdAt: text('created_at').notNull(),
+})
+
+export const progress = sqliteTable('progress', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
+  verseId: text('verse_id').notNull(),
+  translation: text('translation').notNull(),
+  cardJson: text('card_json').notNull(),
+  ease: real('ease').default(2.5),
+  intervalDays: integer('interval_days').default(0),
+  repetitions: integer('repetitions').default(0),
+  nextReview: text('next_review'),
+  lastReview: text('last_review'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+})
+
+export const syncLog = sqliteTable('sync_log', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
+  tableName: text('table_name').notNull(),
+  rowId: text('row_id').notNull(),
+  operation: text('operation').notNull(),
+  data: text('data').notNull(),
+  createdAt: text('created_at').notNull(),
+})

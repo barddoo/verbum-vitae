@@ -1,0 +1,14 @@
+name = "remember-bible-api"
+main = "src/index.ts"
+compatibility_date = "2025-05-22"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "remember-bible"
+database_id = "remember-bible-db"
+
+[observability]
+enabled = true
+
+[env.production]
+name = "remember-bible-api"
