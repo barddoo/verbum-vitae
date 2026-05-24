@@ -61,26 +61,30 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
         <form className="auth-form" onSubmit={handleSubmit}>
           {error && <p className="auth-error">{error}</p>}
-          <label>
-            Email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
-          </label>
-          <label>
-            Senha
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
-              required
-              minLength={8}
-            />
-          </label>
+          <label htmlFor="auth-email">Email</label>
+          <input id="auth-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+          <label htmlFor="auth-password">Senha</label>
+          <input
+            id="auth-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
+            required
+            minLength={8}
+          />
           {tab === 'register' && (
-            <label>
-              Confirmar senha
-              <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required />
-            </label>
+            <>
+              <label htmlFor="auth-confirm">Confirmar senha</label>
+              <input
+                id="auth-confirm"
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </>
           )}
           <button className="btn btn-primary" type="submit" disabled={loading}>
             {loading ? (tab === 'login' ? 'Entrando...' : 'Criando...') : tab === 'login' ? 'Entrar' : 'Criar conta'}

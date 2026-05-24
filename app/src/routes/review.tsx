@@ -213,46 +213,17 @@ export function ReviewPage() {
   }
 
   if (currentIndex >= items.length) {
-    const gradeCounts = [1, 2, 3, 4].map((r) => gradeHistory.filter((g) => g === r).length)
     return (
-      <div className="page review-page">
-        <div className="session-complete">
-          <h2>Sessão concluída!</h2>
-          <p className="session-complete-count">{completed} versículos revisados</p>
-          {completed > 0 && (
-            <div className="session-grade-breakdown">
-              <span className="grade-breakdown-item grade-breakdown-1" title="Esqueci">
-                {gradeCounts[0]} ✗
-              </span>
-              <span className="grade-breakdown-item grade-breakdown-2" title="Difícil">
-                {gradeCounts[1]} ~
-              </span>
-              <span className="grade-breakdown-item grade-breakdown-3" title="Bom">
-                {gradeCounts[2]} ✓
-              </span>
-              <span className="grade-breakdown-item grade-breakdown-4" title="Fácil">
-                {gradeCounts[3]} ★
-              </span>
-            </div>
-          )}
-          <div className="session-complete-actions">
-            <button type="button" className="btn btn-primary" onClick={goBack}>
-              Voltar ao painel
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => {
-                setCurrentIndex(0)
-                setCompleted(0)
-                setGradeHistory([])
-              }}
-            >
-              Nova sessão
-            </button>
-          </div>
-        </div>
-      </div>
+      <SessionComplete
+        completed={completed}
+        gradeHistory={gradeHistory}
+        onGoBack={goBack}
+        onNewSession={() => {
+          setCurrentIndex(0)
+          setCompleted(0)
+          setGradeHistory([])
+        }}
+      />
     )
   }
 
@@ -336,6 +307,52 @@ function levenshtein(a: string, b: string): number {
   return dp[m][n]
 }
 
+function SessionComplete({
+  completed,
+  gradeHistory,
+  onGoBack,
+  onNewSession,
+}: {
+  completed: number
+  gradeHistory: Grade[]
+  onGoBack: () => void
+  onNewSession: () => void
+}) {
+  const gradeCounts = useMemo(() => [1, 2, 3, 4].map((r) => gradeHistory.filter((g) => g === r).length), [gradeHistory])
+  return (
+    <div className="page review-page">
+      <div className="session-complete">
+        <h2>Sessão concluída!</h2>
+        <p className="session-complete-count">{completed} versículos revisados</p>
+        {completed > 0 && (
+          <div className="session-grade-breakdown">
+            <span className="grade-breakdown-item grade-breakdown-1" title="Esqueci">
+              {gradeCounts[0]} ✗
+            </span>
+            <span className="grade-breakdown-item grade-breakdown-2" title="Difícil">
+              {gradeCounts[1]} ~
+            </span>
+            <span className="grade-breakdown-item grade-breakdown-3" title="Bom">
+              {gradeCounts[2]} ✓
+            </span>
+            <span className="grade-breakdown-item grade-breakdown-4" title="Fácil">
+              {gradeCounts[3]} ★
+            </span>
+          </div>
+        )}
+        <div className="session-complete-actions">
+          <button type="button" className="btn btn-primary" onClick={onGoBack}>
+            Voltar ao painel
+          </button>
+          <button type="button" className="btn btn-secondary" onClick={onNewSession}>
+            Nova sessão
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const GradingButtons = memo(function GradingButtons({ onGrade }: { onGrade: (r: Grade) => void }) {
   return (
     <div className="flashcard-grade">
@@ -374,7 +391,7 @@ const HeatVerse = memo(function HeatVerse({ words, heat }: { words: string[]; he
           else cls = 'heat-bad'
         }
         return (
-          <span key={i} className={cls}>
+          <span key={`${w}-${i}`} className={cls}>
             {w}
             {i < words.length - 1 ? ' ' : ''}
           </span>
@@ -495,7 +512,7 @@ function FillInBlankView({
             <div className="fill-blank-text">
               <p>
                 {displayParts.map((part, i) => (
-                  <span key={i}>
+                  <span key={`${part}-${i}`}>
                     {part === null ? <span className="blank-word">_____</span> : <span>{part}</span>}
                     {i < displayParts.length - 1 ? ' ' : ''}
                   </span>
@@ -538,15 +555,15 @@ function TypingPracticeView({
   const [submitted, setSubmitted] = useState(false)
   const [accuracy, setAccuracy] = useState(0)
   const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
-  const [hasRecorded, setHasRecorded] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const hasRecordedRef = useRef(false)
 
   const words = useMemo(() => verseText.split(' '), [verseText])
 
   useEffect(() => {
     getWordHeat(verseId, translation, words.length).then(setHeat)
     setSubmitted(false)
-    setHasRecorded(false)
+    hasRecordedRef.current = false
     setInput('')
     inputRef.current?.focus()
   }, [verseId, translation, words.length])
@@ -559,8 +576,8 @@ function TypingPracticeView({
     const acc = maxLen > 0 ? Math.round((1 - dist / maxLen) * 100) : 0
     setAccuracy(acc)
     setSubmitted(true)
-    if (!hasRecorded) {
-      setHasRecorded(true)
+    if (!hasRecordedRef.current) {
+      hasRecordedRef.current = true
       const typedWords = cleanInput.split(/\s+/)
       const correctWords = cleanVerse.split(/\s+/)
       const correct = new Set<number>()
@@ -593,6 +610,7 @@ function TypingPracticeView({
             onKeyDown={handleKeyDown}
             placeholder="Digite o versículo de memória..."
             rows={4}
+            aria-label="Digite o versículo de memória"
           />
           <div className="flashcard-actions">
             <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={!input.trim()}>
@@ -632,7 +650,7 @@ function TypingPracticeView({
                     const correct = verseText.trim().toLowerCase().split(/\s+/)[i]
                     const ok = w.toLowerCase() === correct
                     return (
-                      <span key={i}>
+                      <span key={`${w}-${i}`}>
                         {i > 0 ? ' ' : ''}
                         <mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark>
                       </span>
@@ -648,7 +666,7 @@ function TypingPracticeView({
                     const typed = input.trim().toLowerCase().split(/\s+/)[i]
                     const ok = typed === w.toLowerCase()
                     return (
-                      <span key={i}>
+                      <span key={`${w}-${i}`}>
                         {i > 0 ? ' ' : ''}
                         <mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark>
                       </span>

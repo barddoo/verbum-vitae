@@ -132,7 +132,7 @@ function BrowsePageView({
           {BOOKS.map((book, i) => (
             <button
               type="button"
-              key={i}
+              key={book}
               className="book-item"
               onClick={() => {
                 setBookIndex(i)
