@@ -722,6 +722,8 @@ body::before {
 }
 
 .collection-verse-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 62px;
   padding: 0.625rem 0.5rem;
   border-bottom: 1px solid var(--border);
   font-size: 0.85rem;
@@ -895,6 +897,8 @@ body::before {
 
 /* Verse rows */
 .verse-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 62px;
   display: flex;
   gap: 0.625rem;
   align-items: flex-start;
@@ -2602,7 +2606,9 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s, border-color 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
   flex-shrink: 0;
 }
 

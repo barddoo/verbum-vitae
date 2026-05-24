@@ -18,6 +18,8 @@ interface DueItem {
   translation: string
 }
 
+const loadingSpinner = <div className="loading">Carregando...</div>
+
 export function ReviewPage() {
   const { autostart } = useSearch({ from: '/review' })
   const autostartFired = useRef(false)
@@ -147,7 +149,7 @@ export function ReviewPage() {
   if (loading || sessionLoading)
     return (
       <div className="page">
-        <div className="loading">Carregando...</div>
+        {loadingSpinner}
       </div>
     )
 

@@ -1,7 +1,6 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { BOOKS } from 'shared/bible'
-import { DEFAULT_TRANSLATION } from 'shared/bible'
+import { BOOKS, DEFAULT_TRANSLATION } from 'shared/bible'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { addCollectionToMemory, db, fetchVersesBatch, getCollectionProgress, parseVerseKey } from '../lib/db'
 import { logProgressChange } from '../lib/sync'
@@ -45,6 +44,8 @@ async function ensureCollectionsSeeded() {
   }
 }
 
+const loadingSpinner = <div className="loading">Carregando...</div>
+
 export function CollectionsListPage() {
   const [collections, setCollections] = useState<CollectionEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -79,7 +80,7 @@ export function CollectionsListPage() {
   if (loading)
     return (
       <div className="page">
-        <div className="loading">Carregando...</div>
+        {loadingSpinner}
       </div>
     )
 
@@ -175,7 +176,7 @@ export function CollectionDetailPage() {
   if (loading)
     return (
       <div className="page">
-        <div className="loading">Carregando...</div>
+        {loadingSpinner}
       </div>
     )
 

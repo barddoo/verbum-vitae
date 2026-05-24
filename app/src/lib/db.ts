@@ -116,10 +116,7 @@ const seedingByTranslation = new Map<string, Promise<void>>()
 
 export async function ensureTranslationSeeded(translation: string) {
   if (!seedingByTranslation.has(translation)) {
-    seedingByTranslation.set(
-      translation,
-      seedVerses(translation as Verse['translation']),
-    )
+    seedingByTranslation.set(translation, seedVerses(translation as Verse['translation']))
   }
   return seedingByTranslation.get(translation)!
 }

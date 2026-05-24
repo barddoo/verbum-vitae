@@ -1,12 +1,18 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
+import BarChart2 from 'lucide-react/dist/esm/icons/bar-chart-2'
+import BookOpen from 'lucide-react/dist/esm/icons/book-open'
+import Home from 'lucide-react/dist/esm/icons/home'
+import Layers from 'lucide-react/dist/esm/icons/layers'
+import RotateCcw from 'lucide-react/dist/esm/icons/rotate-ccw'
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { BookOpen, BarChart2, Home, Layers, RotateCcw } from 'lucide-react'
 import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
-import { WelcomeModal } from './components/welcome-modal'
 import { ThemeToggle } from './components/theme-toggle'
+import { WelcomeModal } from './components/welcome-modal'
 import { useAuth } from './lib/auth'
+
+const loadingSpinner = <div className="loading">Carregando...</div>
 
 const HomePage = lazy(() => import('./routes/index').then((m) => ({ default: m.HomePage })))
 const BrowsePage = lazy(() => import('./routes/browse').then((m) => ({ default: m.BrowsePage })))
@@ -82,7 +88,7 @@ function RootLayout() {
         )}
 
         <main className="main-content">
-          <Suspense fallback={<div className="loading">Carregando...</div>}>
+          <Suspense fallback={loadingSpinner}>
             <Outlet />
           </Suspense>
           <footer className="app-footer">

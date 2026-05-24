@@ -12,6 +12,8 @@ interface SearchResult {
   ref: string
 }
 
+const loadingSpinner = <div className="loading">Carregando...</div>
+
 export function BrowsePage() {
   const [translation, setTranslation] = useState<Translation>(
     () => (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION,
@@ -348,27 +350,29 @@ export function BrowsePage() {
             )}
           </div>
           {loadingVerses ? (
-            <div className="loading">Carregando...</div>
-          ) : verses.map((text, i) => {
-            const v = i + 1
-            const mem = isMemorized(v)
-            const add = isAdded(v)
-            const sel = selectedVerses.has(v)
-            return (
-              <div
-                key={i}
-                className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                onPointerDown={(e) => handlePointerDown(v, e)}
-                onPointerMove={handlePointerMove}
-                onPointerUp={() => handlePointerUp(v)}
-                onPointerCancel={handlePointerCancel}
-              >
-                <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
-                <span className="verse-text">{text}</span>
-                {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
-              </div>
-            )
-          })}
+            {loadingSpinner}
+          ) : (
+            verses.map((text, i) => {
+              const v = i + 1
+              const mem = isMemorized(v)
+              const add = isAdded(v)
+              const sel = selectedVerses.has(v)
+              return (
+                <div
+                  key={i}
+                  className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
+                  onPointerDown={(e) => handlePointerDown(v, e)}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={() => handlePointerUp(v)}
+                  onPointerCancel={handlePointerCancel}
+                >
+                  <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
+                  <span className="verse-text">{text}</span>
+                  {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
+                </div>
+              )
+            })
+          )}
         </div>
       ) : null}
 

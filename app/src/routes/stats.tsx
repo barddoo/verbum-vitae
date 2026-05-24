@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import { db } from '../lib/db'
+import { computeStreak } from '../lib/stats'
 
 export function StatsPage() {
   const [progress, setProgress] = useState<{
@@ -44,23 +45,6 @@ export function StatsPage() {
     await db.progress.clear()
     setConfirming(false)
     loadStats()
-  }
-
-  function computeStreak(updates: number[]) {
-    const days = [...new Set(updates.map((ts) => new Date(ts).toDateString()))].sort(
-      (a, b) => new Date(b).getTime() - new Date(a).getTime(),
-    )
-    let s = 0
-    const today = new Date().toDateString()
-    let expected = new Date(today).getTime()
-    for (const dayStr of days) {
-      const dayTime = new Date(dayStr).getTime()
-      if (dayTime === expected) {
-        s++
-        expected -= 86400000
-      } else if (dayTime < expected) break
-    }
-    return s
   }
 
   return (
@@ -120,7 +104,7 @@ export function StatsPage() {
   )
 }
 
-function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
+const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
   const weeks = 20
   const today = new Date()
   const startDate = new Date(today)
