@@ -54,7 +54,7 @@ function useInstallGuide() {
   const isAndroid = /android/i.test(ua)
   const isDesktop = !isIOS && !isAndroid
 
-  return { show: !isStandalone && !dismissed, deferredPrompt, isIOS, isAndroid, isDesktop, handleInstall, dismiss }
+  return { show: !isStandalone && !dismissed && (isIOS || isAndroid || !!deferredPrompt), deferredPrompt, isIOS, isAndroid, isDesktop, handleInstall, dismiss }
 }
 
 export function HomePage() {
@@ -98,6 +98,15 @@ export function HomePage() {
         loadingSpinner
       ) : (
         <>
+          <div className="hero-card">
+            <h2 className="hero-greeting">{dueCount > 0 ? `${dueCount} versículos para revisar` : 'Nada pendente!'}</h2>
+            {dueCount > 0 && (
+              <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
+                Revisar Agora ({dueCount})
+              </Link>
+            )}
+          </div>
+
           {show && (
             <div className="install-guide-card">
               <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
@@ -117,7 +126,7 @@ export function HomePage() {
                       Abra este app no <strong>Safari</strong> (não funciona no Chrome)
                     </li>
                     <li>
-                      Toque no ícone <strong>Compartilhar</strong> <span className="install-guide-share-icon">⎙</span> na barra inferior
+                      Toque no ícone <strong>Compartilhar</strong> <span className="install-guide-share-icon">📤</span> na barra inferior
                     </li>
                     <li>
                       Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
@@ -141,31 +150,10 @@ export function HomePage() {
                       Toque em <strong>"Instalar"</strong>
                     </li>
                   </ol>
-                ) : isDesktop ? (
-                  <ol className="install-guide-steps">
-                    <li>
-                      No <strong>Chrome</strong>, clique no ícone <strong>Instalar</strong> 🖥️ na barra de endereço
-                    </li>
-                    <li>
-                      Ou clique em <strong>⋮</strong> (menu) → <strong>"Instalar Verbum Vitae..."</strong>
-                    </li>
-                    <li>
-                      Clique em <strong>"Instalar"</strong>
-                    </li>
-                  </ol>
                 ) : null}
               </div>
             </div>
           )}
-
-          <div className="hero-card">
-            <h2 className="hero-greeting">{dueCount > 0 ? `${dueCount} versículos para revisar` : 'Nada pendente!'}</h2>
-            {dueCount > 0 && (
-              <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
-                Revisar Agora ({dueCount})
-              </Link>
-            )}
-          </div>
 
           <div className="collections-teaser">
             <p className="collections-teaser-text">Adicione vários versículos de uma vez com coleções temáticas</p>
