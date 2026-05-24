@@ -18,8 +18,6 @@ interface CollectionEntry {
 }
 
 async function ensureCollectionsSeeded() {
-  const count = await db.collections.where({ isBuiltin: 1 }).count()
-  if (count > 0) return
   for (const c of bundledCollections) {
     const existing = await db.collections.where({ name: c.name }).first()
     if (existing) continue

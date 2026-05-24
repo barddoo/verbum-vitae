@@ -1,3 +1,4 @@
+import { useSearch } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS } from 'shared/bible'
 import { db, fetchVersesForKey, getWordHeat, parseVerseKey, recordWordAccuracy } from '../lib/db'
@@ -16,23 +17,42 @@ interface DueItem {
 }
 
 export function ReviewPage() {
+  const { autostart } = useSearch({ from: '/review' })
+  const autostartFired = useRef(false)
   const [phase, setPhase] = useState<'queue' | 'session'>('queue')
   const [items, setItems] = useState<DueItem[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [completed, setCompleted] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [practiceMode, setPracticeMode] = useState<PracticeMode>('flashcard')
-  const [filterStatus, setFilterStatus] = useState<'all' | 'due'>('due')
-  const [filterCollection, setFilterCollection] = useState<number | null>(null)
-  const [filterBook, setFilterBook] = useState<number | null>(null)
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>(
+    () => (localStorage.getItem('review_mode') as PracticeMode) || 'flashcard'
+  )
+  const [filterCollection, setFilterCollection] = useState<number | null>(
+    () => { const v = localStorage.getItem('review_filter_collection'); return v ? Number(v) : null }
+  )
+  const [filterBook] = useState<number | null>(null)
   const [totalAll, setTotalAll] = useState(0)
   const [totalDue, setTotalDue] = useState(0)
   const [collections, setCollections] = useState<{ id: number; name: string }[]>([])
+  const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
+
+  const filterStatus = totalDue > 0 ? 'due' : 'all'
+
+  function setAndPersistMode(m: PracticeMode) { setPracticeMode(m); localStorage.setItem('review_mode', m) }
+  function setAndPersistCollection(id: number | null) { setFilterCollection(id); if (id === null) localStorage.removeItem('review_filter_collection'); else localStorage.setItem('review_filter_collection', String(id)) }
 
   useEffect(() => {
     loadQueueStats()
     loadCollections()
   }, [])
+
+  useEffect(() => {
+    if (!loading && autostart === '1' && totalAll > 0 && phase === 'queue' && !autostartFired.current) {
+      autostartFired.current = true
+      startReview()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, autostart, totalAll, phase])
 
   async function loadCollections() {
     const cols = await db.collections.toArray()
@@ -99,6 +119,7 @@ export function ReviewPage() {
     setItems(loaded)
     setCurrentIndex(0)
     setCompleted(0)
+    setGradeHistory([])
     setPhase('session')
     setLoading(false)
   }
@@ -132,6 +153,7 @@ export function ReviewPage() {
     })
 
     setCompleted((prev) => prev + 1)
+    setGradeHistory((prev) => [...prev, rating])
 
     setTimeout(() => {
       setCurrentIndex((prev) => prev + 1)
@@ -143,6 +165,7 @@ export function ReviewPage() {
     setItems([])
     setCurrentIndex(0)
     setCompleted(0)
+    setGradeHistory([])
   }
 
   if (loading) {
@@ -154,86 +177,49 @@ export function ReviewPage() {
   }
 
   if (phase === 'queue') {
+    const reviewCount = filterStatus === 'due' ? totalDue : totalAll
     return (
       <div className="page review-page">
-        <h2 className="review-queue-title">Revisão</h2>
-
-        <div className="queue-summary">
-          <div className="queue-stat">
-            <span className="queue-stat-value">{totalDue}</span>
-            <span className="queue-stat-label">para revisar</span>
-          </div>
-          <div className="queue-stat">
-            <span className="queue-stat-value">{totalAll}</span>
-            <span className="queue-stat-label">total</span>
-          </div>
+        <div className="review-queue-hero">
+          <span className="review-queue-big-num">{reviewCount}</span>
+          <span className="review-queue-big-label">
+            {totalAll === 0
+              ? 'nenhum versículo memorizado'
+              : reviewCount === 1 ? 'versículo para revisar' : 'versículos para revisar'}
+          </span>
+          {filterStatus === 'due' && totalAll > totalDue && totalAll > 0 && (
+            <span className="review-queue-total-hint">{totalAll} total</span>
+          )}
         </div>
 
-        <div className="queue-filters">
-          <div className="queue-filter-group">
-            <label className="queue-filter-label">Filtrar</label>
-            <div className="queue-filter-options">
-              <button
-                className={`filter-chip ${filterStatus === 'due' ? 'active' : ''}`}
-                onClick={() => setFilterStatus('due')}
-              >
-                Vencidos
-              </button>
-              <button
-                className={`filter-chip ${filterStatus === 'all' ? 'active' : ''}`}
-                onClick={() => setFilterStatus('all')}
-              >
-                Todos
-              </button>
-            </div>
-          </div>
-
-          <div className="queue-filter-group">
-            <label className="queue-filter-label">Coleção</label>
-            <select
-              className="queue-select"
-              value={filterCollection ?? ''}
-              onChange={(e) => setFilterCollection(e.target.value ? Number(e.target.value) : null)}
+        <div className="review-mode-grid">
+          {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
+            <button
+              key={m}
+              className={`review-mode-card ${practiceMode === m ? 'active' : ''}`}
+              onClick={() => setAndPersistMode(m)}
             >
-              <option value="">Todas as coleções</option>
-              {collections.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              <span className="review-mode-card-title">
+                {m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
+              </span>
+              <span className="review-mode-card-desc">
+                {m === 'flashcard' ? 'Recite mentalmente' : m === 'fill-blank' ? 'Preencha lacunas' : 'Digite de memória'}
+              </span>
+            </button>
+          ))}
+        </div>
 
-          <div className="queue-filter-group">
-            <label className="queue-filter-label">Livro</label>
-            <select
-              className="queue-select"
-              value={filterBook ?? ''}
-              onChange={(e) => setFilterBook(e.target.value ? Number(e.target.value) : null)}
-            >
-              <option value="">Todos os livros</option>
-              {BOOKS.map((name, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="queue-filter-group">
-            <label className="queue-filter-label">Modo</label>
-            <div className="queue-filter-options">
-              {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
-                <button
-                  key={m}
-                  className={`filter-chip ${practiceMode === m ? 'active' : ''}`}
-                  onClick={() => setPracticeMode(m)}
-                >
-                  {m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="review-filters-compact">
+          <select
+            className="queue-select queue-select-sm"
+            value={filterCollection ?? ''}
+            onChange={(e) => setAndPersistCollection(e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">Coleção</option>
+            {collections.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
         </div>
 
         <button
@@ -241,14 +227,12 @@ export function ReviewPage() {
           onClick={startReview}
           disabled={totalAll === 0 || (filterStatus === 'due' && totalDue === 0)}
         >
-          {totalAll === 0
-            ? 'Nenhum versículo memorizado'
-            : `Iniciar Revisão (${filterStatus === 'due' ? totalDue : totalAll})`}
+          {totalAll === 0 ? 'Adicione versículos para começar' : 'Iniciar Revisão'}
         </button>
 
         {totalAll === 0 && (
           <p className="queue-empty-hint">
-            Adicione versículos na página <a href="/browse">Bíblia</a> para começar.
+            Vá para <a href="/browse">Bíblia</a> para adicionar versículos.
           </p>
         )}
       </div>
@@ -272,11 +256,20 @@ export function ReviewPage() {
   }
 
   if (currentIndex >= items.length) {
+    const gradeCounts = [1, 2, 3, 4].map((r) => gradeHistory.filter((g) => g === r).length)
     return (
       <div className="page review-page">
         <div className="session-complete">
           <h2>Sessão concluída!</h2>
           <p className="session-complete-count">{completed} versículos revisados</p>
+          {completed > 0 && (
+            <div className="session-grade-breakdown">
+              <span className="grade-breakdown-item grade-breakdown-1" title="Esqueci">{gradeCounts[0]} ✗</span>
+              <span className="grade-breakdown-item grade-breakdown-2" title="Difícil">{gradeCounts[1]} ~</span>
+              <span className="grade-breakdown-item grade-breakdown-3" title="Bom">{gradeCounts[2]} ✓</span>
+              <span className="grade-breakdown-item grade-breakdown-4" title="Fácil">{gradeCounts[3]} ★</span>
+            </div>
+          )}
           <div className="session-complete-actions">
             <button className="btn btn-primary" onClick={goBack}>
               Voltar ao painel
@@ -286,6 +279,7 @@ export function ReviewPage() {
               onClick={() => {
                 setCurrentIndex(0)
                 setCompleted(0)
+                setGradeHistory([])
               }}
             >
               Nova sessão
@@ -311,14 +305,20 @@ export function ReviewPage() {
               <button
                 key={m}
                 className={`mode-dot ${practiceMode === m ? 'active' : ''}`}
-                onClick={() => setPracticeMode(m)}
+                onClick={() => setAndPersistMode(m)}
                 aria-label={m}
                 title={m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
               />
             ))}
+            <span className="mode-label">
+              {practiceMode === 'flashcard' ? 'Flashcard' : practiceMode === 'fill-blank' ? 'Completar' : 'Digitar'}
+            </span>
           </div>
         </div>
-        <span className="review-completed">{completed}</span>
+        <span className="review-completed" title="Concluídos">{completed} ✓</span>
+      </div>
+      <div className="review-progress-bar">
+        <div className="review-progress-fill" style={{ width: `${(currentIndex / items.length) * 100}%` }} />
       </div>
 
       {practiceMode === 'flashcard' && (
@@ -457,7 +457,7 @@ function FlashcardView({
               <button className="btn btn-secondary" onClick={() => setHintLevel((h) => h + 1)}>
                 Dica {hintLevel === 0 ? '(1ª letra)' : '(palavras)'}
               </button>
-              <button className="btn btn-primary" onClick={() => { setFlipped(true); setHintLevel(0) }}>
+              <button className="btn btn-primary" onClick={() => setFlipped(true)}>
                 Revelar
               </button>
             </div>
@@ -481,7 +481,6 @@ function FillInBlankView({
 }) {
   const [revealed, setRevealed] = useState(false)
   const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
-  const [hasRecorded, setHasRecorded] = useState(false)
 
   const words = useMemo(() => verseText.split(' '), [verseText])
 
@@ -497,16 +496,7 @@ function FillInBlankView({
   useEffect(() => {
     getWordHeat(verseId, translation, words.length).then(setHeat)
     setRevealed(false)
-    setHasRecorded(false)
   }, [verseId, translation, words.length])
-
-  useEffect(() => {
-    if (revealed && !hasRecorded) {
-      setHasRecorded(true)
-      const wrongWords = new Set(blankIndices)
-      recordWordAccuracy(verseId, translation, new Set(), wrongWords, words)
-    }
-  }, [revealed, hasRecorded, verseId, translation, blankIndices, words])
 
   return (
     <div className="flashcard">
@@ -624,8 +614,20 @@ function TypingPracticeView({
           <details className="typing-diff">
             <summary>Comparar</summary>
             <div className="typing-diff-text">
-              <p><strong>Você:</strong> {input}</p>
-              <p><strong>Versículo:</strong> {verseText}</p>
+              <p><strong>Você: </strong>{
+                input.trim().split(/\s+/).map((w, i) => {
+                  const correct = verseText.trim().toLowerCase().split(/\s+/)[i]
+                  const ok = w.toLowerCase() === correct
+                  return <span key={i}>{i > 0 ? ' ' : ''}<mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark></span>
+                })
+              }</p>
+              <p><strong>Versículo: </strong>{
+                verseText.trim().split(/\s+/).map((w, i) => {
+                  const typed = input.trim().toLowerCase().split(/\s+/)[i]
+                  const ok = typed === w.toLowerCase()
+                  return <span key={i}>{i > 0 ? ' ' : ''}<mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark></span>
+                })
+              }</p>
             </div>
           </details>
         )}

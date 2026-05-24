@@ -1,14 +1,14 @@
-name = "remember-bible-api"
+name = "verbum-vitae-api"
 main = "src/index.ts"
 compatibility_date = "2025-05-22"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "remember-bible"
-database_id = "remember-bible-db"
+database_name = "verbum-vitae"
+database_id = "2d0926ac-edbd-429b-94f0-523552514bce"
 
 [observability]
 enabled = true
 
 [env.production]
-name = "remember-bible-api"
+name = "verbum-vitae-api"

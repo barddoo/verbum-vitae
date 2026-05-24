@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verbum Vitae — Design Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #111; font-family: sans-serif; padding: 40px 24px; }
+
+  h1 { color: #fff; font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 40px; opacity: 0.4; }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1000px; }
+
+  .theme { border-radius: 12px; overflow: hidden; }
+
+  .theme-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ===================== THEME A: Modern Sacred ===================== */
+  .theme-a { background: #0f1117; }
+  .theme-a .card {
+    margin: 16px;
+    background: #1a1f2e;
+    border: 1px solid #252c40;
+    border-radius: 6px;
+    padding: 24px 22px;
+  }
+  .theme-a .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #252c40;
+    margin-bottom: 16px;
+  }
+  .theme-a .app-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #c9a84c;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .theme-a .nav-pills {
+    display: flex;
+    gap: 6px;
+  }
+  .theme-a .pill {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: #7a7a9a;
+    background: transparent;
+    border: 1px solid #252c40;
+  }
+  .theme-a .pill.active {
+    color: #c9a84c;
+    background: rgba(201,168,76,0.08);
+    border-color: rgba(201,168,76,0.2);
+  }
+  .theme-a .verse-ref {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: #c9a84c;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .theme-a .verse-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    color: #e8e6f0;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+  .theme-a .btn-row { display: flex; gap: 8px; }
+  .theme-a .btn-primary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 9px 18px;
+    background: #c9a84c;
+    color: #0f1117;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .theme-a .btn-secondary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    padding: 9px 18px;
+    background: transparent;
+    color: #7a7a9a;
+    border: 1px solid #252c40;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .theme-a .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .theme-a .stat {
+    background: #0f1117;
+    border: 1px solid #252c40;
+    border-radius: 4px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .theme-a .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #c9a84c;
+    display: block;
+    line-height: 1;
+  }
+  .theme-a .stat-lbl {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    color: #7a7a9a;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+    display: block;
+  }
+
+  /* ===================== THEME B: Warm Minimal ===================== */
+  .theme-b { background: #faf8f4; }
+  .theme-b .theme-label { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.3); }
+  .theme-b .card {
+    margin: 16px;
+    background: #fff;
+    border: 1px solid #e2d9ce;
+    border-radius: 6px;
+    padding: 24px 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .theme-b .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #e2d9ce;
+    margin-bottom: 16px;
+  }
+  .theme-b .app-title {
+    font-family: 'Spectral', serif;
+    font-size: 1.1rem;
+    color: #b07d3a;
+    font-weight: 600;
+  }
+  .theme-b .nav-pills { display: flex; gap: 6px; }
+  .theme-b .pill {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: #8a8070;
+    background: transparent;
+    border: 1px solid #e2d9ce;
+  }
+  .theme-b .pill.active {
+    color: #b07d3a;
+    background: rgba(176,125,58,0.08);
+    border-color: rgba(176,125,58,0.25);
+  }
+  .theme-b .verse-ref {
+    font-family: 'Spectral', serif;
+    font-size: 1.4rem;
+    color: #b07d3a;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .theme-b .verse-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: #1c1a18;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+  .theme-b .btn-row { display: flex; gap: 8px; }
+  .theme-b .btn-primary {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 9px 18px;
+    background: #b07d3a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .theme-b .btn-secondary {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    padding: 9px 18px;
+    background: transparent;
+    color: #8a8070;
+    border: 1px solid #e2d9ce;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .theme-b .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .theme-b .stat {
+    background: #f0ebe2;
+    border: 1px solid #e2d9ce;
+    border-radius: 4px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .theme-b .stat-num {
+    font-family: 'Spectral', serif;
+    font-size: 1.5rem;
+    color: #b07d3a;
+    display: block;
+    line-height: 1;
+  }
+  .theme-b .stat-lbl {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.55rem;
+    color: #8a8070;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+    display: block;
+  }
+
+  /* ===================== THEME C: Slate + Violet ===================== */
+  .theme-c { background: #0c0d12; }
+  .theme-c .card {
+    margin: 16px;
+    background: #14161f;
+    border: 1px solid #1f2235;
+    border-radius: 6px;
+    padding: 24px 22px;
+  }
+  .theme-c .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #1f2235;
+    margin-bottom: 16px;
+  }
+  .theme-c .app-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.0rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #c9a84c, #8b6fd4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.2px;
+  }
+  .theme-c .nav-pills { display: flex; gap: 6px; }
+  .theme-c .pill {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: #6b6e8a;
+    background: transparent;
+    border: 1px solid #1f2235;
+  }
+  .theme-c .pill.active {
+    color: #8b6fd4;
+    background: rgba(139,111,212,0.1);
+    border-color: rgba(139,111,212,0.25);
+  }
+  .theme-c .verse-ref {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.1rem;
+    color: #c9a84c;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .theme-c .verse-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    color: #dde0ef;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+  .theme-c .btn-row { display: flex; gap: 8px; }
+  .theme-c .btn-primary {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 9px 18px;
+    background: #8b6fd4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .theme-c .btn-secondary {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.78rem;
+    padding: 9px 18px;
+    background: transparent;
+    color: #6b6e8a;
+    border: 1px solid #1f2235;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .theme-c .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .theme-c .stat {
+    background: #0c0d12;
+    border: 1px solid #1f2235;
+    border-radius: 4px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .theme-c .stat-num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8b6fd4;
+    display: block;
+    line-height: 1;
+  }
+  .theme-c .stat-lbl {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.55rem;
+    color: #6b6e8a;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+    display: block;
+  }
+
+  /* ===================== THEME D: Aged Vellum Evolved ===================== */
+  .theme-d { background: #080604; }
+  .theme-d .card {
+    margin: 16px;
+    background: #141008;
+    border: 1px solid #221a10;
+    border-radius: 3px;
+    padding: 24px 22px;
+  }
+  .theme-d .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #221a10;
+    margin-bottom: 16px;
+  }
+  .theme-d .app-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: #d4a348;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .theme-d .nav-pills { display: flex; gap: 6px; }
+  .theme-d .pill {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 2px;
+    color: #9a8870;
+    background: transparent;
+    border: 1px solid #221a10;
+  }
+  .theme-d .pill.active {
+    color: #d4a348;
+    background: rgba(212,163,72,0.07);
+    border-color: rgba(212,163,72,0.2);
+  }
+  .theme-d .verse-ref {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    color: #d4a348;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .theme-d .verse-text {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.9rem;
+    color: #ede5d2;
+    line-height: 1.75;
+    margin-bottom: 18px;
+  }
+  .theme-d .btn-row { display: flex; gap: 8px; }
+  .theme-d .btn-primary {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 9px 18px;
+    background: #d4a348;
+    color: #080604;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .theme-d .btn-secondary {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.78rem;
+    padding: 9px 18px;
+    background: transparent;
+    color: #9a8870;
+    border: 1px solid #221a10;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .theme-d .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .theme-d .stat {
+    background: #080604;
+    border: 1px solid #221a10;
+    border-radius: 2px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .theme-d .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    color: #d4a348;
+    display: block;
+    line-height: 1;
+    font-weight: 700;
+  }
+  .theme-d .stat-lbl {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.55rem;
+    color: #9a8870;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<h1>Verbum Vitae — Design Options</h1>
+<div class="grid">
+
+  <!-- A: Modern Sacred -->
+  <div class="theme theme-a">
+    <div class="theme-label">A — Modern Sacred &nbsp;·&nbsp; Playfair Display + Inter</div>
+    <div class="top-bar">
+      <span class="app-title">Verbum Vitae</span>
+      <div class="nav-pills">
+        <span class="pill active">Home</span>
+        <span class="pill">Review</span>
+        <span class="pill">Browse</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="verse-ref">John 3:16</div>
+      <div class="verse-text">For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.</div>
+      <div class="btn-row">
+        <button class="btn-primary">Start Review</button>
+        <button class="btn-secondary">Browse</button>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><span class="stat-num">24</span><span class="stat-lbl">Due today</span></div>
+        <div class="stat"><span class="stat-num">142</span><span class="stat-lbl">Memorized</span></div>
+        <div class="stat"><span class="stat-num">7</span><span class="stat-lbl">Day streak</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: Warm Minimal -->
+  <div class="theme theme-b">
+    <div class="theme-label">B — Warm Minimal &nbsp;·&nbsp; Spectral + DM Sans</div>
+    <div class="top-bar">
+      <span class="app-title">Verbum Vitae</span>
+      <div class="nav-pills">
+        <span class="pill active">Home</span>
+        <span class="pill">Review</span>
+        <span class="pill">Browse</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="verse-ref">John 3:16</div>
+      <div class="verse-text">For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.</div>
+      <div class="btn-row">
+        <button class="btn-primary">Start Review</button>
+        <button class="btn-secondary">Browse</button>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><span class="stat-num">24</span><span class="stat-lbl">Due today</span></div>
+        <div class="stat"><span class="stat-num">142</span><span class="stat-lbl">Memorized</span></div>
+        <div class="stat"><span class="stat-num">7</span><span class="stat-lbl">Day streak</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C: Slate + Violet -->
+  <div class="theme theme-c">
+    <div class="theme-label">C — Slate + Violet &nbsp;·&nbsp; Plus Jakarta Sans</div>
+    <div class="top-bar">
+      <span class="app-title">Verbum Vitae</span>
+      <div class="nav-pills">
+        <span class="pill active">Home</span>
+        <span class="pill">Review</span>
+        <span class="pill">Browse</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="verse-ref">John 3:16</div>
+      <div class="verse-text">For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.</div>
+      <div class="btn-row">
+        <button class="btn-primary">Start Review</button>
+        <button class="btn-secondary">Browse</button>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><span class="stat-num">24</span><span class="stat-lbl">Due today</span></div>
+        <div class="stat"><span class="stat-num">142</span><span class="stat-lbl">Memorized</span></div>
+        <div class="stat"><span class="stat-num">7</span><span class="stat-lbl">Day streak</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D: Aged Vellum Evolved -->
+  <div class="theme theme-d">
+    <div class="theme-label">D — Aged Vellum Evolved &nbsp;·&nbsp; Cormorant + Source Serif 4</div>
+    <div class="top-bar">
+      <span class="app-title">Verbum Vitae</span>
+      <div class="nav-pills">
+        <span class="pill active">Home</span>
+        <span class="pill">Review</span>
+        <span class="pill">Browse</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="verse-ref">John 3:16</div>
+      <div class="verse-text">For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.</div>
+      <div class="btn-row">
+        <button class="btn-primary">Start Review</button>
+        <button class="btn-secondary">Browse</button>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><span class="stat-num">24</span><span class="stat-lbl">Due today</span></div>
+        <div class="stat"><span class="stat-num">142</span><span class="stat-lbl">Memorized</span></div>
+        <div class="stat"><span class="stat-num">7</span><span class="stat-lbl">Day streak</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

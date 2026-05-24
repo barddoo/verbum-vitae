@@ -1,10 +1,9 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { ThemeToggle } from './components/theme-toggle'
+import { AuthModal } from './components/auth-modal'
 import { useAuth } from './lib/auth'
 import { seedVerses } from './lib/db'
-import { LoginPage } from './routes/auth.login'
-import { RegisterPage } from './routes/auth.register'
 import { BrowsePage } from './routes/browse'
 import { HomePage } from './routes/index'
 import { ReviewPage } from './routes/review'
@@ -12,7 +11,8 @@ import { StatsPage } from './routes/stats'
 import { CollectionsListPage, CollectionDetailPage } from './routes/collections'
 
 function RootLayout() {
-  const { user, isOnline } = useAuth()
+  const { user, isOnline, logout } = useAuth()
+  const [showAuth, setShowAuth] = useState(false)
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
 
   useEffect(() => {
@@ -29,11 +29,21 @@ function RootLayout() {
   return (
     <div className="app-shell">
       <header className="top-bar">
-        <h1 className="top-bar-title">Remember Bible</h1>
+        <Link to="/" className="top-bar-logo">
+          <img src="/favicon-32x32.png" alt="" width={22} height={22} />
+          <h1 className="top-bar-title">Verbum Vitae</h1>
+        </Link>
         <div className="top-bar-right">
           <ThemeToggle />
           {!isOnline && <span className="offline-badge">Offline</span>}
-          {user && <span className="user-badge">{user.email}</span>}
+          {user ? (
+            <>
+              <span className="user-badge">{user.email}</span>
+              <button className="btn btn-sm btn-secondary" onClick={logout}>Sair</button>
+            </>
+          ) : (
+            <button className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>Entrar</button>
+          )}
         </div>
       </header>
 
@@ -84,6 +94,8 @@ function RootLayout() {
           </Link>
         </nav>
       )}
+
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </div>
   )
 }
@@ -105,6 +117,9 @@ const browseRoute = createRoute({
 const reviewRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/review',
+  validateSearch: (search: Record<string, unknown>): { autostart?: '1' } => ({
+    autostart: search.autostart === '1' ? '1' : undefined,
+  }),
   component: ReviewPage,
 })
 
@@ -126,19 +141,7 @@ const collectionDetailRoute = createRoute({
   component: CollectionDetailPage,
 })
 
-const authLoginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/login',
-  component: LoginPage,
-})
-
-const authRegisterRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/register',
-  component: RegisterPage,
-})
-
-const routeTree = rootRoute.addChildren([homeRoute, browseRoute, reviewRoute, collectionsListRoute, collectionDetailRoute, statsRoute, authLoginRoute, authRegisterRoute])
+const routeTree = rootRoute.addChildren([homeRoute, browseRoute, reviewRoute, collectionsListRoute, collectionDetailRoute, statsRoute])
 
 export const router = createRouter({ routeTree })
 

@@ -13,13 +13,12 @@ function getDb(c: any) {
   return drizzle(c.env.DB, { schema })
 }
 
-const JWT_SECRET = 'remember-bible-jwt-secret-change-in-production'
-
 async function getUser(c: any) {
   const auth = c.req.header('Authorization')
   if (!auth?.startsWith('Bearer ')) return null
+  const secret = c.env.JWT_SECRET || 'verbum-vitae-jwt-secret-change-in-production'
   try {
-    const payload = await verify(auth.slice(7), JWT_SECRET, 'HS256')
+    const payload = await verify(auth.slice(7), secret, 'HS256')
     return payload as { sub: string; email: string }
   } catch {
     return null

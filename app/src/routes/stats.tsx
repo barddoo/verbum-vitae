@@ -9,6 +9,7 @@ export function StatsPage() {
     reviewsToday: number
   }>({ total: 0, byState: {}, streak: 0, reviewsToday: 0 })
   const [reviewDays, setReviewDays] = useState<Map<string, number>>(new Map())
+  const [confirming, setConfirming] = useState(false)
 
   useEffect(() => {
     loadStats()
@@ -37,6 +38,12 @@ export function StatsPage() {
       streak: computeStreak(all.map((p) => p.updatedAt)),
       reviewsToday,
     })
+  }
+
+  async function clearProgress() {
+    await db.progress.clear()
+    setConfirming(false)
+    loadStats()
   }
 
   function computeStreak(updates: number[]) {
@@ -86,6 +93,22 @@ export function StatsPage() {
             <span className="breakdown-count">{count}</span>
           </div>
         ))}
+      </div>
+
+      <div className="stats-danger-zone">
+        {!confirming ? (
+          <button className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
+            Recomeçar do zero
+          </button>
+        ) : (
+          <div className="stats-confirm">
+            <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
+            <div className="stats-confirm-actions">
+              <button className="btn btn-danger" onClick={clearProgress}>Sim, limpar</button>
+              <button className="btn btn-secondary" onClick={() => setConfirming(false)}>Cancelar</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

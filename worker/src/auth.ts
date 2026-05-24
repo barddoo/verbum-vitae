@@ -13,7 +13,9 @@ function getDb(c: any) {
   return drizzle(c.env.DB, { schema })
 }
 
-const JWT_SECRET = 'remember-bible-jwt-secret-change-in-production'
+function getJwtSecret(c: any): string {
+  return c.env.JWT_SECRET || 'verbum-vitae-jwt-secret-change-in-production'
+}
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -33,19 +35,20 @@ async function hashPassword(password: string): Promise<string> {
   return hashArr.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-async function generateToken(userId: string, email: string): Promise<string> {
+async function generateToken(userId: string, email: string, secret: string): Promise<string> {
   const payload = {
     sub: userId,
     email,
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
   }
-  return await sign(payload, JWT_SECRET)
+  return await sign(payload, secret)
 }
 
 authApp.post('/register', zValidator('json', registerSchema), async (c) => {
   const { email, password } = c.req.valid('json')
   const db = getDb(c)
+  const secret = getJwtSecret(c)
 
   const existing = await db.select().from(users).where(eq(users.email, email)).get()
   if (existing) {
@@ -63,13 +66,14 @@ authApp.post('/register', zValidator('json', registerSchema), async (c) => {
     createdAt: now,
   })
 
-  const token = await generateToken(id, email)
+  const token = await generateToken(id, email, secret)
   return c.json({ token, user: { id, email } })
 })
 
 authApp.post('/login', zValidator('json', loginSchema), async (c) => {
   const { email, password } = c.req.valid('json')
   const db = getDb(c)
+  const secret = getJwtSecret(c)
 
   const user = await db.select().from(users).where(eq(users.email, email)).get()
   if (!user) {
@@ -81,7 +85,7 @@ authApp.post('/login', zValidator('json', loginSchema), async (c) => {
     return c.json({ error: 'Credenciais inválidas' }, 401)
   }
 
-  const token = await generateToken(user.id, user.email)
+  const token = await generateToken(user.id, user.email, secret)
   return c.json({ token, user: { id: user.id, email: user.email } })
 })
 

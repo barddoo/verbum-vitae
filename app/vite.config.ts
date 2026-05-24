@@ -8,11 +8,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Remember Bible',
-        short_name: 'Remember',
+        name: 'Verbum Vitae',
+        short_name: 'Verbum',
         description: 'Memorização bíblica com repetição espaçada',
-        theme_color: '#0d0806',
-        background_color: '#0d0806',
+        theme_color: '#0f1117',
+        background_color: '#0f1117',
         display: 'standalone',
         orientation: 'portrait',
         icons: [
@@ -25,7 +25,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 7 * 1024 * 1024,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/remember-bible\..*\/api\/.*/i,
+            urlPattern: /^https:\/\/verbum-vitae\..*\/api\/.*/i,
             handler: 'NetworkFirst',
             options: { cacheName: 'api-cache', expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 } },
           },

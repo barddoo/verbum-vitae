@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { db } from '../lib/db'
 import { getDueCards } from '../lib/srs'
 
@@ -10,6 +10,14 @@ export function HomePage() {
   const [loading, setLoading] = useState(true)
   const mounted = useRef(true)
 
+  const loadStats = useCallback(async () => {
+    const allProgress = await db.progress.toArray()
+    const dueCards = getDueCards(allProgress)
+    setTotalMemorized(allProgress.length)
+    setDueCount(dueCards.length)
+    setStreak(computeStreak(allProgress.map((p) => p.dueDate)))
+  }, [])
+
   useEffect(() => {
     mounted.current = true
     loadStats().then(() => {
@@ -19,14 +27,6 @@ export function HomePage() {
       mounted.current = false
     }
   }, [loadStats])
-
-  async function loadStats() {
-    const allProgress = await db.progress.toArray()
-    const dueCards = getDueCards(allProgress)
-    setTotalMemorized(allProgress.length)
-    setDueCount(dueCards.length)
-    setStreak(computeStreak(allProgress.map((p) => p.dueDate)))
-  }
 
   function computeStreak(timestamps: number[]) {
     const days = [...new Set(timestamps.map((ts) => new Date(ts).toDateString()))].sort(
@@ -62,7 +62,7 @@ export function HomePage() {
           <div className="hero-card">
             <h2 className="hero-greeting">{dueCount > 0 ? `${dueCount} versículos para revisar` : 'Nada pendente!'}</h2>
             {dueCount > 0 && (
-              <Link to="/review" className="btn btn-primary btn-large">
+              <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
                 Revisar Agora ({dueCount})
               </Link>
             )}
@@ -86,7 +86,7 @@ export function HomePage() {
           <div className="quick-actions">
             {dueCount === 0 && totalMemorized > 0 ? (
               <>
-                <Link to="/review" className="btn btn-primary">
+                <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary">
                   Praticar versículos
                 </Link>
                 <Link to="/collections" className="btn btn-secondary">
