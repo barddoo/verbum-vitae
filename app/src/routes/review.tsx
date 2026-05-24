@@ -1,6 +1,6 @@
 import { useSearch } from '@tanstack/react-router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import { BOOKS } from 'shared/bible'
+import { BOOKS, DEFAULT_TRANSLATION, type Translation } from 'shared/bible'
 import { db, fetchVersesBatch, getWordHeat, parseVerseKey, recordWordAccuracy } from '../lib/db'
 import { getNextCard, Rating } from '../lib/scheduler'
 import { type Card, type Grade, getDueCards } from '../lib/srs'
@@ -35,6 +35,7 @@ export function ReviewPage() {
   const [totalDue, setTotalDue] = useState(0)
   const [collections, setCollections] = useState<{ id: number; name: string }[]>([])
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
+  const translation = (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION
 
   const filterStatus = totalDue > 0 ? 'due' : 'all'
 
@@ -66,7 +67,7 @@ export function ReviewPage() {
   }
 
   async function loadQueueStats() {
-    const allProgress = await db.progress.toArray()
+    const allProgress = await db.progress.where({ translation }).toArray()
     const dueCards = getDueCards(allProgress)
     setTotalAll(allProgress.length)
     setTotalDue(dueCards.length)
@@ -75,7 +76,7 @@ export function ReviewPage() {
 
   async function startReview() {
     setLoading(true)
-    const allProgress = await db.progress.toArray()
+    const allProgress = await db.progress.where({ translation }).toArray()
 
     let selected = allProgress
     if (filterStatus === 'due') {
