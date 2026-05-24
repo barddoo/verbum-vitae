@@ -13,7 +13,9 @@ interface SearchResult {
 }
 
 export function BrowsePage() {
-  const [translation, setTranslation] = useState<Translation>(DEFAULT_TRANSLATION)
+  const [translation, setTranslation] = useState<Translation>(
+    () => (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION,
+  )
   const [bookIndex, setBookIndex] = useState<number | null>(null)
   const [chapter, setChapter] = useState<number | null>(null)
   const [verses, setVerses] = useState<string[]>([])
@@ -244,7 +246,14 @@ export function BrowsePage() {
     <div className="page browse-page">
       <div className="browse-top">
         <div className="translate-picker">
-          <select value={translation} onChange={(e) => setTranslation(e.target.value as Translation)}>
+          <select
+            value={translation}
+            onChange={(e) => {
+              const t = e.target.value as Translation
+              localStorage.setItem('translation', t)
+              setTranslation(t)
+            }}
+          >
             {TRANSLATIONS.map((t) => (
               <option key={t} value={t}>
                 {TRANSLATION_LABELS[t]}
