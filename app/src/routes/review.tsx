@@ -1,4 +1,5 @@
 import { useSearch } from '@tanstack/react-router'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, type Translation } from 'shared/bible'
 import { db, fetchVersesBatch, getWordHeat, parseVerseKey, recordWordAccuracy } from '../lib/db'
@@ -20,18 +21,24 @@ interface DueItem {
 export function ReviewPage() {
   const { autostart } = useSearch({ from: '/review' })
   const autostartFired = useRef(false)
-  const retried = useRef(false)
   const [phase, setPhase] = useState<'queue' | 'session'>('queue')
   const [items, setItems] = useState<DueItem[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [completed, setCompleted] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [sessionLoading, setSessionLoading] = useState(false)
   const [practiceMode, setPracticeMode] = useState<PracticeMode>(() => (localStorage.getItem('review_mode') as PracticeMode) || 'flashcard')
   const [filterBook] = useState<number | null>(null)
-  const [totalAll, setTotalAll] = useState(0)
-  const [totalDue, setTotalDue] = useState(0)
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
   const translation = (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION
+
+  const allProgress = useLiveQuery(
+    () => db.progress.toArray().then((rows) => rows.filter((p) => p.translation === translation)),
+    [translation],
+  )
+
+  const totalAll = allProgress?.length ?? 0
+  const totalDue = allProgress ? getDueCards(allProgress).length : 0
+  const loading = allProgress === undefined
 
   const filterStatus = totalDue > 0 ? 'due' : 'all'
 
@@ -41,35 +48,15 @@ export function ReviewPage() {
   }
 
   useEffect(() => {
-    loadQueueStats()
-  }, [])
-
-  useEffect(() => {
-    if (!loading && totalAll === 0 && !retried.current) {
-      retried.current = true
-      const t = setTimeout(loadQueueStats, 700)
-      return () => clearTimeout(t)
-    }
-  }, [loading, totalAll])
-
-  useEffect(() => {
     if (!loading && autostart === '1' && totalAll > 0 && phase === 'queue' && !autostartFired.current) {
       autostartFired.current = true
       startReview()
     }
   }, [loading, autostart, totalAll, phase])
 
-  async function loadQueueStats() {
-    const allProgress = (await db.progress.toArray()).filter((p) => p.translation === translation)
-    const dueCards = getDueCards(allProgress)
-    setTotalAll(allProgress.length)
-    setTotalDue(dueCards.length)
-    setLoading(false)
-  }
-
   async function startReview() {
-    setLoading(true)
-    const allProgress = (await db.progress.toArray()).filter((p) => p.translation === translation)
+    if (!allProgress) return
+    setSessionLoading(true)
 
     let selected = allProgress
     if (filterStatus === 'due') {
@@ -80,7 +67,7 @@ export function ReviewPage() {
       selected = selected.filter((p) => parseVerseKey(p.verseId).bookNumber === filterBook)
     }
     if (selected.length === 0) {
-      setLoading(false)
+      setSessionLoading(false)
       return
     }
 
@@ -113,7 +100,7 @@ export function ReviewPage() {
     setCompleted(0)
     setGradeHistory([])
     setPhase('session')
-    setLoading(false)
+    setSessionLoading(false)
   }
 
   async function handleGrade(rating: Grade) {
@@ -157,7 +144,7 @@ export function ReviewPage() {
     setGradeHistory([])
   }
 
-  if (loading)
+  if (loading || sessionLoading)
     return (
       <div className="page">
         <div className="loading">Carregando...</div>
