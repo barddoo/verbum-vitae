@@ -16,7 +16,7 @@ const steps = [
   {
     icon: '🔄',
     title: 'Revise todo dia',
-    text: 'Abra Revisar para ver os versículos do dia. O app usa repetição espaçada — você vê cada versículo na hora certa.',
+    text: 'Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa.',
   },
   {
     icon: '🌐',

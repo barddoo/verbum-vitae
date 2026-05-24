@@ -15,6 +15,221 @@ interface SearchResult {
 
 const loadingSpinner = <div className="loading">Carregando…</div>
 
+interface BrowsePageViewProps {
+  translation: Translation
+  setTranslation: (t: Translation) => void
+  searchQuery: string
+  setSearchQuery: (q: string) => void
+  clearSearch: () => void
+  searchResults: SearchResult[]
+  searching: boolean
+  goToVerse: (b: number, c: number) => void
+  bookIndex: number | null
+  setBookIndex: (i: number | null) => void
+  chapter: number | null
+  setChapter: (c: number | null) => void
+  chapterCount: number
+  loadingVerses: boolean
+  verses: string[]
+  selectionMode: boolean
+  selectedVerses: Set<number>
+  exitSelectionMode: () => void
+  isMemorized: (v: number) => boolean
+  isAdded: (v: number) => boolean
+  handlePointerDown: (v: number, e: React.PointerEvent<HTMLDivElement>) => void
+  handlePointerMove: (e: React.PointerEvent<HTMLDivElement>) => void
+  handlePointerUp: (v: number) => void
+  handlePointerCancel: () => void
+  previewText: string
+  memorizeSelected: () => Promise<void>
+  highlightMatch: (text: string, query: string) => React.ReactNode
+}
+
+function BrowsePageView({
+  translation,
+  setTranslation,
+  searchQuery,
+  setSearchQuery,
+  clearSearch,
+  searchResults,
+  searching,
+  goToVerse,
+  bookIndex,
+  setBookIndex,
+  chapter,
+  setChapter,
+  chapterCount,
+  loadingVerses,
+  verses,
+  selectionMode,
+  selectedVerses,
+  exitSelectionMode,
+  isMemorized,
+  isAdded,
+  handlePointerDown,
+  handlePointerMove,
+  handlePointerUp,
+  handlePointerCancel,
+  previewText,
+  memorizeSelected,
+  highlightMatch,
+}: BrowsePageViewProps) {
+  return (
+    <div className="page browse-page">
+      <div className="browse-top">
+        <div className="translate-picker">
+          <select
+            value={translation}
+            onChange={(e) => {
+              const t = e.target.value as Translation
+              localStorage.setItem('translation', t)
+              setTranslation(t)
+            }}
+          >
+            {TRANSLATIONS.map((t) => (
+              <option key={t} value={t}>
+                {TRANSLATION_LABELS[t]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="search-bar">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Buscar versículos…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button type="button" className="search-clear" onClick={clearSearch}>
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {searchQuery.trim().length >= 2 && (
+        <div className="search-results">
+          {searching ? (
+            <div className="loading">Buscando…</div>
+          ) : searchResults.length === 0 ? (
+            <p className="search-empty">Nenhum resultado para "{searchQuery}"</p>
+          ) : (
+            searchResults.map((r) => (
+              <button type="button" key={r.ref} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
+                <span className="search-result-ref">{r.ref}</span>
+                <span className="search-result-text">{highlightMatch(r.text, searchQuery)}</span>
+              </button>
+            ))
+          )}
+        </div>
+      )}
+
+      {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
+        <div className="book-list">
+          {BOOKS.map((book, i) => (
+            <button
+              type="button"
+              key={i}
+              className="book-item"
+              onClick={() => {
+                setBookIndex(i)
+                setChapter(null)
+              }}
+            >
+              {book}
+            </button>
+          ))}
+        </div>
+      ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
+        <div className="chapter-view">
+          <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
+            ← Voltar
+          </button>
+          <h3>{BOOKS[bookIndex!]}</h3>
+          <div className="chapter-grid">
+            {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
+              <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : !searchQuery || searchQuery.trim().length < 2 ? (
+        <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
+          <button type="button" className="back-btn" onClick={() => setChapter(null)}>
+            ← {BOOKS[bookIndex!]}
+          </button>
+          <div className="verse-header">
+            {selectionMode ? (
+              <>
+                <span className="select-mode-label">
+                  {selectedVerses.size > 0
+                    ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
+                    : 'Toque para selecionar'}
+                </span>
+                <button type="button" className="select-mode-exit" onClick={exitSelectionMode}>
+                  ✕
+                </button>
+              </>
+            ) : (
+              <h3>
+                {BOOKS[bookIndex!]} {chapter}
+              </h3>
+            )}
+          </div>
+          {loadingVerses
+            ? loadingSpinner
+            : verses.map((text, i) => {
+                const v = i + 1
+                const mem = isMemorized(v)
+                const add = isAdded(v)
+                const sel = selectedVerses.has(v)
+                return (
+                  <div
+                    key={i}
+                    className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
+                    onPointerDown={(e) => handlePointerDown(v, e)}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={() => handlePointerUp(v)}
+                    onPointerCancel={handlePointerCancel}
+                  >
+                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
+                    <span className="verse-text">{text}</span>
+                    {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
+                  </div>
+                )
+              })}
+        </div>
+      ) : null}
+
+      {selectedVerses.size > 0 && (
+        <div className="selection-bar">
+          <div className="selection-bar-info">
+            <span className="selection-bar-count">
+              {selectedVerses.size} selecionado{selectedVerses.size > 1 ? 's' : ''}
+            </span>
+            <span className="selection-bar-preview">
+              "{previewText.slice(0, 60)}
+              {previewText.length > 60 ? '…' : ''}"
+            </span>
+          </div>
+          <div className="selection-bar-actions">
+            <button type="button" className="btn btn-sm btn-secondary" onClick={exitSelectionMode}>
+              Limpar
+            </button>
+            <button type="button" className="btn btn-sm btn-primary" onClick={memorizeSelected}>
+              Memorizar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function BrowsePage() {
   const [translation, setTranslation] = useState<Translation>(
     () => (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION,
@@ -261,157 +476,34 @@ export function BrowsePage() {
   }
 
   return (
-    <div className="page browse-page">
-      <div className="browse-top">
-        <div className="translate-picker">
-          <select
-            value={translation}
-            onChange={(e) => {
-              const t = e.target.value as Translation
-              localStorage.setItem('translation', t)
-              setTranslation(t)
-            }}
-          >
-            {TRANSLATIONS.map((t) => (
-              <option key={t} value={t}>
-                {TRANSLATION_LABELS[t]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="search-bar">
-          <input
-            type="search"
-            className="search-input"
-            placeholder="Buscar versículos..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button type="button" className="search-clear" onClick={clearSearch}>
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
-
-      {searchQuery.trim().length >= 2 && (
-        <div className="search-results">
-          {searching ? (
-            <div className="loading">Buscando…</div>
-          ) : searchResults.length === 0 ? (
-            <p className="search-empty">Nenhum resultado para "{searchQuery}"</p>
-          ) : (
-            searchResults.map((r) => (
-              <div key={r.ref} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
-                <span className="search-result-ref">{r.ref}</span>
-                <span className="search-result-text">{highlightMatch(r.text, searchQuery)}</span>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
-        <div className="book-list">
-          {BOOKS.map((book, i) => (
-            <button
-              type="button"
-              key={i}
-              className="book-item"
-              onClick={() => {
-                setBookIndex(i)
-                setChapter(null)
-              }}
-            >
-              {book}
-            </button>
-          ))}
-        </div>
-      ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
-        <div className="chapter-view">
-          <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
-            ← Voltar
-          </button>
-          <h3>{BOOKS[bookIndex!]}</h3>
-          <div className="chapter-grid">
-            {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
-              <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : !searchQuery || searchQuery.trim().length < 2 ? (
-        <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
-          <button type="button" className="back-btn" onClick={() => setChapter(null)}>
-            ← {BOOKS[bookIndex!]}
-          </button>
-          <div className="verse-header">
-            {selectionMode ? (
-              <>
-                <span className="select-mode-label">
-                  {selectedVerses.size > 0
-                    ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
-                    : 'Toque para selecionar'}
-                </span>
-                <button type="button" className="select-mode-exit" onClick={exitSelectionMode}>
-                  ✕
-                </button>
-              </>
-            ) : (
-              <h3>
-                {BOOKS[bookIndex!]} {chapter}
-              </h3>
-            )}
-          </div>
-          {loadingVerses
-            ? loadingSpinner
-            : verses.map((text, i) => {
-                const v = i + 1
-                const mem = isMemorized(v)
-                const add = isAdded(v)
-                const sel = selectedVerses.has(v)
-                return (
-                  <div
-                    key={i}
-                    className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                    onPointerDown={(e) => handlePointerDown(v, e)}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={() => handlePointerUp(v)}
-                    onPointerCancel={handlePointerCancel}
-                  >
-                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
-                    <span className="verse-text">{text}</span>
-                    {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
-                  </div>
-                )
-              })}
-        </div>
-      ) : null}
-
-      {selectedVerses.size > 0 && (
-        <div className="selection-bar">
-          <div className="selection-bar-info">
-            <span className="selection-bar-count">
-              {selectedVerses.size} selecionado{selectedVerses.size > 1 ? 's' : ''}
-            </span>
-            <span className="selection-bar-preview">
-              "{previewText.slice(0, 60)}
-              {previewText.length > 60 ? '...' : ''}"
-            </span>
-          </div>
-          <div className="selection-bar-actions">
-            <button type="button" className="btn btn-sm btn-secondary" onClick={exitSelectionMode}>
-              Limpar
-            </button>
-            <button type="button" className="btn btn-sm btn-primary" onClick={memorizeSelected}>
-              Memorizar
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    <BrowsePageView
+      translation={translation}
+      setTranslation={setTranslation}
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+      clearSearch={clearSearch}
+      searchResults={searchResults}
+      searching={searching}
+      goToVerse={goToVerse}
+      bookIndex={bookIndex}
+      setBookIndex={setBookIndex}
+      chapter={chapter}
+      setChapter={setChapter}
+      chapterCount={chapterCount}
+      loadingVerses={loadingVerses}
+      verses={verses}
+      selectionMode={selectionMode}
+      selectedVerses={selectedVerses}
+      exitSelectionMode={exitSelectionMode}
+      isMemorized={isMemorized}
+      isAdded={isAdded}
+      handlePointerDown={handlePointerDown}
+      handlePointerMove={handlePointerMove}
+      handlePointerUp={handlePointerUp}
+      handlePointerCancel={handlePointerCancel}
+      previewText={previewText}
+      memorizeSelected={memorizeSelected}
+      highlightMatch={highlightMatch}
+    />
   )
 }

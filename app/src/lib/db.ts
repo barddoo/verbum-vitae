@@ -239,8 +239,7 @@ export async function addCollectionToMemory(
   _progressIdFn: () => string,
   logChange: (entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) => void,
 ) {
-  const cv = await db.collectionVerses.where({ collectionId }).toArray()
-  const { createEmptyCard } = await import('./srs')
+  const [cv, { createEmptyCard }] = await Promise.all([db.collectionVerses.where({ collectionId }).toArray(), import('./srs')])
   const userId = cachedGet('auth_token') ? 'user' : ''
 
   const toAdd: Progress[] = []

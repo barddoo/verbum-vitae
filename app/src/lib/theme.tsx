@@ -1,10 +1,11 @@
 import { createContext, type ReactNode, use, useCallback, useEffect, useMemo, useState } from 'react'
+import { cachedGet, cachedSet } from './storage'
 
 type Theme = 'light' | 'dark'
 
 function getInitialTheme(): Theme {
   if (typeof window === 'undefined') return 'dark'
-  const stored = localStorage.getItem('theme')
+  const stored = cachedGet('theme')
   if (stored === 'light' || stored === 'dark') return stored
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
 }
@@ -27,7 +28,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: light)')
     const handler = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) setTheme(e.matches ? 'light' : 'dark')
+      if (!cachedGet('theme')) setTheme(e.matches ? 'light' : 'dark')
     }
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
@@ -36,7 +37,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
       const next = prev === 'dark' ? 'light' : 'dark'
-      localStorage.setItem('theme', next)
+      cachedSet('theme', next)
       return next
     })
   }, [])

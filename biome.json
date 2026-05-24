@@ -45,6 +45,7 @@
     }
   },
   "files": {
+    "includes": ["**", "!app/public/bible*.json"],
     "maxSize": 10485760
   },
   "vcs": {

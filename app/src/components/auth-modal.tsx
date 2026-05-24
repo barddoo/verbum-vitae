@@ -44,7 +44,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()} role="presentation">
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
           ✕
@@ -89,7 +89,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
         <p className="auth-free-notice">
           Verbum Vitae é <strong>100% gratuito</strong> e sempre será. A conta serve apenas para sincronizar seu progresso entre
-          dispositivos — sem cobranças, sem planos, sem coleta de dados.
+          dispositivos: sem cobranças, sem planos, sem coleta de dados.
         </p>
       </div>
     </div>
