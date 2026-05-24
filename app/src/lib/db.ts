@@ -130,7 +130,7 @@ export async function ensureVersesSeeded() {
 }
 
 export async function fetchVersesForKey(verseId: string, translation: string): Promise<string> {
-  await ensureVersesSeeded()
+  await ensureTranslationSeeded(translation)
   const p = parseVerseKey(verseId)
   const endVerse = p.verseEnd || p.verseStart
   const rows = await db.verses.where('[bookNumber+chapter]').equals([p.bookNumber, p.chapter]).sortBy('verse')
@@ -139,7 +139,8 @@ export async function fetchVersesForKey(verseId: string, translation: string): P
 }
 
 export async function fetchVersesBatch(keys: { verseId: string; translation: string }[]): Promise<Map<string, string>> {
-  await ensureVersesSeeded()
+  const translations = [...new Set(keys.map((k) => k.translation))]
+  await Promise.all(translations.map((t) => ensureTranslationSeeded(t)))
   const chapterGroups = new Map<string, { keys: { verseId: string; translation: string }[] }>()
   for (const k of keys) {
     const p = parseVerseKey(k.verseId)
