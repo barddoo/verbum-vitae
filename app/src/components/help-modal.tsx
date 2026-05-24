@@ -1,0 +1,60 @@
+interface HelpModalProps {
+  onClose: () => void
+}
+
+const steps = [
+  {
+    icon: '📖',
+    title: 'Encontre um versículo',
+    text: 'Vá em Bíblia, escolha um livro, capítulo e segure o dedo sobre o versículo que deseja memorizar.',
+  },
+  {
+    icon: '➕',
+    title: 'Adicione à memória',
+    text: 'Selecione um ou mais versículos e toque em Memorizar. Eles entram na sua fila de revisão.',
+  },
+  {
+    icon: '🔄',
+    title: 'Revise todo dia',
+    text: 'Abra Revisar para ver os versículos do dia. O app usa repetição espaçada — você vê cada versículo na hora certa.',
+  },
+  {
+    icon: '🌐',
+    title: 'Sincronize entre dispositivos',
+    text: 'Crie uma conta (opcional) para salvar seu progresso na nuvem e acessar em qualquer aparelho.',
+  },
+]
+
+export function HelpModal({ onClose }: HelpModalProps) {
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal help-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fechar">
+          ✕
+        </button>
+
+        <div className="help-header">
+          <span className="help-icon">🕊️</span>
+          <h2 className="help-title">Como usar o Verbum Vitae</h2>
+          <p className="help-subtitle">Memorize versículos com repetição espaçada.</p>
+        </div>
+
+        <ol className="help-steps">
+          {steps.map((s, i) => (
+            <li key={i} className="help-step">
+              <span className="help-step-icon">{s.icon}</span>
+              <div>
+                <strong className="help-step-title">{s.title}</strong>
+                <p className="help-step-text">{s.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <button className="btn btn-primary help-cta" onClick={onClose}>
+          Entendido!
+        </button>
+      </div>
+    </div>
+  )
+}

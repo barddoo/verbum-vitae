@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { BookOpen, BarChart2, Home, Layers, RotateCcw } from 'lucide-react'
 import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
+import { HelpModal } from './components/help-modal'
 import { ThemeToggle } from './components/theme-toggle'
 import { useAuth } from './lib/auth'
 
@@ -17,6 +18,7 @@ function RootLayout() {
   const { user, isOnline, logout } = useAuth()
   const [showAuth, setShowAuth] = useState(false)
   const [showDonate, setShowDonate] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
 
   useEffect(() => {
@@ -34,6 +36,9 @@ function RootLayout() {
           <h1 className="top-bar-title">Verbum Vitae</h1>
         </Link>
         <div className="top-bar-right">
+          <button className="btn-help" onClick={() => setShowHelp(true)} aria-label="Ajuda">
+            ?
+          </button>
           <ThemeToggle />
           {!isOnline && <span className="offline-badge">Offline</span>}
           {user ? (
@@ -123,6 +128,7 @@ function RootLayout() {
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
       {showDonate && <DonateModal onClose={() => setShowDonate(false)} />}
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
     </div>
   )
 }
