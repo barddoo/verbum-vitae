@@ -36,7 +36,7 @@ export function ReviewPage() {
   const [practiceMode, setPracticeMode] = useState<PracticeMode>(() => (localStorage.getItem('review_mode') as PracticeMode) || 'flashcard')
   const [filterBook] = useState<number | null>(null)
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
-  const translation = (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION
+  const translation = (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION
 
   const allProgress = useLiveQuery(
     () => db.progress.toArray().then((rows) => rows.filter((p) => p.translation === translation)),
