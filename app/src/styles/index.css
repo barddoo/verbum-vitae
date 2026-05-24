@@ -1368,7 +1368,6 @@ body::before {
 .flip-card-inner {
   position: relative;
   width: 100%;
-  min-height: 16.25rem;
   transition: transform 0.5s ease;
   transform-style: preserve-3d;
 }
@@ -1379,14 +1378,22 @@ body::before {
 
 .flip-card-front,
 .flip-card-back {
-  position: absolute;
-  inset: 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.flip-card-front {
+  position: relative;
+  min-height: 16.25rem;
+}
+
+.flip-card-back {
+  position: absolute;
+  inset: 0;
 }
 
 .flip-card-front {
@@ -2453,11 +2460,11 @@ body::before {
     max-width: 43.75rem;
   }
 
-  .flip-card-inner {
+  .flip-card-front {
     min-height: 18.75rem;
+    padding: 3.5rem 3rem;
   }
 
-  .flip-card-front,
   .flip-card-back {
     padding: 3.5rem 3rem;
   }
