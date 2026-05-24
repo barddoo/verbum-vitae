@@ -83,17 +83,17 @@ export function StatsPage() {
 
       <div className="stats-danger-zone">
         {!confirming ? (
-          <button className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
+          <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
             Recomeçar do zero
           </button>
         ) : (
           <div className="stats-confirm">
             <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
             <div className="stats-confirm-actions">
-              <button className="btn btn-danger" onClick={clearProgress}>
+              <button type="button" className="btn btn-danger" onClick={clearProgress}>
                 Sim, limpar
               </button>
-              <button className="btn btn-secondary" onClick={() => setConfirming(false)}>
+              <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>
                 Cancelar
               </button>
             </div>
@@ -105,13 +105,13 @@ export function StatsPage() {
 }
 
 const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
-  const weeks = 20
-  const today = new Date()
-  const startDate = new Date(today)
-  startDate.setDate(startDate.getDate() - weeks * 7 + 1)
-  startDate.setDate(startDate.getDate() - startDate.getDay())
-
   const cells = useMemo(() => {
+    const weeks = 20
+    const today = new Date()
+    const startDate = new Date(today)
+    startDate.setDate(startDate.getDate() - weeks * 7 + 1)
+    startDate.setDate(startDate.getDate() - startDate.getDay())
+
     const result: { date: Date; count: number; dateStr: string }[] = []
     const cursor = new Date(startDate)
     while (cursor <= today) {
@@ -201,4 +201,4 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
       </div>
     </div>
   )
-}
+})

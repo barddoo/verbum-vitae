@@ -220,15 +220,3 @@ export function verseRefToId(ref: VerseRef): string {
   }
   return `${ref.book}_${ref.chapter}_${ref.verse}`
 }
-
-export function countVersesInCollection(collection: BundledCollection): number {
-  let count = 0
-  for (const ref of collection.verses) {
-    if (Array.isArray(ref.verse)) {
-      count += ref.verse[1] - ref.verse[0] + 1
-    } else {
-      count += 1
-    }
-  }
-  return count
-}

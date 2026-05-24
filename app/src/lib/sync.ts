@@ -1,4 +1,5 @@
 import { db, type SyncLog } from './db'
+import { cachedGet } from './storage'
 import { api } from './worker'
 
 let syncTimer: ReturnType<typeof setInterval> | null = null
@@ -38,7 +39,7 @@ function scheduleNext(delay = 30_000) {
 }
 
 export async function syncNow() {
-  const token = localStorage.getItem('auth_token')
+  const token = cachedGet('auth_token')
   if (!token || !navigator.onLine || isSyncing) return
 
   isSyncing = true
@@ -71,7 +72,7 @@ async function pushPending() {
 
   await api.sync.push(entries)
 
-  const ids = pending.map((e) => e.id!).filter(Boolean) as number[]
+  const ids = pending.flatMap((e) => (e.id ? [e.id] : []))
   await db.syncLog.where('id').anyOf(ids).modify({ synced: 1 })
 }
 
@@ -85,17 +86,17 @@ async function pullRemote() {
 
     _totalEntries += result.entries.length
 
-    for (const entry of result.entries) {
-      if (entry.tableName !== 'progress') continue
+    await Promise.all(
+      result.entries.map(async (entry: { tableName: string; operation: string; data: string }) => {
+        if (entry.tableName !== 'progress') return
 
-      try {
-        const data = JSON.parse(entry.data)
-        const exists = await db.progress.where({ verseId: data.verseId, translation: data.translation }).first()
+        try {
+          const data = JSON.parse(entry.data)
+          const exists = await db.progress.where({ verseId: data.verseId, translation: data.translation }).first()
 
-        if (entry.operation === 'delete') {
-          if (exists) await db.progress.delete(exists.id!)
-        } else {
-          if (exists) {
+          if (entry.operation === 'delete') {
+            if (exists) await db.progress.delete(exists.id!)
+          } else if (exists) {
             await db.progress.update(exists.id!, {
               cardJson: data.cardJson,
               updatedAt: Date.now(),
@@ -111,11 +112,11 @@ async function pullRemote() {
               updatedAt: Date.now(),
             })
           }
+        } catch {
+          /* skip */
         }
-      } catch {
-        /* skip */
-      }
-    }
+      }),
+    )
 
     if (!result.hasMore) break
     cursor = result.nextCursor

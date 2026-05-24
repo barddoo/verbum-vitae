@@ -1,4 +1,5 @@
-import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
+import { createContext, type ReactNode, use, useEffect, useMemo, useState } from 'react'
+import { cachedRemove, cachedSet } from './storage'
 import { startAutoSync, stopAutoSync } from './sync'
 import { api } from './worker'
 
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser({ id: payload.sub, email: payload.email })
         if (isOnline) startAutoSync()
       } catch {
-        localStorage.removeItem('auth_token')
+        cachedRemove('auth_token')
       }
     } else {
       stopAutoSync()
@@ -51,28 +52,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const data = await api.auth.login(email, password)
-    localStorage.setItem('auth_token', data.token)
+    cachedSet('auth_token', data.token)
     setToken(data.token)
   }
 
   const register = async (email: string, password: string) => {
     const data = await api.auth.register(email, password)
-    localStorage.setItem('auth_token', data.token)
+    cachedSet('auth_token', data.token)
     setToken(data.token)
   }
 
   const logout = () => {
     stopAutoSync()
-    localStorage.removeItem('auth_token')
+    cachedRemove('auth_token')
     setToken(null)
     setUser(null)
   }
 
-  return <AuthContext.Provider value={{ user, token, login, register, logout, isOnline }}>{children}</AuthContext.Provider>
+  const value = useMemo(() => ({ user, token, login, register, logout, isOnline }), [user, token, login, register, logout, isOnline])
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext)
+  const ctx = use(AuthContext)
   if (!ctx) throw new Error('useAuth must be used within AuthProvider')
   return ctx
 }

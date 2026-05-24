@@ -9,7 +9,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={handleClose}>
+    <div className="modal-backdrop" onClick={handleClose} role="presentation">
       <div className="modal welcome-modal" onClick={(e) => e.stopPropagation()}>
         <div className="welcome-header">
           <span className="welcome-icon">🕊️</span>
@@ -22,7 +22,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
           <cite className="welcome-verse-ref">Salmos 119:11 — NVI</cite>
         </blockquote>
 
-        <button className="btn btn-primary welcome-cta" onClick={handleClose}>
+        <button type="button" className="btn btn-primary welcome-cta" onClick={handleClose}>
           Começar
         </button>
       </div>

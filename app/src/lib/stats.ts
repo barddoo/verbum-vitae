@@ -1,5 +1,5 @@
 export function computeStreak(timestamps: number[]) {
-  const days = [...new Set(timestamps.map((ts) => new Date(ts).toDateString()))].sort(
+  const days = [...new Set(timestamps.map((ts) => new Date(ts).toDateString()))].toSorted(
     (a, b) => new Date(b).getTime() - new Date(a).getTime(),
   )
   let streak = 0

@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION } from 'shared/bible'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { addCollectionToMemory, db, fetchVersesBatch, getCollectionProgress, parseVerseKey } from '../lib/db'
@@ -44,7 +44,7 @@ async function ensureCollectionsSeeded() {
   }
 }
 
-const loadingSpinner = <div className="loading">Carregando...</div>
+const loadingSpinner = <div className="loading">Carregando…</div>
 
 export function CollectionsListPage() {
   const [collections, setCollections] = useState<CollectionEntry[]>([])
@@ -77,12 +77,7 @@ export function CollectionsListPage() {
     setLoading(false)
   }
 
-  if (loading)
-    return (
-      <div className="page">
-        {loadingSpinner}
-      </div>
-    )
+  if (loading) return <div className="page">{loadingSpinner}</div>
 
   return (
     <div className="page collections-page">
@@ -127,11 +122,7 @@ export function CollectionDetailPage() {
   const [added, setAdded] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    load()
-  }, [id])
-
-  async function load() {
+  const load = useCallback(async () => {
     const dbId = Number(id)
     const c = await db.collections.get(dbId)
     if (!c) return
@@ -161,7 +152,11 @@ export function CollectionDetailPage() {
     }
     setVerses(verseList)
     setLoading(false)
-  }
+  }, [id])
+
+  useEffect(() => {
+    load()
+  }, [id, load])
 
   async function handleAddAll() {
     if (!col) return
@@ -173,12 +168,7 @@ export function CollectionDetailPage() {
     await load()
   }
 
-  if (loading)
-    return (
-      <div className="page">
-        {loadingSpinner}
-      </div>
-    )
+  if (loading) return <div className="page">{loadingSpinner}</div>
 
   if (!col)
     return (
@@ -224,12 +214,13 @@ export function CollectionDetailPage() {
       </div>
       <div className="collection-detail-actions">
         <button
+          type="button"
           className={`btn btn-primary btn-large ${added ? 'btn-added' : ''}`}
           onClick={handleAddAll}
           disabled={adding || added || col.memorized === col.total}
         >
           {adding
-            ? 'Adicionando...'
+            ? 'Adicionando…'
             : added || col.memorized === col.total
               ? '✓ Adicionado'
               : `Adicionar todos (${col.total - col.memorized})`}

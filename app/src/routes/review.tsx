@@ -1,10 +1,11 @@
 import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, type Translation } from 'shared/bible'
 import { db, fetchVersesBatch, getWordHeat, parseVerseKey, recordWordAccuracy } from '../lib/db'
 import { getNextCard, Rating } from '../lib/scheduler'
 import { type Card, type Grade, getDueCards } from '../lib/srs'
+import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 
 type PracticeMode = 'flashcard' | 'fill-blank' | 'typing'
@@ -18,7 +19,7 @@ interface DueItem {
   translation: string
 }
 
-const loadingSpinner = <div className="loading">Carregando...</div>
+const loadingSpinner = <div className="loading">Carregando…</div>
 
 export function ReviewPage() {
   const { autostart } = useSearch({ from: '/review' })
@@ -49,14 +50,7 @@ export function ReviewPage() {
     localStorage.setItem('review_mode', m)
   }
 
-  useEffect(() => {
-    if (!loading && autostart === '1' && totalAll > 0 && phase === 'queue' && !autostartFired.current) {
-      autostartFired.current = true
-      startReview()
-    }
-  }, [loading, autostart, totalAll, phase])
-
-  async function startReview() {
+  const startReview = useCallback(async () => {
     if (!allProgress) return
     setSessionLoading(true)
 
@@ -103,7 +97,14 @@ export function ReviewPage() {
     setGradeHistory([])
     setPhase('session')
     setSessionLoading(false)
-  }
+  }, [allProgress, filterStatus, filterBook, translation])
+
+  useEffect(() => {
+    if (!loading && autostart === '1' && totalAll > 0 && phase === 'queue' && !autostartFired.current) {
+      autostartFired.current = true
+      startReview()
+    }
+  }, [loading, autostart, totalAll, phase, startReview])
 
   async function handleGrade(rating: Grade) {
     const item = items[currentIndex]
@@ -120,7 +121,7 @@ export function ReviewPage() {
     })
 
     logProgressChange({
-      userId: localStorage.getItem('auth_token') ? 'user' : '',
+      userId: cachedGet('auth_token') ? 'user' : '',
       tableName: 'progress',
       rowId: item.verseId,
       operation: 'update',
@@ -146,12 +147,7 @@ export function ReviewPage() {
     setGradeHistory([])
   }
 
-  if (loading || sessionLoading)
-    return (
-      <div className="page">
-        {loadingSpinner}
-      </div>
-    )
+  if (loading || sessionLoading) return <div className="page">{loadingSpinner}</div>
 
   if (phase === 'queue') {
     const reviewCount = filterStatus === 'due' ? totalDue : totalAll
@@ -168,7 +164,12 @@ export function ReviewPage() {
         </div>
         <div className="review-mode-grid">
           {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
-            <button key={m} className={`review-mode-card ${practiceMode === m ? 'active' : ''}`} onClick={() => setAndPersistMode(m)}>
+            <button
+              type="button"
+              key={m}
+              className={`review-mode-card ${practiceMode === m ? 'active' : ''}`}
+              onClick={() => setAndPersistMode(m)}
+            >
               <span className="review-mode-card-title">
                 {m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
               </span>
@@ -179,6 +180,7 @@ export function ReviewPage() {
           ))}
         </div>
         <button
+          type="button"
           className="btn btn-primary btn-large btn-start"
           onClick={startReview}
           disabled={totalAll === 0 || (filterStatus === 'due' && totalDue === 0)}
@@ -201,7 +203,7 @@ export function ReviewPage() {
           <h2>Nada para revisar!</h2>
           <p>{filterStatus === 'due' ? 'Todos os versículos estão em dia.' : 'Nenhum versículo encontrado.'}</p>
           <div className="empty-actions">
-            <button className="btn btn-secondary" onClick={goBack}>
+            <button type="button" className="btn btn-secondary" onClick={goBack}>
               Voltar
             </button>
           </div>
@@ -234,10 +236,11 @@ export function ReviewPage() {
             </div>
           )}
           <div className="session-complete-actions">
-            <button className="btn btn-primary" onClick={goBack}>
+            <button type="button" className="btn btn-primary" onClick={goBack}>
               Voltar ao painel
             </button>
             <button
+              type="button"
               className="btn btn-secondary"
               onClick={() => {
                 setCurrentIndex(0)
@@ -256,7 +259,7 @@ export function ReviewPage() {
   return (
     <div className="page review-page review-session">
       <div className="review-header">
-        <button className="btn-icon" onClick={goBack} aria-label="Voltar">
+        <button type="button" className="btn-icon" onClick={goBack} aria-label="Voltar">
           ←
         </button>
         <div className="review-header-center">
@@ -266,6 +269,7 @@ export function ReviewPage() {
           <div className="practice-mode-selector">
             {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
               <button
+                type="button"
                 key={m}
                 className={`mode-dot ${practiceMode === m ? 'active' : ''}`}
                 onClick={() => setAndPersistMode(m)}
@@ -337,19 +341,19 @@ const GradingButtons = memo(function GradingButtons({ onGrade }: { onGrade: (r: 
     <div className="flashcard-grade">
       <p className="grade-prompt">Como foi?</p>
       <div className="grade-buttons">
-        <button className="btn grade-btn grade-1" onClick={() => onGrade(Rating.Again as Grade)}>
+        <button type="button" className="btn grade-btn grade-1" onClick={() => onGrade(Rating.Again as Grade)}>
           1<br />
           <small>Esqueci</small>
         </button>
-        <button className="btn grade-btn grade-2" onClick={() => onGrade(Rating.Hard as Grade)}>
+        <button type="button" className="btn grade-btn grade-2" onClick={() => onGrade(Rating.Hard as Grade)}>
           2<br />
           <small>Difícil</small>
         </button>
-        <button className="btn grade-btn grade-3" onClick={() => onGrade(Rating.Good as Grade)}>
+        <button type="button" className="btn grade-btn grade-3" onClick={() => onGrade(Rating.Good as Grade)}>
           3<br />
           <small>Bom</small>
         </button>
-        <button className="btn grade-btn grade-4" onClick={() => onGrade(Rating.Easy as Grade)}>
+        <button type="button" className="btn grade-btn grade-4" onClick={() => onGrade(Rating.Easy as Grade)}>
           4<br />
           <small>Fácil</small>
         </button>
@@ -423,17 +427,17 @@ function FlashcardView({
         <div className="flip-card-inner">
           <div className="flip-card-front">
             <h2 className="flashcard-ref">{reference}</h2>
-            <p className="flashcard-hint">Tente recitar o versículo mentalmente...</p>
+            <p className="flashcard-hint">Tente recitar o versículo mentalmente…</p>
             {hintLevel > 0 && (
               <div className="flashcard-hint-text">
                 <p>{getHiddenText()}</p>
               </div>
             )}
             <div className="flashcard-actions">
-              <button className="btn btn-secondary" onClick={() => setHintLevel((h) => h + 1)}>
+              <button type="button" className="btn btn-secondary" onClick={() => setHintLevel((h) => h + 1)}>
                 Dica {hintLevel === 0 ? '(1ª letra)' : '(palavras)'}
               </button>
-              <button className="btn btn-primary" onClick={() => setFlipped(true)}>
+              <button type="button" className="btn btn-primary" onClick={() => setFlipped(true)}>
                 Revelar
               </button>
             </div>
@@ -500,7 +504,7 @@ function FillInBlankView({
               <p className="blank-count">Preencha mentalmente {blankIndices.size} palavra(s)</p>
             </div>
             <div className="flashcard-actions">
-              <button className="btn btn-primary" onClick={() => setRevealed(true)}>
+              <button type="button" className="btn btn-primary" onClick={() => setRevealed(true)}>
                 Revelar
               </button>
             </div>
@@ -591,7 +595,7 @@ function TypingPracticeView({
             rows={4}
           />
           <div className="flashcard-actions">
-            <button className="btn btn-primary" onClick={handleSubmit} disabled={!input.trim()}>
+            <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={!input.trim()}>
               Verificar
             </button>
           </div>

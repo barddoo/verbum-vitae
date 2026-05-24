@@ -1,10 +1,6 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
-import BarChart2 from 'lucide-react/dist/esm/icons/bar-chart-2'
-import BookOpen from 'lucide-react/dist/esm/icons/book-open'
-import Home from 'lucide-react/dist/esm/icons/home'
-import Layers from 'lucide-react/dist/esm/icons/layers'
-import RotateCcw from 'lucide-react/dist/esm/icons/rotate-ccw'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
+import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
 import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
@@ -12,7 +8,7 @@ import { ThemeToggle } from './components/theme-toggle'
 import { WelcomeModal } from './components/welcome-modal'
 import { useAuth } from './lib/auth'
 
-const loadingSpinner = <div className="loading">Carregando...</div>
+const loadingSpinner = <div className="loading">Carregando…</div>
 
 const HomePage = lazy(() => import('./routes/index').then((m) => ({ default: m.HomePage })))
 const BrowsePage = lazy(() => import('./routes/browse').then((m) => ({ default: m.BrowsePage })))
@@ -21,13 +17,33 @@ const StatsPage = lazy(() => import('./routes/stats').then((m) => ({ default: m.
 const CollectionsListPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionsListPage })))
 const CollectionDetailPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionDetailPage })))
 
+type Modal = 'auth' | 'donate' | 'help' | 'welcome'
+
+function modalReducer(state: Modal[], action: { type: 'open'; modal: Modal } | { type: 'close'; modal: Modal }): Modal[] {
+  switch (action.type) {
+    case 'open':
+      return state.includes(action.modal) ? state : [...state, action.modal]
+    case 'close':
+      return state.filter((m) => m !== action.modal)
+  }
+}
+
 function RootLayout() {
   const { user, isOnline, logout } = useAuth()
-  const [showAuth, setShowAuth] = useState(false)
-  const [showDonate, setShowDonate] = useState(false)
-  const [showHelp, setShowHelp] = useState(false)
-  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('welcomed'))
+  const [modals, dispatch] = useReducer(
+    modalReducer,
+    (['welcome'] as Modal[]).filter(() => !localStorage.getItem('welcomed')),
+  )
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
+
+  const setShowAuth = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'auth' })
+  const setShowDonate = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'donate' })
+  const setShowHelp = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'help' })
+  const setShowWelcome = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'welcome' })
+  const showAuth = modals.includes('auth')
+  const showDonate = modals.includes('donate')
+  const showHelp = modals.includes('help')
+  const showWelcome = modals.includes('welcome')
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px)')
@@ -44,7 +60,7 @@ function RootLayout() {
           <h1 className="top-bar-title">Verbum Vitae</h1>
         </Link>
         <div className="top-bar-right">
-          <button className="btn-help" onClick={() => setShowHelp(true)} aria-label="Ajuda">
+          <button type="button" className="btn-help" onClick={() => setShowHelp(true)} aria-label="Ajuda">
             ?
           </button>
           <ThemeToggle />
@@ -52,12 +68,12 @@ function RootLayout() {
           {user ? (
             <>
               <span className="user-badge">{user.email}</span>
-              <button className="btn btn-sm btn-secondary" onClick={logout}>
+              <button type="button" className="btn btn-sm btn-secondary" onClick={logout}>
                 Sair
               </button>
             </>
           ) : (
-            <button className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>
               Entrar
             </button>
           )}
@@ -102,7 +118,7 @@ function RootLayout() {
                 código aberto
               </a>
             </div>
-            <button className="app-footer-donate" onClick={() => setShowDonate(true)}>
+            <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
               ₿ Doar
             </button>
           </footer>

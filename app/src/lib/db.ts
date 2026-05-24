@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { VerseRow } from 'shared/types'
+import { cachedGet } from './storage'
 
 export interface Verse extends VerseRow {
   id?: number
@@ -106,12 +107,6 @@ export function parseVerseKey(key: string): VerseKeyParsed {
   }
 }
 
-export function verseIdToReference(verseId: string, bookName: string): string {
-  const p = parseVerseKey(verseId)
-  if (p.verseEnd) return `${bookName} ${p.chapter}:${p.verseStart}-${p.verseEnd}`
-  return `${bookName} ${p.chapter}:${p.verseStart}`
-}
-
 const seedingByTranslation = new Map<string, Promise<void>>()
 
 export async function ensureTranslationSeeded(translation: string) {
@@ -119,20 +114,6 @@ export async function ensureTranslationSeeded(translation: string) {
     seedingByTranslation.set(translation, seedVerses(translation as Verse['translation']))
   }
   return seedingByTranslation.get(translation)!
-}
-
-// kept for backward compat
-export async function ensureVersesSeeded() {
-  return ensureTranslationSeeded('naa')
-}
-
-export async function fetchVersesForKey(verseId: string, translation: string): Promise<string> {
-  await ensureTranslationSeeded(translation)
-  const p = parseVerseKey(verseId)
-  const endVerse = p.verseEnd || p.verseStart
-  const rows = await db.verses.where('[bookNumber+chapter]').equals([p.bookNumber, p.chapter]).sortBy('verse')
-  const filtered = rows.filter((r) => r.translation === translation && r.verse >= p.verseStart && r.verse <= endVerse)
-  return filtered.map((r) => r.text).join(' ')
 }
 
 export async function fetchVersesBatch(keys: { verseId: string; translation: string }[]): Promise<Map<string, string>> {
@@ -146,24 +127,27 @@ export async function fetchVersesBatch(keys: { verseId: string; translation: str
     chapterGroups.get(ck)!.keys.push(k)
   }
 
-  const result = new Map<string, string>()
-  for (const [ck, group] of chapterGroups) {
-    const [bookNumStr, chapterNumStr] = ck.split('_')
-    const rows = await db.verses
-      .where('[bookNumber+chapter]')
-      .equals([parseInt(bookNumStr, 10), parseInt(chapterNumStr, 10)])
-      .toArray()
-    for (const k of group.keys) {
-      const p = parseVerseKey(k.verseId)
-      const endVerse = p.verseEnd || p.verseStart
-      const filtered = rows.filter((r) => r.translation === k.translation && r.verse >= p.verseStart && r.verse <= endVerse)
-      result.set(k.verseId, filtered.map((r) => r.text).join(' '))
-    }
-  }
-  return result
+  const results = await Promise.all(
+    [...chapterGroups].map(async ([ck, group]) => {
+      const [bookNumStr, chapterNumStr] = ck.split('_')
+      const rows = await db.verses
+        .where('[bookNumber+chapter]')
+        .equals([parseInt(bookNumStr, 10), parseInt(chapterNumStr, 10)])
+        .toArray()
+      const entries: [string, string][] = []
+      for (const k of group.keys) {
+        const p = parseVerseKey(k.verseId)
+        const endVerse = p.verseEnd || p.verseStart
+        const filtered = rows.filter((r) => r.translation === k.translation && r.verse >= p.verseStart && r.verse <= endVerse)
+        entries.push([k.verseId, filtered.map((r) => r.text).join(' ')])
+      }
+      return entries
+    }),
+  )
+  return new Map(results.flat())
 }
 
-export async function seedVerses(translation: Verse['translation']) {
+async function seedVerses(translation: Verse['translation']) {
   const count = await db.verses.where({ translation }).count()
   if (count > 0) return
 
@@ -220,16 +204,18 @@ export async function recordWordAccuracy(
   incorrectWords: Set<number>,
   allWords: string[],
 ) {
-  for (const idx of correctWords) {
-    const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
-    if (existing) await db.wordStats.update(existing.id!, { correctCount: existing.correctCount + 1 })
-    else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 1, incorrectCount: 0 })
-  }
-  for (const idx of incorrectWords) {
-    const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
-    if (existing) await db.wordStats.update(existing.id!, { incorrectCount: existing.incorrectCount + 1 })
-    else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 0, incorrectCount: 1 })
-  }
+  await Promise.all([
+    ...[...correctWords].map(async (idx) => {
+      const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
+      if (existing) await db.wordStats.update(existing.id!, { correctCount: existing.correctCount + 1 })
+      else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 1, incorrectCount: 0 })
+    }),
+    ...[...incorrectWords].map(async (idx) => {
+      const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
+      if (existing) await db.wordStats.update(existing.id!, { incorrectCount: existing.incorrectCount + 1 })
+      else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 0, incorrectCount: 1 })
+    }),
+  ])
 }
 
 export async function getWordHeat(verseId: string, translation: string, wordCount: number): Promise<{ index: number; accuracy: number }[]> {
@@ -249,23 +235,23 @@ export async function getWordHeat(verseId: string, translation: string, wordCoun
 
 export async function addCollectionToMemory(
   collectionId: number,
-  translation: string,
+  _translation: string,
   _progressIdFn: () => string,
   logChange: (entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) => void,
 ) {
   const cv = await db.collectionVerses.where({ collectionId }).toArray()
   const { createEmptyCard } = await import('./srs')
-  const userId = localStorage.getItem('auth_token') ? 'user' : ''
+  const userId = cachedGet('auth_token') ? 'user' : ''
 
   const toAdd: Progress[] = []
   await db.transaction('r', db.progress, async () => {
     for (const c of cv) {
-      const existing = await db.progress.where({ verseId: c.verseId, translation }).first()
+      const existing = await db.progress.where({ verseId: c.verseId, translation: c.translation }).first()
       if (!existing) {
         const card = createEmptyCard()
         toAdd.push({
           verseId: c.verseId,
-          translation,
+          translation: c.translation,
           cardJson: JSON.stringify(card),
           state: 0,
           dueDate: card.due.getTime(),

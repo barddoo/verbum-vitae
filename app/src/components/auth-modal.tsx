@@ -46,15 +46,15 @@ export function AuthModal({ onClose }: AuthModalProps) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Fechar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
           ✕
         </button>
 
         <div className="modal-tabs">
-          <button className={`modal-tab ${tab === 'login' ? 'active' : ''}`} onClick={() => switchTab('login')}>
+          <button type="button" className={`modal-tab ${tab === 'login' ? 'active' : ''}`} onClick={() => switchTab('login')}>
             Entrar
           </button>
-          <button className={`modal-tab ${tab === 'register' ? 'active' : ''}`} onClick={() => switchTab('register')}>
+          <button type="button" className={`modal-tab ${tab === 'register' ? 'active' : ''}`} onClick={() => switchTab('register')}>
             Criar Conta
           </button>
         </div>

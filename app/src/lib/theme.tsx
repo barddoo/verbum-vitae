@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, type ReactNode, use, useCallback, useEffect, useMemo, useState } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -41,11 +41,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
 export function useTheme() {
-  const ctx = useContext(ThemeContext)
+  const ctx = use(ThemeContext)
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
   return ctx
 }

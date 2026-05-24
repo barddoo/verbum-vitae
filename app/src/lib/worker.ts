@@ -1,7 +1,9 @@
+import { cachedGet } from './storage'
+
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 async function request(path: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('auth_token')
+  const token = cachedGet('auth_token')
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...((token && { Authorization: `Bearer ${token}` }) as Record<string, string>),

@@ -27,9 +27,9 @@ const steps = [
 
 export function HelpModal({ onClose }: HelpModalProps) {
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose} role="presentation">
       <div className="modal help-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Fechar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
           ✕
         </button>
 
@@ -40,8 +40,8 @@ export function HelpModal({ onClose }: HelpModalProps) {
         </div>
 
         <ol className="help-steps">
-          {steps.map((s, i) => (
-            <li key={i} className="help-step">
+          {steps.map((s) => (
+            <li key={s.title} className="help-step">
               <span className="help-step-icon">{s.icon}</span>
               <div>
                 <strong className="help-step-title">{s.title}</strong>
@@ -51,7 +51,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
           ))}
         </ol>
 
-        <button className="btn btn-primary help-cta" onClick={onClose}>
+        <button type="button" className="btn btn-primary help-cta" onClick={onClose}>
           Entendido!
         </button>
       </div>

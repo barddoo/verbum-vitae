@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { db } from '../lib/db'
 import { computeStreak } from '../lib/stats'
 
-const loadingSpinner = <div className="loading">Carregando...</div>
+const loadingSpinner = <div className="loading">Carregando…</div>
 
 export function HomePage() {
   const [dueCount, setDueCount] = useState(0)
@@ -42,7 +42,7 @@ export function HomePage() {
   return (
     <div className="page home-page">
       {loading ? (
-{loadingSpinner}
+        loadingSpinner
       ) : (
         <>
           <div className="hero-card">

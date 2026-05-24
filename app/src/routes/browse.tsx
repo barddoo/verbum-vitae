@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { db, ensureTranslationSeeded, verseKey } from '../lib/db'
 import { createEmptyCard } from '../lib/srs'
+import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 
 interface SearchResult {
@@ -12,7 +13,7 @@ interface SearchResult {
   ref: string
 }
 
-const loadingSpinner = <div className="loading">Carregando...</div>
+const loadingSpinner = <div className="loading">Carregando…</div>
 
 export function BrowsePage() {
   const [translation, setTranslation] = useState<Translation>(
@@ -35,14 +36,55 @@ export function BrowsePage() {
   const pointerStart = useRef({ x: 0, y: 0 })
   const didLongPress = useRef(false)
 
+  const loadMemorizedVerses = useCallback(async () => {
+    await ensureTranslationSeeded(translation)
+    const progress = await db.progress.where({ translation }).toArray()
+    setMemorizedVerses(new Set(progress.map((p) => p.verseId)))
+  }, [translation])
+
+  const loadChapter = useCallback(async () => {
+    if (bookIndex === null || chapter === null) return
+    setLoadingVerses(true)
+    await ensureTranslationSeeded(translation)
+    const rows = await db.verses.where({ bookNumber: bookIndex, chapter, translation }).sortBy('verse')
+    setVerses(rows.map((r) => r.text))
+    setLoadingVerses(false)
+    setSelectionMode(false)
+    setSelectionAnchor(null)
+    setSelectedVerses(new Set())
+  }, [bookIndex, chapter, translation])
+
+  const doSearch = useCallback(
+    async (query: string) => {
+      setSearching(true)
+      await ensureTranslationSeeded(translation)
+      const lower = query.toLowerCase()
+      const all = await db.verses
+        .where({ translation })
+        .filter((v) => v.text.toLowerCase().includes(lower))
+        .limit(50)
+        .toArray()
+      const results: SearchResult[] = all.map((v) => ({
+        bookNumber: v.bookNumber,
+        chapter: v.chapter,
+        verse: v.verse,
+        text: v.text,
+        ref: `${BOOKS[v.bookNumber]} ${v.chapter}:${v.verse}`,
+      }))
+      setSearchResults(results)
+      setSearching(false)
+    },
+    [translation],
+  )
+
   useEffect(() => {
     loadMemorizedVerses()
-  }, [translation])
+  }, [translation, loadMemorizedVerses])
 
   useEffect(() => {
     if (bookIndex === null || chapter === null) return
     loadChapter()
-  }, [bookIndex, chapter, translation])
+  }, [bookIndex, chapter, translation, loadChapter])
 
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
@@ -54,45 +96,7 @@ export function BrowsePage() {
     return () => {
       if (searchTimer.current) clearTimeout(searchTimer.current)
     }
-  }, [searchQuery, translation])
-
-  async function loadMemorizedVerses() {
-    await ensureTranslationSeeded(translation)
-    const progress = await db.progress.where({ translation }).toArray()
-    setMemorizedVerses(new Set(progress.map((p) => p.verseId)))
-  }
-
-  async function loadChapter() {
-    if (bookIndex === null || chapter === null) return
-    setLoadingVerses(true)
-    await ensureTranslationSeeded(translation)
-    const rows = await db.verses.where({ bookNumber: bookIndex, chapter, translation }).sortBy('verse')
-    setVerses(rows.map((r) => r.text))
-    setLoadingVerses(false)
-    setSelectionMode(false)
-    setSelectionAnchor(null)
-    setSelectedVerses(new Set())
-  }
-
-  async function doSearch(query: string) {
-    setSearching(true)
-    await ensureTranslationSeeded(translation)
-    const lower = query.toLowerCase()
-    const all = await db.verses
-      .where({ translation })
-      .filter((v) => v.text.toLowerCase().includes(lower))
-      .limit(50)
-      .toArray()
-    const results: SearchResult[] = all.map((v) => ({
-      bookNumber: v.bookNumber,
-      chapter: v.chapter,
-      verse: v.verse,
-      text: v.text,
-      ref: `${BOOKS[v.bookNumber]} ${v.chapter}:${v.verse}`,
-    }))
-    setSearchResults(results)
-    setSearching(false)
-  }
+  }, [searchQuery, translation, doSearch])
 
   function goToVerse(b: number, c: number) {
     setBookIndex(b)
@@ -177,13 +181,19 @@ export function BrowsePage() {
 
   async function memorizeSelected() {
     if (bookIndex === null || chapter === null || selectedVerses.size === 0) return
-    const keys: string[] = []
-    for (const v of selectedVerses) {
-      const key = verseKey(bookIndex, chapter, v)
-      const existing = await db.progress.where({ verseId: key, translation }).first()
-      if (existing) continue
+    const keys = [...selectedVerses].map((v) => verseKey(bookIndex, chapter, v))
+    const existingList = await Promise.all(keys.map((key) => db.progress.where({ verseId: key, translation }).first()))
+    const toAddKeys = keys.filter((_, i) => !existingList[i])
+    const userId = cachedGet('auth_token') ? 'user' : ''
+
+    if (toAddKeys.length === 0) {
+      exitSelectionMode()
+      return
+    }
+
+    const newProgress = toAddKeys.map((key) => {
       const card = createEmptyCard()
-      await db.progress.put({
+      return {
         verseId: key,
         translation,
         cardJson: JSON.stringify(card),
@@ -191,29 +201,35 @@ export function BrowsePage() {
         dueDate: card.due.getTime(),
         streak: 0,
         updatedAt: Date.now(),
-      })
+      }
+    })
+
+    await db.progress.bulkAdd(newProgress)
+
+    for (const p of newProgress) {
+      const card = JSON.parse(p.cardJson)
       logProgressChange({
-        userId: localStorage.getItem('auth_token') ? 'user' : '',
+        userId,
         tableName: 'progress',
-        rowId: key,
+        rowId: p.verseId,
         operation: 'create',
         data: JSON.stringify({
-          verseId: key,
+          verseId: p.verseId,
           translation,
-          cardJson: JSON.stringify(card),
-          nextReview: new Date(card.due.getTime()).toISOString(),
+          cardJson: p.cardJson,
+          nextReview: new Date(card.due).toISOString(),
           lastReview: new Date().toISOString(),
         }),
       })
-      keys.push(key)
     }
-    setJustAdded(new Set(keys))
+
+    setJustAdded(new Set(toAddKeys))
     exitSelectionMode()
     await loadMemorizedVerses()
     setTimeout(() => setJustAdded(new Set()), 2000)
   }
 
-  const sortedSelected = useMemo(() => [...selectedVerses].sort((a, b) => a - b), [selectedVerses])
+  const sortedSelected = useMemo(() => [...selectedVerses].toSorted((a, b) => a - b), [selectedVerses])
   const chapterCount = useMemo(() => {
     if (bookIndex === null) return 0
     const counts = [
@@ -273,7 +289,7 @@ export function BrowsePage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button className="search-clear" onClick={clearSearch}>
+            <button type="button" className="search-clear" onClick={clearSearch}>
               ✕
             </button>
           )}
@@ -283,12 +299,12 @@ export function BrowsePage() {
       {searchQuery.trim().length >= 2 && (
         <div className="search-results">
           {searching ? (
-            <div className="loading">Buscando...</div>
+            <div className="loading">Buscando…</div>
           ) : searchResults.length === 0 ? (
             <p className="search-empty">Nenhum resultado para "{searchQuery}"</p>
           ) : (
-            searchResults.map((r, i) => (
-              <div key={i} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
+            searchResults.map((r) => (
+              <div key={r.ref} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
                 <span className="search-result-ref">{r.ref}</span>
                 <span className="search-result-text">{highlightMatch(r.text, searchQuery)}</span>
               </div>
@@ -301,6 +317,7 @@ export function BrowsePage() {
         <div className="book-list">
           {BOOKS.map((book, i) => (
             <button
+              type="button"
               key={i}
               className="book-item"
               onClick={() => {
@@ -314,13 +331,13 @@ export function BrowsePage() {
         </div>
       ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
         <div className="chapter-view">
-          <button className="back-btn" onClick={() => setBookIndex(null)}>
+          <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
             ← Voltar
           </button>
           <h3>{BOOKS[bookIndex!]}</h3>
           <div className="chapter-grid">
             {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
-              <button key={c} className="chapter-item" onClick={() => setChapter(c)}>
+              <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
                 {c}
               </button>
             ))}
@@ -328,7 +345,7 @@ export function BrowsePage() {
         </div>
       ) : !searchQuery || searchQuery.trim().length < 2 ? (
         <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
-          <button className="back-btn" onClick={() => setChapter(null)}>
+          <button type="button" className="back-btn" onClick={() => setChapter(null)}>
             ← {BOOKS[bookIndex!]}
           </button>
           <div className="verse-header">
@@ -339,7 +356,7 @@ export function BrowsePage() {
                     ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
                     : 'Toque para selecionar'}
                 </span>
-                <button className="select-mode-exit" onClick={exitSelectionMode}>
+                <button type="button" className="select-mode-exit" onClick={exitSelectionMode}>
                   ✕
                 </button>
               </>
@@ -349,30 +366,28 @@ export function BrowsePage() {
               </h3>
             )}
           </div>
-          {loadingVerses ? (
-            {loadingSpinner}
-          ) : (
-            verses.map((text, i) => {
-              const v = i + 1
-              const mem = isMemorized(v)
-              const add = isAdded(v)
-              const sel = selectedVerses.has(v)
-              return (
-                <div
-                  key={i}
-                  className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                  onPointerDown={(e) => handlePointerDown(v, e)}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={() => handlePointerUp(v)}
-                  onPointerCancel={handlePointerCancel}
-                >
-                  <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
-                  <span className="verse-text">{text}</span>
-                  {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
-                </div>
-              )
-            })
-          )}
+          {loadingVerses
+            ? loadingSpinner
+            : verses.map((text, i) => {
+                const v = i + 1
+                const mem = isMemorized(v)
+                const add = isAdded(v)
+                const sel = selectedVerses.has(v)
+                return (
+                  <div
+                    key={i}
+                    className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
+                    onPointerDown={(e) => handlePointerDown(v, e)}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={() => handlePointerUp(v)}
+                    onPointerCancel={handlePointerCancel}
+                  >
+                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
+                    <span className="verse-text">{text}</span>
+                    {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
+                  </div>
+                )
+              })}
         </div>
       ) : null}
 
@@ -388,10 +403,10 @@ export function BrowsePage() {
             </span>
           </div>
           <div className="selection-bar-actions">
-            <button className="btn btn-sm btn-secondary" onClick={exitSelectionMode}>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={exitSelectionMode}>
               Limpar
             </button>
-            <button className="btn btn-sm btn-primary" onClick={memorizeSelected}>
+            <button type="button" className="btn btn-sm btn-primary" onClick={memorizeSelected}>
               Memorizar
             </button>
           </div>
