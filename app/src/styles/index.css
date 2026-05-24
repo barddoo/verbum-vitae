@@ -2674,3 +2674,60 @@ body::before {
 .help-cta {
   width: 100%;
 }
+
+/* Welcome modal */
+.welcome-modal {
+  max-width: 26rem;
+  text-align: center;
+}
+
+.welcome-header {
+  margin-bottom: 1.75rem;
+}
+
+.welcome-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.welcome-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--parchment);
+  margin: 0 0 0.5rem;
+}
+
+.welcome-subtitle {
+  font-size: 0.85rem;
+  color: var(--aged);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.welcome-verse {
+  margin: 0 0 1.75rem;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--gold);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  text-align: left;
+}
+
+.welcome-verse-text {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--parchment);
+  margin: 0 0 0.5rem;
+  line-height: 1.6;
+}
+
+.welcome-verse-ref {
+  font-size: 0.75rem;
+  color: var(--gold);
+  font-style: normal;
+}
+
+.welcome-cta {
+  width: 100%;
+}

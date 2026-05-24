@@ -4,6 +4,7 @@ import { BookOpen, BarChart2, Home, Layers, RotateCcw } from 'lucide-react'
 import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
+import { WelcomeModal } from './components/welcome-modal'
 import { ThemeToggle } from './components/theme-toggle'
 import { useAuth } from './lib/auth'
 
@@ -19,6 +20,7 @@ function RootLayout() {
   const [showAuth, setShowAuth] = useState(false)
   const [showDonate, setShowDonate] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('welcomed'))
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
 
   useEffect(() => {
@@ -129,6 +131,7 @@ function RootLayout() {
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
       {showDonate && <DonateModal onClose={() => setShowDonate(false)} />}
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
     </div>
   )
 }
