@@ -1,18 +1,21 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import { ThemeToggle } from './components/theme-toggle'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { AuthModal } from './components/auth-modal'
+import { DonateModal } from './components/donate-modal'
+import { ThemeToggle } from './components/theme-toggle'
 import { useAuth } from './lib/auth'
-import { seedVerses } from './lib/db'
-import { BrowsePage } from './routes/browse'
-import { HomePage } from './routes/index'
-import { ReviewPage } from './routes/review'
-import { StatsPage } from './routes/stats'
-import { CollectionsListPage, CollectionDetailPage } from './routes/collections'
+
+const HomePage = lazy(() => import('./routes/index').then((m) => ({ default: m.HomePage })))
+const BrowsePage = lazy(() => import('./routes/browse').then((m) => ({ default: m.BrowsePage })))
+const ReviewPage = lazy(() => import('./routes/review').then((m) => ({ default: m.ReviewPage })))
+const StatsPage = lazy(() => import('./routes/stats').then((m) => ({ default: m.StatsPage })))
+const CollectionsListPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionsListPage })))
+const CollectionDetailPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionDetailPage })))
 
 function RootLayout() {
   const { user, isOnline, logout } = useAuth()
   const [showAuth, setShowAuth] = useState(false)
+  const [showDonate, setShowDonate] = useState(false)
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
 
   useEffect(() => {
@@ -20,10 +23,6 @@ function RootLayout() {
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
-  }, [])
-
-  useEffect(() => {
-    seedVerses('ara')
   }, [])
 
   return (
@@ -39,10 +38,14 @@ function RootLayout() {
           {user ? (
             <>
               <span className="user-badge">{user.email}</span>
-              <button className="btn btn-sm btn-secondary" onClick={logout}>Sair</button>
+              <button className="btn btn-sm btn-secondary" onClick={logout}>
+                Sair
+              </button>
             </>
           ) : (
-            <button className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>Entrar</button>
+            <button className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>
+              Entrar
+            </button>
           )}
         </div>
       </header>
@@ -71,7 +74,24 @@ function RootLayout() {
         )}
 
         <main className="main-content">
-          <Outlet />
+          <Suspense fallback={<div className="loading">Carregando...</div>}>
+            <Outlet />
+          </Suspense>
+          <footer className="app-footer">
+            <div>
+              Feito por{' '}
+              <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
+                Charles Fonseca
+              </a>
+              {' '}&mdash;{' '}
+              <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
+                código aberto
+              </a>
+            </div>
+            <button className="app-footer-donate" onClick={() => setShowDonate(true)}>
+              ₿ Doar
+            </button>
+          </footer>
         </main>
       </div>
 
@@ -96,6 +116,7 @@ function RootLayout() {
       )}
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showDonate && <DonateModal onClose={() => setShowDonate(false)} />}
     </div>
   )
 }

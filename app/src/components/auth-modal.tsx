@@ -46,19 +46,15 @@ export function AuthModal({ onClose }: AuthModalProps) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Fechar">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Fechar">
+          ✕
+        </button>
 
         <div className="modal-tabs">
-          <button
-            className={`modal-tab ${tab === 'login' ? 'active' : ''}`}
-            onClick={() => switchTab('login')}
-          >
+          <button className={`modal-tab ${tab === 'login' ? 'active' : ''}`} onClick={() => switchTab('login')}>
             Entrar
           </button>
-          <button
-            className={`modal-tab ${tab === 'register' ? 'active' : ''}`}
-            onClick={() => switchTab('register')}
-          >
+          <button className={`modal-tab ${tab === 'register' ? 'active' : ''}`} onClick={() => switchTab('register')}>
             Criar Conta
           </button>
         </div>
@@ -71,7 +67,14 @@ export function AuthModal({ onClose }: AuthModalProps) {
           </label>
           <label>
             Senha
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={tab === 'login' ? 'current-password' : 'new-password'} required minLength={8} />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
+              required
+              minLength={8}
+            />
           </label>
           {tab === 'register' && (
             <label>
@@ -80,11 +83,13 @@ export function AuthModal({ onClose }: AuthModalProps) {
             </label>
           )}
           <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading
-              ? (tab === 'login' ? 'Entrando...' : 'Criando...')
-              : (tab === 'login' ? 'Entrar' : 'Criar conta')}
+            {loading ? (tab === 'login' ? 'Entrando...' : 'Criando...') : tab === 'login' ? 'Entrar' : 'Criar conta'}
           </button>
         </form>
+
+        <p className="auth-free-notice">
+          Verbum Vitae é <strong>100% gratuito</strong> e sempre será. A conta serve apenas para sincronizar seu progresso entre dispositivos — sem cobranças, sem planos, sem coleta de dados.
+        </p>
       </div>
     </div>
   )
