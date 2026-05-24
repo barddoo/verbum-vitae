@@ -14,6 +14,13 @@ mode = "smart"
 [observability]
 enabled = true
 
+[observability.logs]
+enabled = true
+invocation_logs = true
+
+[observability.traces]
+enabled = false
+
 [assets]
 directory = "../app/dist"
 binding = "ASSETS"
