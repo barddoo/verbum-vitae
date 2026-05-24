@@ -45,10 +45,8 @@ async function verifyPassword(password: string, stored: string): Promise<boolean
     key,
     PBKDF2_KEY_LENGTH * 8,
   )
-  const computedHex = Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-  return computedHex === hashHex
+  const storedBytes = new Uint8Array(hashHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)))
+  return crypto.subtle.timingSafeEqual(new Uint8Array(hash), storedBytes)
 }
 
 async function generateToken(userId: string, email: string, secret: string): Promise<string> {

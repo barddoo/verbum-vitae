@@ -14,5 +14,9 @@ mode = "smart"
 [observability]
 enabled = true
 
+[assets]
+directory = "../app/dist"
+binding = "ASSETS"
+
 [env.production]
 name = "verbum-vitae-api"

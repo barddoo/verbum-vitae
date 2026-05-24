@@ -21,14 +21,16 @@ async function getUser(c: any) {
 }
 
 const pushSchema = z.object({
-  entries: z.array(
-    z.object({
-      tableName: z.string(),
-      rowId: z.string(),
-      operation: z.enum(['create', 'update', 'delete']),
-      data: z.string(),
-    }),
-  ),
+  entries: z
+    .array(
+      z.object({
+        tableName: z.string(),
+        rowId: z.string(),
+        operation: z.enum(['create', 'update', 'delete']),
+        data: z.string(),
+      }),
+    )
+    .max(500),
 })
 
 syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
@@ -48,7 +50,12 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
     )
 
     if (entry.tableName === 'progress') {
-      const parsed = JSON.parse(entry.data)
+      let parsed: Record<string, unknown>
+      try {
+        parsed = JSON.parse(entry.data)
+      } catch {
+        return c.json({ error: 'Invalid entry data' }, 400)
+      }
       if (entry.operation === 'create') {
         stmts.push(
           c.env.DB.prepare(
