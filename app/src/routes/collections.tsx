@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { BOOKS } from 'shared/bible'
+import { DEFAULT_TRANSLATION } from 'shared/bible'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { addCollectionToMemory, db, fetchVersesBatch, getCollectionProgress, parseVerseKey } from '../lib/db'
 import { logProgressChange } from '../lib/sync'
@@ -55,21 +56,22 @@ export function CollectionsListPage() {
   async function init() {
     await ensureCollectionsSeeded()
     const allCols = await db.collections.toArray()
-    const entries: CollectionEntry[] = []
-    for (const col of allCols) {
-      const { total, memorized, percent } = await getCollectionProgress(col.id!, 'ara')
-      entries.push({
-        id: col.id!,
-        dbId: col.id!,
-        name: col.name,
-        description: col.description,
-        icon: col.icon,
-        isBuiltin: col.isBuiltin,
-        total,
-        memorized,
-        percent,
-      })
-    }
+    const entries: CollectionEntry[] = await Promise.all(
+      allCols.map(async (col) => {
+        const { total, memorized, percent } = await getCollectionProgress(col.id!, 'ara')
+        return {
+          id: col.id!,
+          dbId: col.id!,
+          name: col.name,
+          description: col.description,
+          icon: col.icon,
+          isBuiltin: col.isBuiltin,
+          total,
+          memorized,
+          percent,
+        }
+      }),
+    )
     setCollections(entries)
     setLoading(false)
   }
@@ -133,12 +135,15 @@ export function CollectionDetailPage() {
     const c = await db.collections.get(dbId)
     if (!c) return
 
-    const { total, memorized, percent } = await getCollectionProgress(dbId, 'ara')
-    setCol({ id: dbId, dbId, name: c.name, description: c.description, icon: c.icon, isBuiltin: c.isBuiltin, total, memorized, percent })
+    const [progressResult, cvs, allProgress] = await Promise.all([
+      getCollectionProgress(dbId, 'ara'),
+      db.collectionVerses.where({ collectionId: dbId }).sortBy('sortOrder'),
+      db.progress.toArray(),
+    ])
 
-    const cvs = await db.collectionVerses.where({ collectionId: dbId }).sortBy('sortOrder')
+    setCol({ id: dbId, dbId, name: c.name, description: c.description, icon: c.icon, isBuiltin: c.isBuiltin, ...progressResult })
+
     const memSet = new Set<string>()
-    const allProgress = await db.progress.toArray()
     for (const p of allProgress) memSet.add(p.verseId + p.translation)
 
     const verseTexts = await fetchVersesBatch(cvs.map((cv) => ({ verseId: cv.verseId, translation: cv.translation })))
@@ -160,7 +165,8 @@ export function CollectionDetailPage() {
   async function handleAddAll() {
     if (!col) return
     setAdding(true)
-    const _addedCount = await addCollectionToMemory(col.dbId, 'ara', () => '', logProgressChange)
+    const userTranslation = (localStorage.getItem('translation') as string | null) ?? DEFAULT_TRANSLATION
+    const _addedCount = await addCollectionToMemory(col.dbId, userTranslation, () => '', logProgressChange)
     setAdded(true)
     setAdding(false)
     await load()
