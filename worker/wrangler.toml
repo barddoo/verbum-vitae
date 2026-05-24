@@ -1,6 +1,6 @@
 name = "verbum-vitae-api"
 main = "src/index.ts"
-compatibility_date = "2025-05-22"
+compatibility_date = "2026-05-14"
 compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
