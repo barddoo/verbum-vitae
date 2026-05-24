@@ -26,14 +26,9 @@ export function ReviewPage() {
   const [completed, setCompleted] = useState(0)
   const [loading, setLoading] = useState(true)
   const [practiceMode, setPracticeMode] = useState<PracticeMode>(() => (localStorage.getItem('review_mode') as PracticeMode) || 'flashcard')
-  const [filterCollection, setFilterCollection] = useState<number | null>(() => {
-    const v = localStorage.getItem('review_filter_collection')
-    return v ? Number(v) : null
-  })
   const [filterBook] = useState<number | null>(null)
   const [totalAll, setTotalAll] = useState(0)
   const [totalDue, setTotalDue] = useState(0)
-  const [collections, setCollections] = useState<{ id: number; name: string }[]>([])
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
   const translation = (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION
 
@@ -43,15 +38,9 @@ export function ReviewPage() {
     setPracticeMode(m)
     localStorage.setItem('review_mode', m)
   }
-  function setAndPersistCollection(id: number | null) {
-    setFilterCollection(id)
-    if (id === null) localStorage.removeItem('review_filter_collection')
-    else localStorage.setItem('review_filter_collection', String(id))
-  }
 
   useEffect(() => {
     loadQueueStats()
-    loadCollections()
   }, [])
 
   useEffect(() => {
@@ -60,11 +49,6 @@ export function ReviewPage() {
       startReview()
     }
   }, [loading, autostart, totalAll, phase])
-
-  async function loadCollections() {
-    const cols = await db.collections.toArray()
-    setCollections(cols.map((c) => ({ id: c.id!, name: c.name })))
-  }
 
   async function loadQueueStats() {
     const allProgress = (await db.progress.toArray()).filter((p) => p.translation === translation)
@@ -86,12 +70,6 @@ export function ReviewPage() {
     if (filterBook !== null) {
       selected = selected.filter((p) => parseVerseKey(p.verseId).bookNumber === filterBook)
     }
-    if (filterCollection !== null) {
-      const cvs = await db.collectionVerses.where({ collectionId: filterCollection }).toArray()
-      const colSet = new Set(cvs.map((cv) => cv.verseId + cv.translation))
-      selected = selected.filter((p) => colSet.has(p.verseId + p.translation))
-    }
-
     if (selected.length === 0) {
       setLoading(false)
       return
@@ -201,20 +179,6 @@ export function ReviewPage() {
               </span>
             </button>
           ))}
-        </div>
-        <div className="review-filters-compact">
-          <select
-            className="queue-select queue-select-sm"
-            value={filterCollection ?? ''}
-            onChange={(e) => setAndPersistCollection(e.target.value ? Number(e.target.value) : null)}
-          >
-            <option value="">Coleção</option>
-            {collections.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
         </div>
         <button
           className="btn btn-primary btn-large btn-start"
