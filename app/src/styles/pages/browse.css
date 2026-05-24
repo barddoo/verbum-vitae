@@ -16,8 +16,13 @@
   outline: none;
 }
 
-.translate-picker select:focus {
+.translate-picker select:focus-visible {
   border-color: var(--gold);
+}
+
+.book-search {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
 }
 
 .book-list {
@@ -36,13 +41,28 @@
   font-size: 0.8rem;
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .book-item:hover {
   background: var(--leather-hover);
   border-color: var(--gold);
   color: var(--gold);
+}
+
+.book-section-label {
+  grid-column: 1 / -1;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--aged);
+  padding: 0.75rem 0 0.25rem;
+}
+
+.book-section-label:first-child {
+  padding-top: 0;
 }
 
 .chapter-view h3,
@@ -69,7 +89,7 @@
   font-size: 0.8rem;
   cursor: pointer;
   text-align: center;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .chapter-item:hover {
@@ -330,7 +350,7 @@
   outline: none;
 }
 
-.search-input:focus {
+.search-input:focus-visible {
   border-color: var(--gold);
 }
 
@@ -372,7 +392,7 @@
   font-family: var(--font-body);
   font-size: 0.82rem;
   margin-bottom: 0.375rem;
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s;
 }
 
 .search-result-row:hover {
@@ -407,4 +427,19 @@
   color: var(--aged);
   font-style: italic;
   text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-item,
+  .chapter-item,
+  .search-result-row,
+  .back-btn,
+  .search-clear,
+  .verse-row {
+    transition: none;
+  }
+
+  @keyframes selectionSlideUp {
+    from { transform: none; opacity: 1; }
+  }
 }

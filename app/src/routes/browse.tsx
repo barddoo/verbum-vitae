@@ -32,6 +32,7 @@ export function BrowsePage() {
   const [selectionMode, setSelectionMode] = useState(false)
   const [selectionAnchor, setSelectionAnchor] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [bookQuery, setBookQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -197,6 +198,13 @@ export function BrowsePage() {
     setTimeout(() => setJustAdded(new Set()), 2000)
   }
 
+  const filteredBooks = useMemo(() => {
+    return BOOKS.reduce<{ name: string; idx: number }[]>((acc, name, i) => {
+      if (!bookQuery || name.toLowerCase().includes(bookQuery.toLowerCase())) acc.push({ name, idx: i })
+      return acc
+    }, [])
+  }, [bookQuery])
+
   const sortedSelected = useMemo(() => [...selectedVerses].toSorted((a, b) => a - b), [selectedVerses])
   const chapterCount = bookIndex !== null ? CHAPTER_COUNTS[bookIndex] : 0
   const previewText = sortedSelected.length > 0 ? verses[sortedSelected[0] - 1] : ''
@@ -227,6 +235,7 @@ export function BrowsePage() {
       <div className="browse-top">
         <div className="translate-picker">
           <select
+            aria-label="Selecionar tradução"
             value={translation}
             onChange={(e) => {
               const t = e.target.value as Translation
@@ -247,11 +256,14 @@ export function BrowsePage() {
             type="search"
             className="search-input"
             placeholder="Buscar versículos…"
+            aria-label="Buscar versículos"
+            name="verse-search"
+            autoComplete="off"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button type="button" className="search-clear" onClick={clearSearch}>
+            <button type="button" className="search-clear" aria-label="Limpar busca" onClick={clearSearch}>
               ✕
             </button>
           )}
@@ -259,7 +271,7 @@ export function BrowsePage() {
       </div>
 
       {searchQuery.trim().length >= 2 && (
-        <div className="search-results">
+        <div className="search-results" aria-live="polite" aria-atomic="false">
           {searching ? (
             <div className="loading">Buscando…</div>
           ) : searchResults.length === 0 ? (
@@ -276,21 +288,50 @@ export function BrowsePage() {
       )}
 
       {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
-        <div className="book-list">
-          {BOOKS.map((book, i) => (
-            <button
-              type="button"
-              key={book}
-              className="book-item"
-              onClick={() => {
-                setBookIndex(i)
-                setChapter(null)
-              }}
-            >
-              {book}
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="search-bar book-search">
+            <input
+              type="search"
+              className="search-input"
+              placeholder="Buscar livro…"
+              aria-label="Buscar livro"
+              name="book-search"
+              autoComplete="off"
+              value={bookQuery}
+              onChange={(e) => setBookQuery(e.target.value)}
+            />
+            {bookQuery && (
+              <button type="button" className="search-clear" aria-label="Limpar busca de livro" onClick={() => setBookQuery('')}>
+                ✕
+              </button>
+            )}
+          </div>
+          {filteredBooks.length === 0 ? (
+            <p className="search-empty">Nenhum livro encontrado</p>
+          ) : (
+            <div className="book-list">
+              {filteredBooks.flatMap(({ name, idx }) => {
+                const items = []
+                if (!bookQuery && idx === 0) items.push(<div key="at-label" className="book-section-label">Antigo Testamento</div>)
+                if (!bookQuery && idx === 39) items.push(<div key="nt-label" className="book-section-label">Novo Testamento</div>)
+                items.push(
+                  <button
+                    type="button"
+                    key={name}
+                    className="book-item"
+                    onClick={() => {
+                      setBookIndex(idx)
+                      setChapter(null)
+                    }}
+                  >
+                    {name}
+                  </button>,
+                )
+                return items
+              })}
+            </div>
+          )}
+        </>
       ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
         <div className="chapter-view">
           <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
@@ -318,7 +359,7 @@ export function BrowsePage() {
                     ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
                     : 'Toque para selecionar'}
                 </span>
-                <button type="button" className="select-mode-exit" onClick={exitSelectionMode}>
+                <button type="button" className="select-mode-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
                   ✕
                 </button>
               </>
@@ -341,11 +382,14 @@ export function BrowsePage() {
                 return (
                   <div
                     key={i}
+                    role="button"
+                    tabIndex={0}
                     className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
                     onPointerDown={(e) => longPress.handlePointerDown(v, e)}
                     onPointerMove={longPress.handlePointerMove}
                     onPointerUp={() => longPress.handlePointerUp(v)}
                     onPointerCancel={longPress.handlePointerCancel}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleTap(v) } }}
                   >
                     <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
                     <span className="verse-text">{text}</span>
