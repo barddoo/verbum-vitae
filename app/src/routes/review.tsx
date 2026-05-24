@@ -1,8 +1,9 @@
 import { useSearch } from '@tanstack/react-router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS } from 'shared/bible'
-import { db, fetchVersesForKey, getWordHeat, parseVerseKey, recordWordAccuracy } from '../lib/db'
-import { type Card, type Grade, getDueCards, getNextCard, Rating } from '../lib/srs'
+import { db, fetchVersesBatch, getWordHeat, parseVerseKey, recordWordAccuracy } from '../lib/db'
+import { getNextCard, Rating } from '../lib/scheduler'
+import { type Card, type Grade, getDueCards } from '../lib/srs'
 import { logProgressChange } from '../lib/sync'
 
 type PracticeMode = 'flashcard' | 'fill-blank' | 'typing'
@@ -24,12 +25,11 @@ export function ReviewPage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [completed, setCompleted] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [practiceMode, setPracticeMode] = useState<PracticeMode>(
-    () => (localStorage.getItem('review_mode') as PracticeMode) || 'flashcard'
-  )
-  const [filterCollection, setFilterCollection] = useState<number | null>(
-    () => { const v = localStorage.getItem('review_filter_collection'); return v ? Number(v) : null }
-  )
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>(() => (localStorage.getItem('review_mode') as PracticeMode) || 'flashcard')
+  const [filterCollection, setFilterCollection] = useState<number | null>(() => {
+    const v = localStorage.getItem('review_filter_collection')
+    return v ? Number(v) : null
+  })
   const [filterBook] = useState<number | null>(null)
   const [totalAll, setTotalAll] = useState(0)
   const [totalDue, setTotalDue] = useState(0)
@@ -38,8 +38,15 @@ export function ReviewPage() {
 
   const filterStatus = totalDue > 0 ? 'due' : 'all'
 
-  function setAndPersistMode(m: PracticeMode) { setPracticeMode(m); localStorage.setItem('review_mode', m) }
-  function setAndPersistCollection(id: number | null) { setFilterCollection(id); if (id === null) localStorage.removeItem('review_filter_collection'); else localStorage.setItem('review_filter_collection', String(id)) }
+  function setAndPersistMode(m: PracticeMode) {
+    setPracticeMode(m)
+    localStorage.setItem('review_mode', m)
+  }
+  function setAndPersistCollection(id: number | null) {
+    setFilterCollection(id)
+    if (id === null) localStorage.removeItem('review_filter_collection')
+    else localStorage.setItem('review_filter_collection', String(id))
+  }
 
   useEffect(() => {
     loadQueueStats()
@@ -51,7 +58,6 @@ export function ReviewPage() {
       autostartFired.current = true
       startReview()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, autostart, totalAll, phase])
 
   async function loadCollections() {
@@ -77,10 +83,7 @@ export function ReviewPage() {
       selected = allProgress.filter((p) => dueCards.some((dc) => dc.verseId === p.verseId))
     }
     if (filterBook !== null) {
-      selected = selected.filter((p) => {
-        const parsed = parseVerseKey(p.verseId)
-        return parsed.bookNumber === filterBook
-      })
+      selected = selected.filter((p) => parseVerseKey(p.verseId).bookNumber === filterBook)
     }
     if (filterCollection !== null) {
       const cvs = await db.collectionVerses.where({ collectionId: filterCollection }).toArray()
@@ -96,16 +99,17 @@ export function ReviewPage() {
     const cards = getDueCards(selected)
     const cardMap = new Map(cards.map((c) => [c.verseId, c.card]))
 
+    const verseTexts = await fetchVersesBatch(selected.map((p) => ({ verseId: p.verseId, translation: p.translation })))
+
     const loaded: DueItem[] = []
     for (const p of selected) {
       const card = cardMap.get(p.verseId) || JSON.parse(p.cardJson || '{}')
-      const text = await fetchVersesForKey(p.verseId, p.translation)
+      const text = verseTexts.get(p.verseId) || ''
       const parsed = parseVerseKey(p.verseId)
       const bookName = BOOKS[parsed.bookNumber]
       const ref = parsed.verseEnd
         ? `${bookName} ${parsed.chapter}:${parsed.verseStart}-${parsed.verseEnd}`
         : `${bookName} ${parsed.chapter}:${parsed.verseStart}`
-
       loaded.push({
         progressId: p.id!,
         verseId: p.verseId,
@@ -154,10 +158,7 @@ export function ReviewPage() {
 
     setCompleted((prev) => prev + 1)
     setGradeHistory((prev) => [...prev, rating])
-
-    setTimeout(() => {
-      setCurrentIndex((prev) => prev + 1)
-    }, 100)
+    setTimeout(() => setCurrentIndex((prev) => prev + 1), 100)
   }
 
   function goBack() {
@@ -168,13 +169,12 @@ export function ReviewPage() {
     setGradeHistory([])
   }
 
-  if (loading) {
+  if (loading)
     return (
       <div className="page">
         <div className="loading">Carregando...</div>
       </div>
     )
-  }
 
   if (phase === 'queue') {
     const reviewCount = filterStatus === 'due' ? totalDue : totalAll
@@ -183,22 +183,15 @@ export function ReviewPage() {
         <div className="review-queue-hero">
           <span className="review-queue-big-num">{reviewCount}</span>
           <span className="review-queue-big-label">
-            {totalAll === 0
-              ? 'nenhum versículo memorizado'
-              : reviewCount === 1 ? 'versículo para revisar' : 'versículos para revisar'}
+            {totalAll === 0 ? 'nenhum versículo memorizado' : reviewCount === 1 ? 'versículo para revisar' : 'versículos para revisar'}
           </span>
           {filterStatus === 'due' && totalAll > totalDue && totalAll > 0 && (
             <span className="review-queue-total-hint">{totalAll} total</span>
           )}
         </div>
-
         <div className="review-mode-grid">
           {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
-            <button
-              key={m}
-              className={`review-mode-card ${practiceMode === m ? 'active' : ''}`}
-              onClick={() => setAndPersistMode(m)}
-            >
+            <button key={m} className={`review-mode-card ${practiceMode === m ? 'active' : ''}`} onClick={() => setAndPersistMode(m)}>
               <span className="review-mode-card-title">
                 {m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
               </span>
@@ -208,7 +201,6 @@ export function ReviewPage() {
             </button>
           ))}
         </div>
-
         <div className="review-filters-compact">
           <select
             className="queue-select queue-select-sm"
@@ -217,11 +209,12 @@ export function ReviewPage() {
           >
             <option value="">Coleção</option>
             {collections.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
           </select>
         </div>
-
         <button
           className="btn btn-primary btn-large btn-start"
           onClick={startReview}
@@ -229,7 +222,6 @@ export function ReviewPage() {
         >
           {totalAll === 0 ? 'Adicione versículos para começar' : 'Iniciar Revisão'}
         </button>
-
         {totalAll === 0 && (
           <p className="queue-empty-hint">
             Vá para <a href="/browse">Bíblia</a> para adicionar versículos.
@@ -264,10 +256,18 @@ export function ReviewPage() {
           <p className="session-complete-count">{completed} versículos revisados</p>
           {completed > 0 && (
             <div className="session-grade-breakdown">
-              <span className="grade-breakdown-item grade-breakdown-1" title="Esqueci">{gradeCounts[0]} ✗</span>
-              <span className="grade-breakdown-item grade-breakdown-2" title="Difícil">{gradeCounts[1]} ~</span>
-              <span className="grade-breakdown-item grade-breakdown-3" title="Bom">{gradeCounts[2]} ✓</span>
-              <span className="grade-breakdown-item grade-breakdown-4" title="Fácil">{gradeCounts[3]} ★</span>
+              <span className="grade-breakdown-item grade-breakdown-1" title="Esqueci">
+                {gradeCounts[0]} ✗
+              </span>
+              <span className="grade-breakdown-item grade-breakdown-2" title="Difícil">
+                {gradeCounts[1]} ~
+              </span>
+              <span className="grade-breakdown-item grade-breakdown-3" title="Bom">
+                {gradeCounts[2]} ✓
+              </span>
+              <span className="grade-breakdown-item grade-breakdown-4" title="Fácil">
+                {gradeCounts[3]} ★
+              </span>
             </div>
           )}
           <div className="session-complete-actions">
@@ -315,7 +315,9 @@ export function ReviewPage() {
             </span>
           </div>
         </div>
-        <span className="review-completed" title="Concluídos">{completed} ✓</span>
+        <span className="review-completed" title="Concluídos">
+          {completed} ✓
+        </span>
       </div>
       <div className="review-progress-bar">
         <div className="review-progress-fill" style={{ width: `${(currentIndex / items.length) * 100}%` }} />
@@ -356,7 +358,8 @@ export function ReviewPage() {
 }
 
 function levenshtein(a: string, b: string): number {
-  const m = a.length; const n = b.length
+  const m = a.length
+  const n = b.length
   const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0))
   for (let i = 0; i <= m; i++) dp[i][0] = i
   for (let j = 0; j <= n; j++) dp[0][j] = j
@@ -366,35 +369,33 @@ function levenshtein(a: string, b: string): number {
   return dp[m][n]
 }
 
-function GradingButtons({ onGrade }: { onGrade: (r: Grade) => void }) {
+const GradingButtons = memo(function GradingButtons({ onGrade }: { onGrade: (r: Grade) => void }) {
   return (
     <div className="flashcard-grade">
       <p className="grade-prompt">Como foi?</p>
       <div className="grade-buttons">
         <button className="btn grade-btn grade-1" onClick={() => onGrade(Rating.Again as Grade)}>
-          1<br /><small>Esqueci</small>
+          1<br />
+          <small>Esqueci</small>
         </button>
         <button className="btn grade-btn grade-2" onClick={() => onGrade(Rating.Hard as Grade)}>
-          2<br /><small>Difícil</small>
+          2<br />
+          <small>Difícil</small>
         </button>
         <button className="btn grade-btn grade-3" onClick={() => onGrade(Rating.Good as Grade)}>
-          3<br /><small>Bom</small>
+          3<br />
+          <small>Bom</small>
         </button>
         <button className="btn grade-btn grade-4" onClick={() => onGrade(Rating.Easy as Grade)}>
-          4<br /><small>Fácil</small>
+          4<br />
+          <small>Fácil</small>
         </button>
       </div>
     </div>
   )
-}
+})
 
-function HeatVerse({
-  words,
-  heat,
-}: {
-  words: string[]
-  heat: { index: number; accuracy: number }[]
-}) {
+const HeatVerse = memo(function HeatVerse({ words, heat }: { words: string[]; heat: { index: number; accuracy: number }[] }) {
   return (
     <p className="flashcard-verse heat-verse">
       {words.map((w, i) => {
@@ -414,34 +415,44 @@ function HeatVerse({
       })}
     </p>
   )
-}
+})
 
 function FlashcardView({
-  reference, verseText, translation, verseId, onGrade,
+  reference,
+  verseText,
+  translation,
+  verseId,
+  onGrade,
 }: {
-  reference: string; verseText: string; translation: string; verseId: string; onGrade: (r: Grade) => void
+  reference: string
+  verseText: string
+  translation: string
+  verseId: string
+  onGrade: (r: Grade) => void
 }) {
   const [flipped, setFlipped] = useState(false)
   const [hintLevel, setHintLevel] = useState(0)
   const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
 
+  const words = useMemo(() => verseText.split(' '), [verseText])
+
   useEffect(() => {
-    getWordHeat(verseId, translation, verseText.split(' ').length).then(setHeat)
+    getWordHeat(verseId, translation, words.length).then(setHeat)
     setFlipped(false)
     setHintLevel(0)
-  }, [verseId, translation, verseText])
+  }, [verseId, translation, words.length])
 
   function getHiddenText(): string {
     if (hintLevel === 0) return ''
-    const words = verseText.split(' ')
-    return words.map((w, i) => {
-      if (hintLevel === 1) return i < 3 ? w : w[0] + '_'.repeat(Math.max(w.length - 1, 1))
-      if (i < hintLevel) return w
-      return '_ '.repeat(w.length).trim()
-    }).join(' ')
+    const ws = verseText.split(' ')
+    return ws
+      .map((w, i) => {
+        if (hintLevel === 1) return i < 3 ? w : w[0] + '_'.repeat(Math.max(w.length - 1, 1))
+        if (i < hintLevel) return w
+        return '_ '.repeat(w.length).trim()
+      })
+      .join(' ')
   }
-
-  const words = useMemo(() => verseText.split(' '), [verseText])
 
   return (
     <div className="flashcard">
@@ -451,7 +462,9 @@ function FlashcardView({
             <h2 className="flashcard-ref">{reference}</h2>
             <p className="flashcard-hint">Tente recitar o versículo mentalmente...</p>
             {hintLevel > 0 && (
-              <div className="flashcard-hint-text"><p>{getHiddenText()}</p></div>
+              <div className="flashcard-hint-text">
+                <p>{getHiddenText()}</p>
+              </div>
             )}
             <div className="flashcard-actions">
               <button className="btn btn-secondary" onClick={() => setHintLevel((h) => h + 1)}>
@@ -475,9 +488,17 @@ function FlashcardView({
 }
 
 function FillInBlankView({
-  reference, verseText, translation, verseId, onGrade,
+  reference,
+  verseText,
+  translation,
+  verseId,
+  onGrade,
 }: {
-  reference: string; verseText: string; translation: string; verseId: string; onGrade: (r: Grade) => void
+  reference: string
+  verseText: string
+  translation: string
+  verseId: string
+  onGrade: (r: Grade) => void
 }) {
   const [revealed, setRevealed] = useState(false)
   const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
@@ -516,7 +537,9 @@ function FillInBlankView({
               <p className="blank-count">Preencha mentalmente {blankIndices.size} palavra(s)</p>
             </div>
             <div className="flashcard-actions">
-              <button className="btn btn-primary" onClick={() => setRevealed(true)}>Revelar</button>
+              <button className="btn btn-primary" onClick={() => setRevealed(true)}>
+                Revelar
+              </button>
             </div>
           </div>
           <div className="flip-card-back">
@@ -532,9 +555,17 @@ function FillInBlankView({
 }
 
 function TypingPracticeView({
-  reference, verseText, translation, verseId, onGrade,
+  reference,
+  verseText,
+  translation,
+  verseId,
+  onGrade,
 }: {
-  reference: string; verseText: string; translation: string; verseId: string; onGrade: (r: Grade) => void
+  reference: string
+  verseText: string
+  translation: string
+  verseId: string
+  onGrade: (r: Grade) => void
 }) {
   const [input, setInput] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -561,7 +592,6 @@ function TypingPracticeView({
     const acc = maxLen > 0 ? Math.round((1 - dist / maxLen) * 100) : 0
     setAccuracy(acc)
     setSubmitted(true)
-
     if (!hasRecorded) {
       setHasRecorded(true)
       const typedWords = cleanInput.split(/\s+/)
@@ -577,7 +607,10 @@ function TypingPracticeView({
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (input.trim()) handleSubmit() }
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (input.trim()) handleSubmit()
+    }
   }
 
   if (!submitted) {
@@ -586,12 +619,18 @@ function TypingPracticeView({
         <div className="typing-card">
           <h2 className="flashcard-ref">{reference}</h2>
           <textarea
-            ref={inputRef} className="typing-input" value={input}
-            onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown}
-            placeholder="Digite o versículo de memória..." rows={4}
+            ref={inputRef}
+            className="typing-input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Digite o versículo de memória..."
+            rows={4}
           />
           <div className="flashcard-actions">
-            <button className="btn btn-primary" onClick={handleSubmit} disabled={!input.trim()}>Verificar</button>
+            <button className="btn btn-primary" onClick={handleSubmit} disabled={!input.trim()}>
+              Verificar
+            </button>
           </div>
         </div>
       </div>
@@ -605,7 +644,10 @@ function TypingPracticeView({
         <HeatVerse words={words} heat={heat} />
         <p className="flashcard-translation-label">{translation.toUpperCase()}</p>
         <div className="typing-accuracy-bar">
-          <div className={`typing-accuracy-fill ${accuracy >= 90 ? 'good' : accuracy >= 70 ? 'ok' : 'bad'}`} style={{ width: `${accuracy}%` }} />
+          <div
+            className={`typing-accuracy-fill ${accuracy >= 90 ? 'good' : accuracy >= 70 ? 'ok' : 'bad'}`}
+            style={{ width: `${accuracy}%` }}
+          />
         </div>
         <span className={`typing-accuracy-label ${accuracy >= 90 ? 'good' : accuracy >= 70 ? 'ok' : 'bad'}`}>
           {accuracy}% correto{accuracy >= 90 ? ' — Ótimo!' : accuracy >= 70 ? ' — Quase lá' : ' — Tente de novo'}
@@ -614,20 +656,38 @@ function TypingPracticeView({
           <details className="typing-diff">
             <summary>Comparar</summary>
             <div className="typing-diff-text">
-              <p><strong>Você: </strong>{
-                input.trim().split(/\s+/).map((w, i) => {
-                  const correct = verseText.trim().toLowerCase().split(/\s+/)[i]
-                  const ok = w.toLowerCase() === correct
-                  return <span key={i}>{i > 0 ? ' ' : ''}<mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark></span>
-                })
-              }</p>
-              <p><strong>Versículo: </strong>{
-                verseText.trim().split(/\s+/).map((w, i) => {
-                  const typed = input.trim().toLowerCase().split(/\s+/)[i]
-                  const ok = typed === w.toLowerCase()
-                  return <span key={i}>{i > 0 ? ' ' : ''}<mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark></span>
-                })
-              }</p>
+              <p>
+                <strong>Você: </strong>
+                {input
+                  .trim()
+                  .split(/\s+/)
+                  .map((w, i) => {
+                    const correct = verseText.trim().toLowerCase().split(/\s+/)[i]
+                    const ok = w.toLowerCase() === correct
+                    return (
+                      <span key={i}>
+                        {i > 0 ? ' ' : ''}
+                        <mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark>
+                      </span>
+                    )
+                  })}
+              </p>
+              <p>
+                <strong>Versículo: </strong>
+                {verseText
+                  .trim()
+                  .split(/\s+/)
+                  .map((w, i) => {
+                    const typed = input.trim().toLowerCase().split(/\s+/)[i]
+                    const ok = typed === w.toLowerCase()
+                    return (
+                      <span key={i}>
+                        {i > 0 ? ' ' : ''}
+                        <mark className={ok ? 'diff-ok' : 'diff-wrong'}>{w}</mark>
+                      </span>
+                    )
+                  })}
+              </p>
             </div>
           </details>
         )}

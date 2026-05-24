@@ -1,7 +1,31 @@
 import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { db } from '../lib/db'
-import { getDueCards } from '../lib/srs'
+
+function computeStreak(timestamps: number[]) {
+  const days = [...new Set(timestamps.map((ts) => new Date(ts).toDateString()))].sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime(),
+  )
+  let streak = 0
+  const today = new Date().toDateString()
+  let expected = new Date(today).getTime()
+
+  for (const dayStr of days) {
+    const dayTime = new Date(dayStr).getTime()
+    if (dayTime === expected) {
+      streak++
+      expected -= 86400000
+    } else if (dayTime < expected) {
+      break
+    }
+  }
+
+  if (!days.includes(today) && !days.includes(new Date(Date.now() - 86400000).toDateString())) {
+    streak = 0
+  }
+
+  return streak
+}
 
 export function HomePage() {
   const [dueCount, setDueCount] = useState(0)
@@ -12,9 +36,18 @@ export function HomePage() {
 
   const loadStats = useCallback(async () => {
     const allProgress = await db.progress.toArray()
-    const dueCards = getDueCards(allProgress)
+    const now = Date.now()
+    let due = 0
+    for (const p of allProgress) {
+      try {
+        const card = JSON.parse(p.cardJson)
+        if (new Date(card.due).getTime() <= now) due++
+      } catch {
+        /* skip */
+      }
+    }
     setTotalMemorized(allProgress.length)
-    setDueCount(dueCards.length)
+    setDueCount(due)
     setStreak(computeStreak(allProgress.map((p) => p.dueDate)))
   }, [])
 
@@ -27,31 +60,6 @@ export function HomePage() {
       mounted.current = false
     }
   }, [loadStats])
-
-  function computeStreak(timestamps: number[]) {
-    const days = [...new Set(timestamps.map((ts) => new Date(ts).toDateString()))].sort(
-      (a, b) => new Date(b).getTime() - new Date(a).getTime(),
-    )
-    let streak = 0
-    const today = new Date().toDateString()
-    let expected = new Date(today).getTime()
-
-    for (const dayStr of days) {
-      const dayTime = new Date(dayStr).getTime()
-      if (dayTime === expected) {
-        streak++
-        expected -= 86400000
-      } else if (dayTime < expected) {
-        break
-      }
-    }
-
-    if (!days.includes(today) && !days.includes(new Date(Date.now() - 86400000).toDateString())) {
-      streak = 0
-    }
-
-    return streak
-  }
 
   return (
     <div className="page home-page">

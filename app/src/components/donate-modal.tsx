@@ -26,9 +26,7 @@ export function DonateModal({ onClose }: DonateModalProps) {
         <div className="donate-header">
           <span className="donate-icon">₿</span>
           <h2 className="donate-title">Apoie este projeto</h2>
-          <p className="donate-subtitle">
-            Verbum Vitae é gratuito e de código aberto. Se foi útil pra você, considere uma doação.
-          </p>
+          <p className="donate-subtitle">Verbum Vitae é gratuito e de código aberto. Se foi útil pra você, considere uma doação.</p>
         </div>
 
         <div className="donate-btc">

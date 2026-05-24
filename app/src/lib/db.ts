@@ -99,21 +99,42 @@ export function parseVerseKey(key: string): VerseKeyParsed {
 
 export function verseIdToReference(verseId: string, bookName: string): string {
   const p = parseVerseKey(verseId)
-  if (p.verseEnd) {
-    return `${bookName} ${p.chapter}:${p.verseStart}-${p.verseEnd}`
-  }
+  if (p.verseEnd) return `${bookName} ${p.chapter}:${p.verseStart}-${p.verseEnd}`
   return `${bookName} ${p.chapter}:${p.verseStart}`
 }
 
 export async function fetchVersesForKey(verseId: string, translation: string): Promise<string> {
   const p = parseVerseKey(verseId)
   const endVerse = p.verseEnd || p.verseStart
-
   const rows = await db.verses.where('[bookNumber+chapter]').equals([p.bookNumber, p.chapter]).sortBy('verse')
-
   const filtered = rows.filter((r) => r.translation === translation && r.verse >= p.verseStart && r.verse <= endVerse)
-
   return filtered.map((r) => r.text).join(' ')
+}
+
+export async function fetchVersesBatch(keys: { verseId: string; translation: string }[]): Promise<Map<string, string>> {
+  const chapterGroups = new Map<string, { keys: { verseId: string; translation: string }[] }>()
+  for (const k of keys) {
+    const p = parseVerseKey(k.verseId)
+    const ck = `${p.bookNumber}_${p.chapter}`
+    if (!chapterGroups.has(ck)) chapterGroups.set(ck, { keys: [] })
+    chapterGroups.get(ck)!.keys.push(k)
+  }
+
+  const result = new Map<string, string>()
+  for (const [ck, group] of chapterGroups) {
+    const [bookNumStr, chapterNumStr] = ck.split('_')
+    const rows = await db.verses
+      .where('[bookNumber+chapter]')
+      .equals([parseInt(bookNumStr, 10), parseInt(chapterNumStr, 10)])
+      .toArray()
+    for (const k of group.keys) {
+      const p = parseVerseKey(k.verseId)
+      const endVerse = p.verseEnd || p.verseStart
+      const filtered = rows.filter((r) => r.translation === k.translation && r.verse >= p.verseStart && r.verse <= endVerse)
+      result.set(k.verseId, filtered.map((r) => r.text).join(' '))
+    }
+  }
+  return result
 }
 
 export async function seedVerses(translation: Verse['translation']) {
@@ -149,20 +170,14 @@ async function bulkInsert(
   data: { books: string[]; verses: { b: number; c: number; v: number; t: string }[] },
   translation: Verse['translation'],
 ) {
-  const verses: Verse[] = data.verses.map((v) => ({
-    bookNumber: v.b,
-    chapter: v.c,
-    verse: v.v,
-    text: v.t,
-    translation,
-  }))
+  const verses: Verse[] = data.verses.map((v) => ({ bookNumber: v.b, chapter: v.c, verse: v.v, text: v.t, translation }))
   const chunkSize = 500
   for (let i = 0; i < verses.length; i += chunkSize) {
     await db.verses.bulkAdd(verses.slice(i, i + chunkSize))
   }
 }
 
-export async function getCollectionProgress(collectionId: number, translation: string) {
+export async function getCollectionProgress(collectionId: number, _translation: string) {
   const cv = await db.collectionVerses.where({ collectionId }).toArray()
   const total = cv.length
   const memorized = await db.progress
@@ -181,19 +196,13 @@ export async function recordWordAccuracy(
 ) {
   for (const idx of correctWords) {
     const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
-    if (existing) {
-      await db.wordStats.update(existing.id!, { correctCount: existing.correctCount + 1 })
-    } else {
-      await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 1, incorrectCount: 0 })
-    }
+    if (existing) await db.wordStats.update(existing.id!, { correctCount: existing.correctCount + 1 })
+    else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 1, incorrectCount: 0 })
   }
   for (const idx of incorrectWords) {
     const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
-    if (existing) {
-      await db.wordStats.update(existing.id!, { incorrectCount: existing.incorrectCount + 1 })
-    } else {
-      await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 0, incorrectCount: 1 })
-    }
+    if (existing) await db.wordStats.update(existing.id!, { incorrectCount: existing.incorrectCount + 1 })
+    else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 0, incorrectCount: 1 })
   }
 }
 
@@ -203,7 +212,7 @@ export async function getWordHeat(verseId: string, translation: string, wordCoun
   const result: { index: number; accuracy: number }[] = []
   for (let i = 0; i < wordCount; i++) {
     const s = map.get(i)
-    if (s && (s.correctCount + s.incorrectCount) > 0) {
+    if (s && s.correctCount + s.incorrectCount > 0) {
       result.push({ index: i, accuracy: s.correctCount / (s.correctCount + s.incorrectCount) })
     } else {
       result.push({ index: i, accuracy: -1 })
@@ -214,8 +223,8 @@ export async function getWordHeat(verseId: string, translation: string, wordCoun
 
 export async function addCollectionToMemory(
   collectionId: number,
-  translation: string,
-  progressIdFn: () => string,
+  _translation: string,
+  _progressIdFn: () => string,
   logChange: (entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) => void,
 ) {
   const cv = await db.collectionVerses.where({ collectionId }).toArray()

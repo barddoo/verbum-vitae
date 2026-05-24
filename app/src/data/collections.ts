@@ -49,11 +49,7 @@ export const bundledCollections: BundledCollection[] = [
     name: 'Fruto do Espírito',
     description: 'O caráter de Cristo formado em nós pelo Espírito',
     icon: '🍇',
-    verses: [
-      v(47, 5, 16),
-      v(47, 5, [22, 23]),
-      v(42, 15, [4, 5]),
-    ],
+    verses: [v(47, 5, 16), v(47, 5, [22, 23]), v(42, 15, [4, 5])],
   },
   {
     id: 'armadura-deus',
@@ -101,28 +97,14 @@ export const bundledCollections: BundledCollection[] = [
     name: 'Amor',
     description: 'O amor de Deus derramado em nossos corações',
     icon: '❤️',
-    verses: [
-      v(45, 13, [1, 13]),
-      v(61, 4, [7, 21]),
-      v(61, 3, 16),
-      v(42, 15, 13),
-      v(44, 5, 8),
-    ],
+    verses: [v(45, 13, [1, 13]), v(61, 4, [7, 21]), v(61, 3, 16), v(42, 15, 13), v(44, 5, 8)],
   },
   {
     id: 'fe',
     name: 'Fé',
     description: 'Andamos por fé, não por vista',
     icon: '🔥',
-    verses: [
-      v(57, 11, 1),
-      v(46, 5, 7),
-      v(44, 10, 17),
-      v(57, 11, 6),
-      v(47, 2, 20),
-      v(39, 17, 20),
-      v(40, 11, 24),
-    ],
+    verses: [v(57, 11, 1), v(46, 5, 7), v(44, 10, 17), v(57, 11, 6), v(47, 2, 20), v(39, 17, 20), v(40, 11, 24)],
   },
   {
     id: 'sermao-monte',

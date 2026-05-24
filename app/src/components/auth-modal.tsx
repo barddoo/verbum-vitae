@@ -88,7 +88,8 @@ export function AuthModal({ onClose }: AuthModalProps) {
         </form>
 
         <p className="auth-free-notice">
-          Verbum Vitae é <strong>100% gratuito</strong> e sempre será. A conta serve apenas para sincronizar seu progresso entre dispositivos — sem cobranças, sem planos, sem coleta de dados.
+          Verbum Vitae é <strong>100% gratuito</strong> e sempre será. A conta serve apenas para sincronizar seu progresso entre
+          dispositivos — sem cobranças, sem planos, sem coleta de dados.
         </p>
       </div>
     </div>

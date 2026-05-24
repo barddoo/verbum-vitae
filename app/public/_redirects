@@ -1,0 +1,5 @@
+# SPA fallback — all routes serve index.html
+/*    /index.html   200
+
+# API requests go to worker
+/api/*   https://verbum-vitae-api.workers.dev/api/:splat  200

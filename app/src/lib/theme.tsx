@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -20,7 +20,9 @@ const ThemeContext = createContext<{ theme: Theme; toggleTheme: () => void } | n
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
 
-  useEffect(() => { applyTheme(theme) }, [theme])
+  useEffect(() => {
+    applyTheme(theme)
+  }, [theme])
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: light)')
@@ -32,18 +34,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => {
+    setTheme((prev) => {
       const next = prev === 'dark' ? 'light' : 'dark'
       localStorage.setItem('theme', next)
       return next
     })
   }, [])
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
 }
 
 export function useTheme() {

@@ -82,8 +82,8 @@ function RootLayout() {
               Feito por{' '}
               <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
                 Charles Fonseca
-              </a>
-              {' '}&mdash;{' '}
+              </a>{' '}
+              &mdash;{' '}
               <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
                 código aberto
               </a>

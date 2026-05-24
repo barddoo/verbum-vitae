@@ -46,7 +46,9 @@ export function BrowsePage() {
     }
     if (searchTimer.current) clearTimeout(searchTimer.current)
     searchTimer.current = setTimeout(() => doSearch(searchQuery.trim()), 300)
-    return () => { if (searchTimer.current) clearTimeout(searchTimer.current) }
+    return () => {
+      if (searchTimer.current) clearTimeout(searchTimer.current)
+    }
   }, [searchQuery, translation])
 
   async function loadMemorizedVerses() {
@@ -66,7 +68,11 @@ export function BrowsePage() {
   async function doSearch(query: string) {
     setSearching(true)
     const lower = query.toLowerCase()
-    const all = await db.verses.where({ translation }).filter((v) => v.text.toLowerCase().includes(lower)).limit(50).toArray()
+    const all = await db.verses
+      .where({ translation })
+      .filter((v) => v.text.toLowerCase().includes(lower))
+      .limit(50)
+      .toArray()
     const results: SearchResult[] = all.map((v) => ({
       bookNumber: v.bookNumber,
       chapter: v.chapter,
@@ -105,12 +111,18 @@ export function BrowsePage() {
   function handleVerseSelectTap(v: number) {
     setSelectedVerses((prev) => {
       const next = new Set(prev)
-      if (next.has(v)) { next.delete(v); if (v === selectionAnchor) setSelectionAnchor(null) }
-      else if (selectionAnchor !== null) {
-        const lo = Math.min(selectionAnchor, v); const hi = Math.max(selectionAnchor, v)
+      if (next.has(v)) {
+        next.delete(v)
+        if (v === selectionAnchor) setSelectionAnchor(null)
+      } else if (selectionAnchor !== null) {
+        const lo = Math.min(selectionAnchor, v)
+        const hi = Math.max(selectionAnchor, v)
         for (let i = lo; i <= hi; i++) next.add(i)
         setSelectionAnchor(v)
-      } else { next.add(v); setSelectionAnchor(v) }
+      } else {
+        next.add(v)
+        setSelectionAnchor(v)
+      }
       return next
     })
   }
@@ -131,17 +143,26 @@ export function BrowsePage() {
     if (!longPressTimer.current) return
     const dx = e.clientX - pointerStart.current.x
     const dy = e.clientY - pointerStart.current.y
-    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
   }
 
   function handlePointerUp(v: number) {
-    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
     if (didLongPress.current) return
     if (selectionMode) handleVerseSelectTap(v)
   }
 
   function handlePointerCancel() {
-    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
   }
 
   async function memorizeSelected() {
@@ -152,11 +173,27 @@ export function BrowsePage() {
       const existing = await db.progress.where({ verseId: key, translation }).first()
       if (existing) continue
       const card = createEmptyCard()
-      await db.progress.put({ verseId: key, translation, cardJson: JSON.stringify(card), state: 0, dueDate: card.due.getTime(), streak: 0, updatedAt: Date.now() })
+      await db.progress.put({
+        verseId: key,
+        translation,
+        cardJson: JSON.stringify(card),
+        state: 0,
+        dueDate: card.due.getTime(),
+        streak: 0,
+        updatedAt: Date.now(),
+      })
       logProgressChange({
         userId: localStorage.getItem('auth_token') ? 'user' : '',
-        tableName: 'progress', rowId: key, operation: 'create',
-        data: JSON.stringify({ verseId: key, translation, cardJson: JSON.stringify(card), nextReview: new Date(card.due.getTime()).toISOString(), lastReview: new Date().toISOString() }),
+        tableName: 'progress',
+        rowId: key,
+        operation: 'create',
+        data: JSON.stringify({
+          verseId: key,
+          translation,
+          cardJson: JSON.stringify(card),
+          nextReview: new Date(card.due.getTime()).toISOString(),
+          lastReview: new Date().toISOString(),
+        }),
       })
       keys.push(key)
     }
@@ -169,12 +206,19 @@ export function BrowsePage() {
   const sortedSelected = useMemo(() => [...selectedVerses].sort((a, b) => a - b), [selectedVerses])
   const chapterCount = useMemo(() => {
     if (bookIndex === null) return 0
-    const counts = [50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29, 36, 10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22]
+    const counts = [
+      50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29, 36, 10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3,
+      2, 14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22,
+    ]
     return counts[bookIndex]
   }, [bookIndex])
 
-  function isMemorized(v: number) { return memorizedVerses.has(verseKey(bookIndex!, chapter!, v)) }
-  function isAdded(v: number) { return justAdded.has(verseKey(bookIndex!, chapter!, v)) }
+  function isMemorized(v: number) {
+    return memorizedVerses.has(verseKey(bookIndex!, chapter!, v))
+  }
+  function isAdded(v: number) {
+    return justAdded.has(verseKey(bookIndex!, chapter!, v))
+  }
   const previewText = sortedSelected.length > 0 ? verses[sortedSelected[0] - 1] : ''
 
   function highlightMatch(text: string, query: string) {
@@ -195,7 +239,11 @@ export function BrowsePage() {
       <div className="browse-top">
         <div className="translate-picker">
           <select value={translation} onChange={(e) => setTranslation(e.target.value as Translation)}>
-            {TRANSLATIONS.map((t) => <option key={t} value={t}>{TRANSLATION_LABELS[t]}</option>)}
+            {TRANSLATIONS.map((t) => (
+              <option key={t} value={t}>
+                {TRANSLATION_LABELS[t]}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -208,7 +256,9 @@ export function BrowsePage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button className="search-clear" onClick={clearSearch}>✕</button>
+            <button className="search-clear" onClick={clearSearch}>
+              ✕
+            </button>
           )}
         </div>
       </div>
@@ -233,40 +283,68 @@ export function BrowsePage() {
       {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
         <div className="book-list">
           {BOOKS.map((book, i) => (
-            <button key={i} className="book-item" onClick={() => { setBookIndex(i); setChapter(null) }}>{book}</button>
+            <button
+              key={i}
+              className="book-item"
+              onClick={() => {
+                setBookIndex(i)
+                setChapter(null)
+              }}
+            >
+              {book}
+            </button>
           ))}
         </div>
       ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
         <div className="chapter-view">
-          <button className="back-btn" onClick={() => setBookIndex(null)}>← Voltar</button>
+          <button className="back-btn" onClick={() => setBookIndex(null)}>
+            ← Voltar
+          </button>
           <h3>{BOOKS[bookIndex!]}</h3>
           <div className="chapter-grid">
             {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
-              <button key={c} className="chapter-item" onClick={() => setChapter(c)}>{c}</button>
+              <button key={c} className="chapter-item" onClick={() => setChapter(c)}>
+                {c}
+              </button>
             ))}
           </div>
         </div>
-      ) : (!searchQuery || searchQuery.trim().length < 2) ? (
+      ) : !searchQuery || searchQuery.trim().length < 2 ? (
         <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
-          <button className="back-btn" onClick={() => setChapter(null)}>← {BOOKS[bookIndex!]}</button>
+          <button className="back-btn" onClick={() => setChapter(null)}>
+            ← {BOOKS[bookIndex!]}
+          </button>
           <div className="verse-header">
             {selectionMode ? (
               <>
                 <span className="select-mode-label">
-                  {selectedVerses.size > 0 ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}` : 'Toque para selecionar'}
+                  {selectedVerses.size > 0
+                    ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
+                    : 'Toque para selecionar'}
                 </span>
-                <button className="select-mode-exit" onClick={exitSelectionMode}>✕</button>
+                <button className="select-mode-exit" onClick={exitSelectionMode}>
+                  ✕
+                </button>
               </>
             ) : (
-              <h3>{BOOKS[bookIndex!]} {chapter}</h3>
+              <h3>
+                {BOOKS[bookIndex!]} {chapter}
+              </h3>
             )}
           </div>
           {verses.map((text, i) => {
-            const v = i + 1; const mem = isMemorized(v); const add = isAdded(v); const sel = selectedVerses.has(v)
+            const v = i + 1
+            const mem = isMemorized(v)
+            const add = isAdded(v)
+            const sel = selectedVerses.has(v)
             return (
-              <div key={i} className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                onPointerDown={(e) => handlePointerDown(v, e)} onPointerMove={handlePointerMove}
-                onPointerUp={() => handlePointerUp(v)} onPointerCancel={handlePointerCancel}
+              <div
+                key={i}
+                className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
+                onPointerDown={(e) => handlePointerDown(v, e)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={() => handlePointerUp(v)}
+                onPointerCancel={handlePointerCancel}
               >
                 <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
                 <span className="verse-text">{text}</span>
@@ -280,12 +358,21 @@ export function BrowsePage() {
       {selectedVerses.size > 0 && (
         <div className="selection-bar">
           <div className="selection-bar-info">
-            <span className="selection-bar-count">{selectedVerses.size} selecionado{selectedVerses.size > 1 ? 's' : ''}</span>
-            <span className="selection-bar-preview">"{previewText.slice(0, 60)}{previewText.length > 60 ? '...' : ''}"</span>
+            <span className="selection-bar-count">
+              {selectedVerses.size} selecionado{selectedVerses.size > 1 ? 's' : ''}
+            </span>
+            <span className="selection-bar-preview">
+              "{previewText.slice(0, 60)}
+              {previewText.length > 60 ? '...' : ''}"
+            </span>
           </div>
           <div className="selection-bar-actions">
-            <button className="btn btn-sm btn-secondary" onClick={exitSelectionMode}>Limpar</button>
-            <button className="btn btn-sm btn-primary" onClick={memorizeSelected}>Memorizar</button>
+            <button className="btn btn-sm btn-secondary" onClick={exitSelectionMode}>
+              Limpar
+            </button>
+            <button className="btn btn-sm btn-primary" onClick={memorizeSelected}>
+              Memorizar
+            </button>
           </div>
         </div>
       )}

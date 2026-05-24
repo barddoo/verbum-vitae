@@ -21,13 +21,29 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html}'],
-        maximumFileSizeToCacheInBytes: 7 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,json,br,ico,png,svg}'],
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+        navigateFallback: '/offline.html',
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/verbum-vitae\..*\/api\/.*/i,
+            urlPattern: /\/api\//,
             handler: 'NetworkFirst',
             options: { cacheName: 'api-cache', expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 } },
+          },
+          {
+            urlPattern: /\/bible-.+\.json(\.br)?$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'bible-data', expiration: { maxEntries: 6, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+          },
+          {
+            urlPattern: /\.(png|jpg|jpeg|svg|ico|webp)$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'images', expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+          },
+          {
+            urlPattern: /^https?:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: { cacheName: 'google-fonts', expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 365 } },
           },
         ],
       },
@@ -35,5 +51,22 @@ export default defineConfig({
   ],
   resolve: {
     alias: { '@': '/src' },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/@tanstack/react-router') ||
+            id.includes('node_modules/@tanstack/react-query')
+          )
+            return 'vendor'
+          if (id.includes('node_modules/ts-fsrs')) return 'srs'
+          if (id.includes('node_modules/dexie')) return 'dexie'
+        },
+      },
+    },
   },
 })

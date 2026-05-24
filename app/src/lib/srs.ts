@@ -1,17 +1,19 @@
-import { type Card, createEmptyCard, fsrs, type Grade, Rating, type ReviewLog } from 'ts-fsrs'
+import type { Card, Grade, ReviewLog } from 'ts-fsrs'
 
 export type { Card, Grade, ReviewLog }
-export { createEmptyCard, Rating }
 
-export const scheduler = fsrs()
-
-export function getNextCard(card: Card, rating: Grade, now: Date = new Date()) {
-  const result = scheduler.next(card, now, rating)
+export function createEmptyCard(now: Date = new Date()): Card {
   return {
-    card: result.card,
-    log: result.log,
-    dueDate: result.card.due.getTime(),
-    state: stateFromCard(result.card),
+    due: now,
+    stability: 0,
+    difficulty: 0,
+    elapsed_days: 0,
+    scheduled_days: 0,
+    learning_steps: 0,
+    reps: 0,
+    lapses: 0,
+    state: 0,
+    last_review: undefined,
   }
 }
 
@@ -32,7 +34,9 @@ export function getDueCards(progressList: { verseId: string; cardJson: string }[
       if (card.due.getTime() <= nowTs) {
         due.push({ verseId: p.verseId, card })
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
   }
 
   return due.sort((a, b) => a.card.due.getTime() - b.card.due.getTime())
@@ -41,13 +45,13 @@ export function getDueCards(progressList: { verseId: string; cardJson: string }[
 export function stateFromCard(card: Card): number {
   switch (card.state) {
     case 1:
-      return 1 // Learning
+      return 1
     case 2:
-      return 2 // Review
+      return 2
     case 3:
-      return 3 // Relearning
+      return 3
     default:
-      return 0 // New
+      return 0
   }
 }
 

@@ -55,8 +55,10 @@ export function StatsPage() {
     let expected = new Date(today).getTime()
     for (const dayStr of days) {
       const dayTime = new Date(dayStr).getTime()
-      if (dayTime === expected) { s++; expected -= 86400000 }
-      else if (dayTime < expected) break
+      if (dayTime === expected) {
+        s++
+        expected -= 86400000
+      } else if (dayTime < expected) break
     }
     return s
   }
@@ -104,8 +106,12 @@ export function StatsPage() {
           <div className="stats-confirm">
             <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
             <div className="stats-confirm-actions">
-              <button className="btn btn-danger" onClick={clearProgress}>Sim, limpar</button>
-              <button className="btn btn-secondary" onClick={() => setConfirming(false)}>Cancelar</button>
+              <button className="btn btn-danger" onClick={clearProgress}>
+                Sim, limpar
+              </button>
+              <button className="btn btn-secondary" onClick={() => setConfirming(false)}>
+                Cancelar
+              </button>
             </div>
           </div>
         )}
@@ -133,7 +139,7 @@ function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
   }, [reviewDays])
 
   const weeks_arr = useMemo(() => {
-    const w: typeof cells[] = []
+    const w: (typeof cells)[] = []
     for (let i = 0; i < cells.length; i += 7) w.push(cells.slice(i, i + 7))
     return w
   }, [cells])
@@ -172,13 +178,17 @@ function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
       <div className="sc-body">
         <div className="sc-months">
           {monthLabels.map((ml) => (
-            <span key={ml.weekIndex} className="sc-month" style={{ marginLeft: `${ml.weekIndex * 14}px` }}>{ml.label}</span>
+            <span key={ml.weekIndex} className="sc-month" style={{ marginLeft: `${ml.weekIndex * 14}px` }}>
+              {ml.label}
+            </span>
           ))}
         </div>
         <div className="sc-grid">
           <div className="sc-days">
             {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d) => (
-              <span key={d} className="sc-day-label">{d}</span>
+              <span key={d} className="sc-day-label">
+                {d}
+              </span>
             ))}
           </div>
           <div className="sc-weeks">
