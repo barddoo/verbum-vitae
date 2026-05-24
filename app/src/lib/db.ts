@@ -235,7 +235,7 @@ export async function getWordHeat(verseId: string, translation: string, wordCoun
 
 export async function addCollectionToMemory(
   collectionId: number,
-  _translation: string,
+  translation: string,
   _progressIdFn: () => string,
   logChange: (entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) => void,
 ) {
@@ -245,12 +245,12 @@ export async function addCollectionToMemory(
   const toAdd: Progress[] = []
   await db.transaction('r', db.progress, async () => {
     for (const c of cv) {
-      const existing = await db.progress.where({ verseId: c.verseId, translation: c.translation }).first()
+      const existing = await db.progress.where({ verseId: c.verseId, translation }).first()
       if (!existing) {
         const card = createEmptyCard()
         toAdd.push({
           verseId: c.verseId,
-          translation: c.translation,
+          translation,
           cardJson: JSON.stringify(card),
           state: 0,
           dueDate: card.due.getTime(),

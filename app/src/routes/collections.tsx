@@ -26,19 +26,19 @@ async function ensureCollectionsSeeded() {
     let order = 0
     for (const ref of c.verses) {
       const verseId = verseRefToId(ref)
-      const existingCv = await db.collectionVerses.where({ collectionId: cId, verseId, translation: 'ara' }).first()
+      const existingCv = await db.collectionVerses.where({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION }).first()
       if (existingCv) continue
       if (Array.isArray(ref.verse)) {
         for (let v = ref.verse[0]; v <= ref.verse[1]; v++) {
           await db.collectionVerses.put({
             collectionId: cId,
             verseId: `${ref.book}_${ref.chapter}_${v}`,
-            translation: 'ara',
+            translation: DEFAULT_TRANSLATION,
             sortOrder: order++,
           })
         }
       } else {
-        await db.collectionVerses.put({ collectionId: cId, verseId, translation: 'ara', sortOrder: order++ })
+        await db.collectionVerses.put({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
       }
     }
   }
@@ -59,7 +59,7 @@ export function CollectionsListPage() {
     const allCols = await db.collections.toArray()
     const entries: CollectionEntry[] = await Promise.all(
       allCols.map(async (col) => {
-        const { total, memorized, percent } = await getCollectionProgress(col.id!, 'ara')
+        const { total, memorized, percent } = await getCollectionProgress(col.id!, DEFAULT_TRANSLATION)
         return {
           id: col.id!,
           dbId: col.id!,
@@ -128,7 +128,7 @@ export function CollectionDetailPage() {
     if (!c) return
 
     const [progressResult, cvs, allProgress] = await Promise.all([
-      getCollectionProgress(dbId, 'ara'),
+      getCollectionProgress(dbId, DEFAULT_TRANSLATION),
       db.collectionVerses.where({ collectionId: dbId }).sortBy('sortOrder'),
       db.progress.toArray(),
     ])
