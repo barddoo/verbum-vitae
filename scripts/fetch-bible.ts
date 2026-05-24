@@ -54,7 +54,15 @@ async function fetchTranslation(code: string, outKey: string) {
       }
       const chVerses: BollsVerse[] = await res.json()
       for (const v of chVerses) {
-        verses.push({ b: bi, c: ch, v: v.verse, t: v.text.trim() })
+        verses.push({
+          b: bi,
+          c: ch,
+          v: v.verse,
+          t: v.text
+            .replace(/<sup[^>]*>.*?<\/sup>/gi, '')
+            .replace(/<[^>]+>/g, '')
+            .trim(),
+        })
       }
       // polite delay — avoid hammering the API
       await Bun.sleep(50)

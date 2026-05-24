@@ -5,12 +5,65 @@ import { computeStreak } from '../lib/stats'
 
 const loadingSpinner = <div className="loading">Carregando…</div>
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+}
+
+function useInstallGuide() {
+  const [isStandalone, setIsStandalone] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [dismissed, setDismissed] = useState(() => localStorage.getItem('dismissedInstallGuide') === '1')
+
+  useEffect(() => {
+    const mq = window.matchMedia('(display-mode: standalone)')
+    setIsStandalone(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsStandalone(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const promptEvent = e as BeforeInstallPromptEvent
+      if (typeof promptEvent.prompt !== 'function') return
+      e.preventDefault()
+      setDeferredPrompt(promptEvent)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const dismiss = () => {
+    localStorage.setItem('dismissedInstallGuide', '1')
+    setDismissed(true)
+  }
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null)
+      setDismissed(true)
+    }
+  }
+
+  const ua = navigator.userAgent
+  const isIOS = /iphone|ipad|ipod/i.test(ua)
+  const isAndroid = /android/i.test(ua)
+  const isDesktop = !isIOS && !isAndroid
+
+  return { show: !isStandalone && !dismissed, deferredPrompt, isIOS, isAndroid, isDesktop, handleInstall, dismiss }
+}
+
 export function HomePage() {
   const [dueCount, setDueCount] = useState(0)
   const [totalMemorized, setTotalMemorized] = useState(0)
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
   const mounted = useRef(true)
+  const { show, deferredPrompt, isIOS, isAndroid, isDesktop, handleInstall, dismiss } = useInstallGuide()
 
   const loadStats = useCallback(async () => {
     const allProgress = await db.progress.toArray()
@@ -45,6 +98,66 @@ export function HomePage() {
         loadingSpinner
       ) : (
         <>
+          {show && (
+            <div className="install-guide-card">
+              <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
+                ✕
+              </button>
+              <span className="install-guide-icon">📲</span>
+              <div className="install-guide-body">
+                <strong className="install-guide-title">Instalar como aplicativo</strong>
+                <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
+                {deferredPrompt ? (
+                  <button type="button" className="btn btn-primary install-guide-btn" onClick={handleInstall}>
+                    Instalar App
+                  </button>
+                ) : isIOS ? (
+                  <ol className="install-guide-steps">
+                    <li>
+                      Abra este app no <strong>Safari</strong> (não funciona no Chrome)
+                    </li>
+                    <li>
+                      Toque no ícone <strong>Compartilhar</strong> <span className="install-guide-share-icon">⎙</span> na barra inferior
+                    </li>
+                    <li>
+                      Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
+                    </li>
+                    <li>
+                      Toque <strong>"Adicionar"</strong> no canto superior direito
+                    </li>
+                  </ol>
+                ) : isAndroid ? (
+                  <ol className="install-guide-steps">
+                    <li>
+                      Abra no <strong>Chrome</strong>
+                    </li>
+                    <li>
+                      Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
+                    </li>
+                    <li>
+                      Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
+                    </li>
+                    <li>
+                      Toque em <strong>"Instalar"</strong>
+                    </li>
+                  </ol>
+                ) : isDesktop ? (
+                  <ol className="install-guide-steps">
+                    <li>
+                      No <strong>Chrome</strong>, clique no ícone <strong>Instalar</strong> 🖥️ na barra de endereço
+                    </li>
+                    <li>
+                      Ou clique em <strong>⋮</strong> (menu) → <strong>"Instalar Verbum Vitae..."</strong>
+                    </li>
+                    <li>
+                      Clique em <strong>"Instalar"</strong>
+                    </li>
+                  </ol>
+                ) : null}
+              </div>
+            </div>
+          )}
+
           <div className="hero-card">
             <h2 className="hero-greeting">{dueCount > 0 ? `${dueCount} versículos para revisar` : 'Nada pendente!'}</h2>
             {dueCount > 0 && (
@@ -54,10 +167,17 @@ export function HomePage() {
             )}
           </div>
 
+          <div className="collections-teaser">
+            <p className="collections-teaser-text">Adicione vários versículos de uma vez com coleções temáticas</p>
+            <Link to="/collections" className="btn btn-secondary btn-sm">
+              Ver Coleções
+            </Link>
+          </div>
+
           <div className="stats-grid">
             <div className="stat-card">
               <span className="stat-value">{totalMemorized}</span>
-              <span className="stat-label">Memorizados</span>
+              <span className="stat-label">Em aprendizado</span>
             </div>
             <div className="stat-card">
               <span className="stat-value">{streak}</span>
@@ -73,7 +193,7 @@ export function HomePage() {
             {dueCount === 0 && totalMemorized > 0 ? (
               <>
                 <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary">
-                  Praticar versículos
+                  Revisar Agora
                 </Link>
                 <Link to="/collections" className="btn btn-secondary">
                   Coleções

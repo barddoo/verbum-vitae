@@ -180,7 +180,13 @@ async function bulkInsert(
   data: { books: string[]; verses: { b: number; c: number; v: number; t: string }[] },
   translation: Verse['translation'],
 ) {
-  const verses: Verse[] = data.verses.map((v) => ({ bookNumber: v.b, chapter: v.c, verse: v.v, text: v.t, translation }))
+  const verses: Verse[] = data.verses.map((v) => ({
+    bookNumber: v.b,
+    chapter: v.c,
+    verse: v.v,
+    text: v.t.replace(/<[^>]+>/g, '').trim(),
+    translation,
+  }))
   const chunkSize = 500
   for (let i = 0; i < verses.length; i += chunkSize) {
     await db.verses.bulkAdd(verses.slice(i, i + chunkSize))

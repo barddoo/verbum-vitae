@@ -19,7 +19,10 @@ const verses = raw.map((v) => ({
   b: v.book - 1, // bolls is 1-indexed, app is 0-indexed
   c: v.chapter,
   v: v.verse,
-  t: v.text.replace(/<[^>]+>/g, '').trim(),
+  t: v.text
+    .replace(/<sup[^>]*>.*?<\/sup>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .trim(),
 }))
 
 const out = { books: [...BOOKS], verses }

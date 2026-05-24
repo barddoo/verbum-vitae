@@ -1,0 +1,97 @@
+/* DESKTOP — min-width: 48rem (768px) */
+
+@media (min-width: 48rem) {
+  .app-footer {
+    padding-bottom: 1.5rem;
+  }
+
+  .app-shell {
+    max-width: 62rem;
+  }
+
+  .page {
+    padding: 1.5rem 1.875rem;
+  }
+
+  .hero-card {
+    padding: 3.5rem 3rem;
+  }
+
+  .hero-greeting {
+    font-size: 1.7rem;
+  }
+
+  .stat-value {
+    font-size: 2.2rem;
+  }
+
+  .review-queue-big-num {
+    font-size: 6.5rem;
+  }
+
+  .flashcard-ref {
+    font-size: 2.2rem;
+  }
+
+  .flashcard-verse {
+    font-size: 1.45rem;
+  }
+
+  .book-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .chapter-grid {
+    grid-template-columns: repeat(10, 1fr);
+  }
+
+  .collection-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 20rem;
+  }
+
+  .streak-calendar {
+    max-width: 75%;
+  }
+
+  .verse-view {
+    padding-bottom: 1rem;
+  }
+
+  .collection-detail-actions {
+    bottom: 1rem;
+  }
+
+  .bottom-nav {
+    display: none;
+  }
+
+  .top-bar {
+    position: static;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .top-bar-title {
+    font-size: 1.4rem;
+  }
+
+  .review-mode-grid {
+    max-width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .selection-bar {
+    max-width: 40rem;
+  }
+
+  .session-complete {
+    max-width: 30rem;
+    margin: 0 auto;
+  }
+}

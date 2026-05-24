@@ -23,6 +23,11 @@ const steps = [
     title: 'Sincronize entre dispositivos',
     text: 'Crie uma conta (opcional) para salvar seu progresso na nuvem e acessar em qualquer aparelho.',
   },
+  {
+    icon: '📲',
+    title: 'Instale como aplicativo',
+    text: 'No Android/Chrome, toque em "Instalar App" no topo da tela. No iPhone, clique em Compartilhar e "Adicionar à Tela de Início". Instalado, o app funciona offline, sem distrações e com acesso rápido na tela inicial.',
+  },
 ]
 
 export function HelpModal({ onClose }: HelpModalProps) {

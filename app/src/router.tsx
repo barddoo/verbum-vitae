@@ -4,7 +4,9 @@ import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
 import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
+import { PwaInstallButton } from './components/pwa-install-button'
 import { ThemeToggle } from './components/theme-toggle'
+import { UpdateBanner } from './components/update-banner'
 import { WelcomeModal } from './components/welcome-modal'
 import { useAuth } from './lib/auth'
 
@@ -54,6 +56,7 @@ function RootLayout() {
 
   return (
     <div className="app-shell">
+      <UpdateBanner />
       <header className="top-bar">
         <Link to="/" className="top-bar-logo">
           <img src="/favicon-32x32.png" alt="" width={22} height={22} />
@@ -63,6 +66,7 @@ function RootLayout() {
           <button type="button" className="btn-help" onClick={() => setShowHelp(true)} aria-label="Ajuda">
             ?
           </button>
+          <PwaInstallButton />
           <ThemeToggle />
           {!isOnline && <span className="offline-badge">Offline</span>}
           {user ? (
