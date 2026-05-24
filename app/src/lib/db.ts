@@ -257,35 +257,50 @@ export async function addCollectionToMemory(
   logChange: (entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) => void,
 ) {
   const cv = await db.collectionVerses.where({ collectionId }).toArray()
-  let added = 0
-  for (const c of cv) {
-    const existing = await db.progress.where({ verseId: c.verseId, translation: c.translation }).first()
-    if (existing) continue
-    const { createEmptyCard } = await import('./srs')
-    const card = createEmptyCard()
-    await db.progress.put({
-      verseId: c.verseId,
-      translation: c.translation,
-      cardJson: JSON.stringify(card),
-      state: 0,
-      dueDate: card.due.getTime(),
-      streak: 0,
-      updatedAt: Date.now(),
-    })
+  const { createEmptyCard } = await import('./srs')
+  const userId = localStorage.getItem('auth_token') ? 'user' : ''
+
+  const toAdd: Progress[] = []
+  await db.transaction('r', db.progress, async () => {
+    for (const c of cv) {
+      const existing = await db.progress.where({ verseId: c.verseId, translation: c.translation }).first()
+      if (!existing) {
+        const card = createEmptyCard()
+        toAdd.push({
+          verseId: c.verseId,
+          translation: c.translation,
+          cardJson: JSON.stringify(card),
+          state: 0,
+          dueDate: card.due.getTime(),
+          streak: 0,
+          updatedAt: Date.now(),
+        })
+      }
+    }
+  })
+
+  if (toAdd.length === 0) return 0
+
+  await db.transaction('rw', db.progress, async () => {
+    await db.progress.bulkAdd(toAdd)
+  })
+
+  for (const p of toAdd) {
+    const card = JSON.parse(p.cardJson)
     logChange({
-      userId: localStorage.getItem('auth_token') ? 'user' : '',
+      userId,
       tableName: 'progress',
-      rowId: c.verseId,
+      rowId: p.verseId,
       operation: 'create',
       data: JSON.stringify({
-        verseId: c.verseId,
-        translation: c.translation,
-        cardJson: JSON.stringify(card),
-        nextReview: new Date(card.due.getTime()).toISOString(),
+        verseId: p.verseId,
+        translation: p.translation,
+        cardJson: p.cardJson,
+        nextReview: new Date(card.due).toISOString(),
         lastReview: new Date().toISOString(),
       }),
     })
-    added++
   }
-  return added
+
+  return toAdd.length
 }

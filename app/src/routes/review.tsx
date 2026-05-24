@@ -20,6 +20,7 @@ interface DueItem {
 export function ReviewPage() {
   const { autostart } = useSearch({ from: '/review' })
   const autostartFired = useRef(false)
+  const retried = useRef(false)
   const [phase, setPhase] = useState<'queue' | 'session'>('queue')
   const [items, setItems] = useState<DueItem[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -42,6 +43,14 @@ export function ReviewPage() {
   useEffect(() => {
     loadQueueStats()
   }, [])
+
+  useEffect(() => {
+    if (!loading && totalAll === 0 && !retried.current) {
+      retried.current = true
+      const t = setTimeout(loadQueueStats, 700)
+      return () => clearTimeout(t)
+    }
+  }, [loading, totalAll])
 
   useEffect(() => {
     if (!loading && autostart === '1' && totalAll > 0 && phase === 'queue' && !autostartFired.current) {
