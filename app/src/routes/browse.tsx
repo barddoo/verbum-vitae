@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BOOKS, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
-import { db, ensureVersesSeeded, verseKey } from '../lib/db'
+import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
+import { db, ensureTranslationSeeded, verseKey } from '../lib/db'
 import { createEmptyCard } from '../lib/srs'
 import { logProgressChange } from '../lib/sync'
 
@@ -13,10 +13,11 @@ interface SearchResult {
 }
 
 export function BrowsePage() {
-  const [translation, setTranslation] = useState<Translation>('ara')
+  const [translation, setTranslation] = useState<Translation>(DEFAULT_TRANSLATION)
   const [bookIndex, setBookIndex] = useState<number | null>(null)
   const [chapter, setChapter] = useState<number | null>(null)
   const [verses, setVerses] = useState<string[]>([])
+  const [loadingVerses, setLoadingVerses] = useState(false)
   const [memorizedVerses, setMemorizedVerses] = useState<Set<string>>(new Set())
   const [selectedVerses, setSelectedVerses] = useState<Set<number>>(new Set())
   const [justAdded, setJustAdded] = useState<Set<string>>(new Set())
@@ -52,15 +53,18 @@ export function BrowsePage() {
   }, [searchQuery, translation])
 
   async function loadMemorizedVerses() {
+    await ensureTranslationSeeded(translation)
     const progress = await db.progress.where({ translation }).toArray()
     setMemorizedVerses(new Set(progress.map((p) => p.verseId)))
   }
 
   async function loadChapter() {
     if (bookIndex === null || chapter === null) return
-    await ensureVersesSeeded()
+    setLoadingVerses(true)
+    await ensureTranslationSeeded(translation)
     const rows = await db.verses.where({ bookNumber: bookIndex, chapter, translation }).sortBy('verse')
     setVerses(rows.map((r) => r.text))
+    setLoadingVerses(false)
     setSelectionMode(false)
     setSelectionAnchor(null)
     setSelectedVerses(new Set())
@@ -68,7 +72,7 @@ export function BrowsePage() {
 
   async function doSearch(query: string) {
     setSearching(true)
-    await ensureVersesSeeded()
+    await ensureTranslationSeeded(translation)
     const lower = query.toLowerCase()
     const all = await db.verses
       .where({ translation })
@@ -334,7 +338,9 @@ export function BrowsePage() {
               </h3>
             )}
           </div>
-          {verses.map((text, i) => {
+          {loadingVerses ? (
+            <div className="loading">Carregando...</div>
+          ) : verses.map((text, i) => {
             const v = i + 1
             const mem = isMemorized(v)
             const add = isAdded(v)

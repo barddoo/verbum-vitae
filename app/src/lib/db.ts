@@ -73,6 +73,15 @@ db.version(3).stores({
   syncLog: '++id, userId, tableName, rowId, synced, createdAt',
 })
 
+db.version(4).stores({
+  verses: '++id, &[bookNumber+chapter+verse+translation], [bookNumber+chapter], bookNumber, translation',
+  progress: '++id, &[verseId+translation], dueDate, state, [dueDate+state], translation',
+  wordStats: '++id, &[verseId+translation+wordIndex], [verseId+translation]',
+  collections: '++id, &name, isBuiltin',
+  collectionVerses: '++id, &[collectionId+verseId+translation], collectionId',
+  syncLog: '++id, userId, tableName, rowId, synced, createdAt',
+})
+
 export function verseKey(bookNumber: number, chapter: number, verse: number, endVerse?: number): string {
   return endVerse ? `${bookNumber}_${chapter}_${verse}:${endVerse}` : `${bookNumber}_${chapter}_${verse}`
 }
@@ -103,18 +112,21 @@ export function verseIdToReference(verseId: string, bookName: string): string {
   return `${bookName} ${p.chapter}:${p.verseStart}`
 }
 
-let seedingPromise: Promise<void> | null = null
+const seedingByTranslation = new Map<string, Promise<void>>()
 
+export async function ensureTranslationSeeded(translation: string) {
+  if (!seedingByTranslation.has(translation)) {
+    seedingByTranslation.set(
+      translation,
+      seedVerses(translation as Verse['translation']),
+    )
+  }
+  return seedingByTranslation.get(translation)!
+}
+
+// kept for backward compat
 export async function ensureVersesSeeded() {
-  if (seedingPromise) return seedingPromise
-  seedingPromise = (async () => {
-    const count = await db.verses.count()
-    if (count === 0) {
-      await seedVerses('ara')
-      await seedVerses('acf')
-    }
-  })()
-  return seedingPromise
+  return ensureTranslationSeeded('naa')
 }
 
 export async function fetchVersesForKey(verseId: string, translation: string): Promise<string> {
