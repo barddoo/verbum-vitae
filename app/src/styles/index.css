@@ -768,6 +768,8 @@ body::before {
 
 .collection-detail-actions .btn {
   pointer-events: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .collection-detail-actions .btn-added {
