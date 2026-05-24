@@ -67,7 +67,7 @@ export function ReviewPage() {
   }
 
   async function loadQueueStats() {
-    const allProgress = await db.progress.where({ translation }).toArray()
+    const allProgress = (await db.progress.toArray()).filter((p) => p.translation === translation)
     const dueCards = getDueCards(allProgress)
     setTotalAll(allProgress.length)
     setTotalDue(dueCards.length)
@@ -76,7 +76,7 @@ export function ReviewPage() {
 
   async function startReview() {
     setLoading(true)
-    const allProgress = await db.progress.where({ translation }).toArray()
+    const allProgress = (await db.progress.toArray()).filter((p) => p.translation === translation)
 
     let selected = allProgress
     if (filterStatus === 'due') {
