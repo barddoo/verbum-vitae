@@ -1,5 +1,6 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense, useEffect, useState } from 'react'
+import { BookOpen, BarChart2, Home, Layers, RotateCcw } from 'lucide-react'
 import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
 import { ThemeToggle } from './components/theme-toggle'
@@ -98,19 +99,24 @@ function RootLayout() {
       {!isDesktop && (
         <nav className="bottom-nav">
           <Link to="/" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-            Início
+            <Home size={20} strokeWidth={1.5} />
+            <span>Início</span>
           </Link>
           <Link to="/browse" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-            Bíblia
+            <BookOpen size={20} strokeWidth={1.5} />
+            <span>Bíblia</span>
           </Link>
           <Link to="/review" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-            Revisar
+            <RotateCcw size={20} strokeWidth={1.5} />
+            <span>Revisar</span>
           </Link>
           <Link to="/collections" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-            Coleções
+            <Layers size={20} strokeWidth={1.5} />
+            <span>Coleções</span>
           </Link>
           <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-            Stats
+            <BarChart2 size={20} strokeWidth={1.5} />
+            <span>Stats</span>
           </Link>
         </nav>
       )}
