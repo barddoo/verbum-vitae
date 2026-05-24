@@ -5,12 +5,12 @@ export const VerseSchema = z.object({
   chapter: z.number().int().min(1),
   verse: z.number().int().min(1),
   text: z.string(),
-  translation: z.enum(['ara', 'acf', 'nvi']),
+  translation: z.enum(['ara', 'acf', 'nvi', 'a21', 'nvt', 'naa']),
 })
 
 export const ProgressSchema = z.object({
   verseId: z.string(),
-  translation: z.enum(['ara', 'acf', 'nvi']),
+  translation: z.enum(['ara', 'acf', 'nvi', 'a21', 'nvt', 'naa']),
   cardJson: z.string(),
   updatedAt: z.string().datetime(),
 })

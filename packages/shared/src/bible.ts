@@ -136,13 +136,16 @@ export const BOOK_ABBREV: Record<string, string> = {
   ap: 'Apocalipse',
 }
 
-export const TRANSLATIONS = ['ara', 'acf', 'nvi'] as const
+export const TRANSLATIONS = ['ara', 'acf', 'nvi', 'a21', 'nvt', 'naa'] as const
 export type Translation = (typeof TRANSLATIONS)[number]
 
-export const DEFAULT_TRANSLATION: Translation = 'ara'
+export const DEFAULT_TRANSLATION: Translation = 'naa'
 
 export const TRANSLATION_LABELS: Record<string, string> = {
   ara: 'Almeida Revista e Atualizada',
   acf: 'Almeida Corrigida Fiel',
   nvi: 'Nova Versão Internacional',
+  a21: 'Almeida Século 21',
+  nvt: 'Nova Versão Transformadora',
+  naa: 'Nova Almeida Atualizada',
 }

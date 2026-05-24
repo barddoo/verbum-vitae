@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
-import { db, verseKey } from '../lib/db'
+import { db, ensureVersesSeeded, verseKey } from '../lib/db'
 import { createEmptyCard } from '../lib/srs'
 import { logProgressChange } from '../lib/sync'
 
@@ -58,6 +58,7 @@ export function BrowsePage() {
 
   async function loadChapter() {
     if (bookIndex === null || chapter === null) return
+    await ensureVersesSeeded()
     const rows = await db.verses.where({ bookNumber: bookIndex, chapter, translation }).sortBy('verse')
     setVerses(rows.map((r) => r.text))
     setSelectionMode(false)
@@ -67,6 +68,7 @@ export function BrowsePage() {
 
   async function doSearch(query: string) {
     setSearching(true)
+    await ensureVersesSeeded()
     const lower = query.toLowerCase()
     const all = await db.verses
       .where({ translation })

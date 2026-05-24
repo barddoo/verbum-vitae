@@ -103,7 +103,22 @@ export function verseIdToReference(verseId: string, bookName: string): string {
   return `${bookName} ${p.chapter}:${p.verseStart}`
 }
 
+let seedingPromise: Promise<void> | null = null
+
+export async function ensureVersesSeeded() {
+  if (seedingPromise) return seedingPromise
+  seedingPromise = (async () => {
+    const count = await db.verses.count()
+    if (count === 0) {
+      await seedVerses('ara')
+      await seedVerses('acf')
+    }
+  })()
+  return seedingPromise
+}
+
 export async function fetchVersesForKey(verseId: string, translation: string): Promise<string> {
+  await ensureVersesSeeded()
   const p = parseVerseKey(verseId)
   const endVerse = p.verseEnd || p.verseStart
   const rows = await db.verses.where('[bookNumber+chapter]').equals([p.bookNumber, p.chapter]).sortBy('verse')
@@ -112,6 +127,7 @@ export async function fetchVersesForKey(verseId: string, translation: string): P
 }
 
 export async function fetchVersesBatch(keys: { verseId: string; translation: string }[]): Promise<Map<string, string>> {
+  await ensureVersesSeeded()
   const chapterGroups = new Map<string, { keys: { verseId: string; translation: string }[] }>()
   for (const k of keys) {
     const p = parseVerseKey(k.verseId)
