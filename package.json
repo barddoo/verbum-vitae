@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "cd app && bun run dev",
     "build": "cd app && bun run build",
-    "deploy": "cd app && bun run build && cd ../worker && bunx wrangler deploy",
+    "deploy": "cd app && bun run build && cd ../worker && bunx wrangler deploy --tag $(git rev-parse --short HEAD)",
     "db:migrate": "cd worker && bun run db:migrate",
     "db:generate": "cd worker && bun run db:generate",
     "check": "bun run check:ts && bun run check:biome",

@@ -1,4 +1,4 @@
-name = "verbum-vitae-api"
+name = "verbum-vitae"
 main = "src/index.ts"
 compatibility_date = "2026-05-14"
 compatibility_flags = ["nodejs_compat"]
@@ -20,6 +20,33 @@ invocation_logs = true
 
 [observability.traces]
 enabled = true
+
+[version_metadata]
+binding = "CF_VERSION_METADATA"
+
+[[ratelimits]]
+name = "AUTH_RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 10
+  period = 60
+
+[[ratelimits]]
+name = "SYNC_RATE_LIMITER"
+namespace_id = "1002"
+
+  [ratelimits.simple]
+  limit = 60
+  period = 60
+
+[[ratelimits]]
+name = "VERSES_RATE_LIMITER"
+namespace_id = "1003"
+
+  [ratelimits.simple]
+  limit = 120
+  period = 60
 
 [assets]
 directory = "../app/dist"
