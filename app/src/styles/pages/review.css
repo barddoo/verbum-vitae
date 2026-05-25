@@ -47,7 +47,7 @@
   padding: 0.875rem 0.5rem 0.75rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: border-color 0.18s, background-color 0.18s;
   display: flex;
   flex-direction: column;
   gap: 0.3125rem;
@@ -107,7 +107,7 @@
   font-family: var(--font-body);
   font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: color 0.15s, background-color 0.15s;
   line-height: 1;
 }
 
@@ -137,8 +137,10 @@
   width: 100%;
 }
 
-.queue-select:focus {
+.queue-select:focus-visible {
   border-color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
 }
 
 .queue-select-sm {
@@ -220,7 +222,7 @@
   font-family: var(--font-body);
   font-size: 0.9rem;
   padding: 0.375rem 0.625rem;
-  transition: all 0.15s;
+  transition: color 0.15s, border-color 0.15s;
   line-height: 1;
 }
 
@@ -281,7 +283,7 @@
   cursor: pointer;
   padding: 0.6875rem;
   box-sizing: content-box;
-  transition: all 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
   min-width: 0;
   min-height: 0;
 }
@@ -681,9 +683,11 @@
   min-height: 6.25rem;
 }
 
-.typing-input:focus {
+.typing-input:focus-visible {
   border-color: var(--gold);
   box-shadow: 0 0 0 1px rgba(212, 168, 83, 0.08);
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
 }
 
 .typing-input::placeholder {

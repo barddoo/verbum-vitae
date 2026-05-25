@@ -241,6 +241,12 @@
   animation: spin 1s linear infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .sync-now-btn .spin {
+    animation: none;
+  }
+}
+
 /* SYNC ERROR BANNER */
 
 .sync-error-banner {
@@ -329,7 +335,7 @@
   font-size: 0.85rem;
   color: var(--aged);
   text-decoration: none;
-  transition: all 0.2s;
+  transition: color 0.2s, background-color 0.2s, border-left-color 0.2s;
   border-left: 0.125rem solid transparent;
   font-weight: 400;
   letter-spacing: 0.0125rem;
@@ -392,7 +398,7 @@
   text-decoration: none;
   padding: 0.75rem 0.25rem;
   border-radius: 0.125rem;
-  transition: all 0.15s;
+  transition: color 0.15s, background-color 0.15s;
   text-transform: uppercase;
   letter-spacing: 0.05rem;
   min-height: 3.5rem;
@@ -442,7 +448,7 @@
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s;
 }
 
 .app-footer-donate:hover {

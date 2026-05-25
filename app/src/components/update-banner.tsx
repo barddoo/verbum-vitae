@@ -87,11 +87,11 @@ export function UpdateBanner() {
   const newVersion = localStorage.getItem(VERSION_TAG_KEY) || __APP_VERSION__
 
   return (
-    <div className="update-banner">
+    <div className="update-banner" role="status" aria-live="polite">
       <span className="update-banner-text">Nova versão disponível</span>
       <span className="update-banner-version">{newVersion}</span>
       <button type="button" className="update-banner-btn" onClick={() => updateServiceWorker(true)}>
-        <Download size={14} />
+        <Download size={14} aria-hidden />
         Atualizar
       </button>
       <button
@@ -104,7 +104,7 @@ export function UpdateBanner() {
         }}
         aria-label="Fechar"
       >
-        x
+        ✕
       </button>
     </div>
   )

@@ -139,7 +139,7 @@
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background-color 0.15s;
   letter-spacing: 0.03rem;
 }
 
@@ -167,8 +167,10 @@
   transition: border-color 0.2s;
 }
 
-.auth-input:focus {
+.auth-input:focus-visible {
   border-color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
 }
 
 .auth-input::placeholder {
@@ -221,7 +223,7 @@
   color: var(--aged);
   cursor: pointer;
   border-bottom: 0.125rem solid transparent;
-  transition: all 0.2s;
+  transition: color 0.2s, border-bottom-color 0.2s;
 }
 
 .modal-tab:hover {
@@ -258,8 +260,10 @@
   margin-bottom: 0.875rem;
 }
 
-.auth-form input:focus {
+.auth-form input:focus-visible {
   border-color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
 }
 
 .modal .auth-form .btn {

@@ -9,11 +9,11 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={handleClose} role="presentation">
-      <div className="modal welcome-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop" onClick={handleClose} onKeyDown={(e) => e.key === 'Escape' && handleClose()} role="presentation">
+      <div className="modal welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-title" onClick={(e) => e.stopPropagation()}>
         <div className="welcome-header">
           <span className="welcome-icon">🕊️</span>
-          <h2 className="welcome-title">Bem-vindo ao Verbum Vitae</h2>
+          <h2 id="welcome-title" className="welcome-title">Bem-vindo ao Verbum Vitae</h2>
           <p className="welcome-subtitle">Obrigado por usar este app. Que a Palavra de Deus habite ricamente em você.</p>
         </div>
 

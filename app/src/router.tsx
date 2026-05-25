@@ -1,7 +1,6 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
 import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
 import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
-import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
 import { PwaInstallButton } from './components/pwa-install-button'
@@ -9,7 +8,9 @@ import { SyncErrorBanner } from './components/sync-error-banner'
 import { SyncIndicator } from './components/sync-indicator'
 import { ThemeToggle } from './components/theme-toggle'
 import { UpdateBanner } from './components/update-banner'
-import { WelcomeModal } from './components/welcome-modal'
+
+const AuthModal = lazy(() => import('./components/auth-modal').then((m) => ({ default: m.AuthModal })))
+const WelcomeModal = lazy(() => import('./components/welcome-modal').then((m) => ({ default: m.WelcomeModal })))
 import { useAuth } from './lib/auth'
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -155,10 +156,10 @@ function RootLayout() {
         </nav>
       )}
 
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showAuth && <Suspense fallback={null}><AuthModal onClose={() => setShowAuth(false)} /></Suspense>}
       {showDonate && <DonateModal onClose={() => setShowDonate(false)} />}
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
-      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
+      {showWelcome && <Suspense fallback={null}><WelcomeModal onClose={() => setShowWelcome(false)} /></Suspense>}
     </div>
   )
 }

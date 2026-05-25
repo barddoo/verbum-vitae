@@ -18,30 +18,27 @@ interface CollectionEntry {
 }
 
 async function ensureCollectionsSeeded() {
-  for (const c of bundledCollections) {
-    const existing = await db.collections.where({ name: c.name }).first()
-    if (existing) continue
-    const colId = await db.collections.put({ name: c.name, description: c.description, icon: c.icon, isBuiltin: 1, createdAt: Date.now() })
-    const cId = colId!
-    let order = 0
-    for (const ref of c.verses) {
-      const verseId = verseRefToId(ref)
-      const existingCv = await db.collectionVerses.where({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION }).first()
-      if (existingCv) continue
-      if (Array.isArray(ref.verse)) {
-        for (let v = ref.verse[0]; v <= ref.verse[1]; v++) {
-          await db.collectionVerses.put({
-            collectionId: cId,
-            verseId: `${ref.book}_${ref.chapter}_${v}`,
-            translation: DEFAULT_TRANSLATION,
-            sortOrder: order++,
-          })
+  const existingNames = new Set((await db.collections.toArray()).map((c) => c.name))
+  await Promise.all(
+    bundledCollections
+      .filter((c) => !existingNames.has(c.name))
+      .map(async (c) => {
+        const cId = (await db.collections.put({ name: c.name, description: c.description, icon: c.icon, isBuiltin: 1, createdAt: Date.now() }))!
+        let order = 0
+        const entries: { collectionId: number; verseId: string; translation: string; sortOrder: number }[] = []
+        for (const ref of c.verses) {
+          const verseId = verseRefToId(ref)
+          if (Array.isArray(ref.verse)) {
+            for (let v = ref.verse[0]; v <= ref.verse[1]; v++) {
+              entries.push({ collectionId: cId, verseId: `${ref.book}_${ref.chapter}_${v}`, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
+            }
+          } else {
+            entries.push({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
+          }
         }
-      } else {
-        await db.collectionVerses.put({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
-      }
-    }
-  }
+        await db.collectionVerses.bulkPut(entries)
+      }),
+  )
 }
 
 const loadingSpinner = <div className="loading">Carregando…</div>

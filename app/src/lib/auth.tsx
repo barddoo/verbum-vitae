@@ -19,9 +19,18 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('auth_token'))
   const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+  const user = useMemo<User | null>(() => {
+    if (!token) return null
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return { id: payload.sub, email: payload.email }
+    } catch {
+      return null
+    }
+  }, [token])
 
   useEffect(() => {
     const goOnline = () => setIsOnline(true)
@@ -35,15 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]))
-        setUser({ id: payload.sub, email: payload.email })
-      } catch {
-        cachedRemove('auth_token')
-      }
+    if (token && !user) {
+      cachedRemove('auth_token')
+      setToken(null)
     }
-  }, [token])
+  }, [token, user])
 
   const login = async (email: string, password: string) => {
     const data = await api.auth.login(email, password)
@@ -60,7 +65,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     cachedRemove('auth_token')
     setToken(null)
-    setUser(null)
   }
 
   const value = useMemo(() => ({ user, token, login, register, logout, isOnline }), [user, token, login, register, logout, isOnline])
