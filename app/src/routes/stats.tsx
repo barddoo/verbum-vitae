@@ -82,25 +82,35 @@ export function StatsPage() {
         ))}
       </div>
 
-      <div className="stats-danger-zone">
-        {!confirming ? (
-          <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
-            Recomeçar do zero
-          </button>
-        ) : (
-          <div className="stats-confirm">
-            <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
-            <div className="stats-confirm-actions">
-              <button type="button" className="btn btn-danger" onClick={clearProgress}>
-                Sim, limpar
-              </button>
-              <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>
-                Cancelar
-              </button>
+      {progress.total > 0 && (
+        <div className="stats-danger-zone">
+          {!confirming ? (
+            <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
+              Recomeçar do zero
+            </button>
+          ) : (
+            <div className="stats-confirm">
+              <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
+              <div className="stats-confirm-actions">
+                <button type="button" className="btn btn-danger" onClick={clearProgress}>
+                  Sim, limpar
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>
+                  Cancelar
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
+
+      {progress.total === 0 && (
+        <div className="stats-empty">
+          Nenhum versículo estudado ainda.
+          <br />
+          Comece a revisar para ver seu progresso aqui.
+        </div>
+      )}
     </div>
   )
 }
@@ -130,17 +140,17 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
   }, [cells])
 
   const monthLabels = useMemo(() => {
-    const labels: { label: string; weekIndex: number }[] = []
+    const labels: { label: string; cellIndex: number }[] = []
     let lastMonth = -1
-    weeks_arr.forEach((week, wi) => {
-      const m = week[0]?.date.getMonth()
-      if (m !== undefined && m !== lastMonth) {
-        labels.push({ label: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][m], weekIndex: wi })
+    cells.forEach((cell, ci) => {
+      const m = cell.date.getMonth()
+      if (m !== lastMonth) {
+        labels.push({ label: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][m], cellIndex: ci })
         lastMonth = m
       }
     })
     return labels
-  }, [weeks_arr])
+  }, [cells])
 
   const maxCount = useMemo(() => Math.max(1, ...cells.map((c) => c.count)), [cells])
 
@@ -163,7 +173,7 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
       <div className="sc-body">
         <div className="sc-months">
           {monthLabels.map((ml) => (
-            <span key={ml.weekIndex} className="sc-month" style={{ marginLeft: `${ml.weekIndex * 14}px` }}>
+            <span key={ml.cellIndex} className="sc-month" style={{ marginLeft: `${23 + (ml.cellIndex % 7) * 16}px` }}>
               {ml.label}
             </span>
           ))}

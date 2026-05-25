@@ -74,12 +74,9 @@ function RootLayout() {
           {user && !isOnline && <span className="offline-badge">Offline</span>}
           {user && <SyncIndicator />}
           {user ? (
-            <>
-              <span className="user-badge">{user.email}</span>
-              <button type="button" className="btn btn-sm btn-secondary" onClick={logout}>
-                Sair
-              </button>
-            </>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={logout}>
+              Sair
+            </button>
           ) : (
             <button type="button" className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>
               Entrar
