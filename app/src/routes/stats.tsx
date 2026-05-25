@@ -43,6 +43,7 @@ export function StatsPage() {
 
   async function clearProgress() {
     await db.progress.clear()
+    await db.syncLog.clear()
     setConfirming(false)
     loadStats()
   }

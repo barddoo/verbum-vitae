@@ -5,6 +5,8 @@ import { AuthModal } from './components/auth-modal'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
 import { PwaInstallButton } from './components/pwa-install-button'
+import { SyncErrorBanner } from './components/sync-error-banner'
+import { SyncIndicator } from './components/sync-indicator'
 import { ThemeToggle } from './components/theme-toggle'
 import { UpdateBanner } from './components/update-banner'
 import { WelcomeModal } from './components/welcome-modal'
@@ -56,6 +58,7 @@ function RootLayout() {
 
   return (
     <div className="app-shell">
+      <SyncErrorBanner />
       <UpdateBanner />
       <header className="top-bar">
         <Link to="/" className="top-bar-logo">
@@ -68,7 +71,8 @@ function RootLayout() {
           </button>
           <PwaInstallButton />
           <ThemeToggle />
-          {!isOnline && <span className="offline-badge">Offline</span>}
+          {user && !isOnline && <span className="offline-badge">Offline</span>}
+          {user && <SyncIndicator />}
           {user ? (
             <>
               <span className="user-badge">{user.email}</span>

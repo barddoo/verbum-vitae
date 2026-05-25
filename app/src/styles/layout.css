@@ -163,6 +163,138 @@
   font-style: italic;
 }
 
+/* SYNC INDICATOR */
+
+.sync-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--aged);
+  transition: color 0.2s;
+}
+
+.sync-indicator:hover {
+  color: var(--gold);
+}
+
+.sync-indicator.is-syncing {
+  color: var(--gold);
+}
+
+.sync-indicator.has-error {
+  color: var(--rubric);
+}
+
+.sync-now-btn {
+  background: none;
+  border: none;
+  color: var(--aged);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  transition: color 0.2s;
+}
+
+.sync-now-btn:hover:not(:disabled) {
+  color: var(--gold);
+}
+
+.sync-now-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sync-pending-badge {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  background: var(--rubric-dim);
+  color: var(--rubric);
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.25rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  top: -0.25rem;
+  right: -0.375rem;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sync-now-btn .spin {
+  animation: spin 1s linear infinite;
+}
+
+/* SYNC ERROR BANNER */
+
+.sync-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 1rem 0.5rem;
+  background: var(--rubric-dim);
+  border-bottom: 1px solid var(--rubric);
+  font-size: 0.8125rem;
+  color: var(--rubric);
+  animation: slideDown 0.25s ease-out;
+}
+
+.sync-error-banner-text {
+  font-weight: 600;
+}
+
+.sync-error-banner-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: var(--rubric);
+  color: var(--ink);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sync-error-banner-btn:hover {
+  opacity: 0.85;
+}
+
+.sync-error-banner-dismiss {
+  background: none;
+  border: none;
+  color: var(--rubric);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
+  line-height: 1;
+  margin-left: 0.25rem;
+  opacity: 0.6;
+}
+
+.sync-error-banner-dismiss:hover {
+  opacity: 1;
+}
+
 /* APP BODY */
 
 .app-body {

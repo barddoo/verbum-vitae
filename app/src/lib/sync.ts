@@ -7,6 +7,23 @@ let isSyncing = false
 let retryCount = 0
 const MAX_RETRY_DELAY = 120_000
 
+export type SyncStateCallback = (s: {
+  isSyncing?: boolean
+  lastSynced?: number | null
+  error?: string | null
+  pendingCount?: number
+}) => void
+
+let syncStateCallback: SyncStateCallback | null = null
+
+export function setSyncStateCallback(cb: SyncStateCallback) {
+  syncStateCallback = cb
+}
+
+export function clearSyncStateCallback() {
+  syncStateCallback = null
+}
+
 export function startAutoSync() {
   if (syncTimer) return
   scheduleNext()
@@ -16,7 +33,7 @@ export function startAutoSync() {
 }
 
 export function stopAutoSync() {
-  if (syncTimer) clearInterval(syncTimer)
+  if (syncTimer) clearTimeout(syncTimer)
   syncTimer = null
   document.removeEventListener('visibilitychange', onVisibilityChange)
   window.removeEventListener('online', onOnline)
@@ -31,28 +48,34 @@ function onOnline() {
 }
 
 function scheduleNext(delay = 30_000) {
-  if (syncTimer) clearInterval(syncTimer)
+  if (syncTimer) clearTimeout(syncTimer)
   syncTimer = setTimeout(() => {
     syncTimer = null
     syncNow()
   }, delay)
 }
 
-export async function syncNow() {
+export async function syncNow(cb?: SyncStateCallback) {
   const token = cachedGet('auth_token')
   if (!token || !navigator.onLine || isSyncing) return
 
   isSyncing = true
+  const update = cb || syncStateCallback
+  update?.({ isSyncing: true, error: null })
+
   try {
     const pendingCount = await db.syncLog.where({ synced: 0 }).count()
     if (pendingCount > 0) await pushPending()
     await pullRemote()
+    const remaining = await db.syncLog.where({ synced: 0 }).count()
     retryCount = 0
+    update?.({ isSyncing: false, lastSynced: Date.now(), pendingCount: remaining })
     scheduleNext(30_000)
   } catch (e) {
     console.warn('Sync failed:', e)
     retryCount++
     const delay = Math.min(1000 * 2 ** retryCount, MAX_RETRY_DELAY)
+    update?.({ isSyncing: false, error: (e as Error)?.message || String(e) })
     scheduleNext(delay)
   } finally {
     isSyncing = false

@@ -1,6 +1,5 @@
 import { createContext, type ReactNode, use, useEffect, useMemo, useState } from 'react'
 import { cachedRemove, cachedSet } from './storage'
-import { startAutoSync, stopAutoSync } from './sync'
 import { api } from './worker'
 
 interface User {
@@ -40,15 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]))
         setUser({ id: payload.sub, email: payload.email })
-        if (isOnline) startAutoSync()
       } catch {
         cachedRemove('auth_token')
       }
-    } else {
-      stopAutoSync()
     }
-    return () => stopAutoSync()
-  }, [token, isOnline])
+  }, [token])
 
   const login = async (email: string, password: string) => {
     const data = await api.auth.login(email, password)
@@ -63,7 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    stopAutoSync()
     cachedRemove('auth_token')
     setToken(null)
     setUser(null)
