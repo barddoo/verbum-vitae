@@ -21,6 +21,21 @@ async function getUser(c: any) {
   }
 }
 
+function extractCardFields(cardJson: unknown): { ease: number; intervalDays: number; repetitions: number } {
+  let ease = 2.5
+  let intervalDays = 0
+  let repetitions = 0
+  try {
+    const card = JSON.parse(cardJson as string)
+    if (typeof card.difficulty === 'number') ease = card.difficulty
+    if (typeof card.scheduled_days === 'number') intervalDays = card.scheduled_days
+    if (typeof card.reps === 'number') repetitions = card.reps
+  } catch {
+    /* use defaults */
+  }
+  return { ease, intervalDays, repetitions }
+}
+
 const pushSchema = z.object({
   entries: z
     .array(
@@ -58,6 +73,7 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
         return c.json({ error: 'Invalid entry data' }, 400)
       }
       if (entry.operation === 'create') {
+        const { ease, intervalDays, repetitions } = extractCardFields(parsed.cardJson)
         stmts.push(
           c.env.DB.prepare(
             'INSERT OR IGNORE INTO progress (id, user_id, verse_id, translation, card_json, ease, interval_days, repetitions, next_review, last_review, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -67,9 +83,9 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
             parsed.verseId,
             parsed.translation,
             parsed.cardJson,
-            2.5,
-            0,
-            0,
+            ease,
+            intervalDays,
+            repetitions,
             parsed.nextReview || now,
             parsed.lastReview || now,
             now,
@@ -77,9 +93,16 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
           ),
         )
       } else if (entry.operation === 'update') {
+        const { ease, intervalDays, repetitions } = extractCardFields(parsed.cardJson)
         stmts.push(
-          c.env.DB.prepare('UPDATE progress SET card_json = ?, last_review = ?, updated_at = ? WHERE id = ?').bind(
+          c.env.DB.prepare(
+            'UPDATE progress SET card_json = ?, ease = ?, interval_days = ?, repetitions = ?, next_review = ?, last_review = ?, updated_at = ? WHERE id = ?',
+          ).bind(
             parsed.cardJson || '',
+            ease,
+            intervalDays,
+            repetitions,
+            parsed.nextReview || now,
             parsed.lastReview || now,
             now,
             entry.rowId,
@@ -91,7 +114,10 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
     }
   }
 
-  if (stmts.length > 0) await c.env.DB.batch(stmts)
+  const CHUNK = 50
+  for (let i = 0; i < stmts.length; i += CHUNK) {
+    await c.env.DB.batch(stmts.slice(i, i + CHUNK))
+  }
   return c.json({ pushed: entries.length })
 })
 
@@ -104,20 +130,25 @@ syncApp.get('/pull', async (c) => {
 
   let result: D1Result<Record<string, unknown>>
   if (cursor) {
+    const [createdAt, lastId] = cursor.split('|')
+    if (!createdAt || !lastId) {
+      return c.json({ error: 'Invalid cursor format' }, 400)
+    }
     result = await db
       .prepare(
-        'SELECT * FROM sync_log WHERE user_id = ? AND created_at > (SELECT created_at FROM sync_log WHERE id = ?) ORDER BY created_at LIMIT ?',
+        'SELECT * FROM sync_log WHERE user_id = ? AND (created_at > ? OR (created_at = ? AND id > ?)) ORDER BY created_at, id LIMIT ?',
       )
-      .bind(user.sub, cursor, PULL_LIMIT)
+      .bind(user.sub, createdAt, createdAt, lastId, PULL_LIMIT)
       .all()
   } else {
-    result = await db.prepare('SELECT * FROM sync_log WHERE user_id = ? ORDER BY created_at LIMIT ?').bind(user.sub, PULL_LIMIT).all()
+    result = await db.prepare('SELECT * FROM sync_log WHERE user_id = ? ORDER BY created_at, id LIMIT ?').bind(user.sub, PULL_LIMIT).all()
   }
 
   const entries = result.results as any[]
+  const last = entries.length > 0 ? entries[entries.length - 1] : null
   return c.json({
     entries,
-    nextCursor: entries.length > 0 ? entries[entries.length - 1].id : null,
+    nextCursor: last ? `${last.created_at}|${last.id}` : null,
     hasMore: entries.length === PULL_LIMIT,
   })
 })

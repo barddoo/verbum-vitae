@@ -1,5 +1,7 @@
 import { createContext, type ReactNode, use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from './auth'
+import { db } from './db'
+import { cachedGet } from './storage'
 import { clearSyncStateCallback, syncNow as runSync, setSyncStateCallback, startAutoSync, stopAutoSync } from './sync'
 
 interface SyncState {
@@ -63,6 +65,19 @@ export function SyncProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!token) {
+      const prevToken = cachedGet('auth_token')
+      if (prevToken) {
+        try {
+          const parts = prevToken.split('.')
+          if (parts.length === 3) {
+            const payload = JSON.parse(atob(parts[1])) as { sub?: string }
+            const userId = payload.sub ?? ''
+            if (userId) db.syncLog.where({ synced: 0, userId }).delete()
+          }
+        } catch {
+          /* token already cleared */
+        }
+      }
       setState({ isSyncing: false, lastSynced: null, error: null, pendingCount: 0 })
     }
   }, [token])

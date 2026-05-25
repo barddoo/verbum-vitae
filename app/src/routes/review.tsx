@@ -134,7 +134,6 @@ export function ReviewPage() {
     })
 
     logProgressChange({
-      userId: cachedGet('auth_token') ? 'user' : '',
       tableName: 'progress',
       rowId: item.verseId,
       operation: 'update',
@@ -142,6 +141,9 @@ export function ReviewPage() {
         verseId: item.verseId,
         translation: item.translation,
         cardJson: JSON.stringify(card),
+        state,
+        dueDate,
+        streak: rating > 1 ? item.card.reps + 1 : 0,
         nextReview: new Date(dueDate).toISOString(),
         lastReview: new Date().toISOString(),
       }),

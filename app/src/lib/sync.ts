@@ -1,6 +1,21 @@
 import { db, type SyncLog } from './db'
+import { parseCardJson } from './srs'
 import { cachedGet } from './storage'
 import { api } from './worker'
+
+function getUserId(): string {
+  const token = cachedGet('auth_token')
+  if (!token) return ''
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) throw new Error('not a JWT')
+    const payload = JSON.parse(atob(parts[1]))
+    return (payload as { sub?: string }).sub ?? ''
+  } catch (e) {
+    console.warn('getUserId: failed to parse auth_token', e)
+    return ''
+  }
+}
 
 let syncTimer: ReturnType<typeof setInterval> | null = null
 let isSyncing = false
@@ -83,7 +98,13 @@ export async function syncNow(cb?: SyncStateCallback) {
 }
 
 async function pushPending() {
-  const pending = await db.syncLog.where({ synced: 0 }).limit(100).toArray()
+  const userId = getUserId()
+  if (!userId) {
+    syncStateCallback?.({ error: 'Não foi possível identificar o utilizador. Tente fazer login novamente.' })
+    return
+  }
+
+  const pending = await db.syncLog.where({ synced: 0, userId }).limit(100).toArray()
   if (pending.length === 0) return
 
   const entries = pending.map((e) => ({
@@ -115,25 +136,33 @@ async function pullRemote() {
 
         try {
           const data = JSON.parse(entry.data)
-          const exists = await db.progress.where({ verseId: data.verseId, translation: data.translation }).first()
+          let card: { due: Date | string; state: number }
+          try {
+            card = parseCardJson(data.cardJson)
+          } catch {
+            card = { due: new Date(), state: 0 }
+          }
+          const verseId = data.verseId
+          const translation = data.translation
+          const exists = await db.progress.where({ verseId, translation }).first()
 
           if (entry.operation === 'delete') {
             if (exists) await db.progress.delete(exists.id!)
-          } else if (exists) {
-            await db.progress.update(exists.id!, {
-              cardJson: data.cardJson,
-              updatedAt: Date.now(),
-            })
+            return
+          }
+
+          const fields = {
+            cardJson: data.cardJson,
+            state: typeof data.state === 'number' ? data.state : ((card.state as number) ?? 0),
+            dueDate: typeof data.dueDate === 'number' ? data.dueDate : new Date(card.due).getTime(),
+            streak: typeof data.streak === 'number' ? data.streak : 0,
+            updatedAt: Date.now(),
+          }
+
+          if (exists) {
+            await db.progress.update(exists.id!, fields)
           } else {
-            await db.progress.put({
-              verseId: data.verseId,
-              translation: data.translation,
-              cardJson: data.cardJson,
-              state: 0,
-              dueDate: Date.now(),
-              streak: 0,
-              updatedAt: Date.now(),
-            })
+            await db.progress.put({ verseId, translation, ...fields })
           }
         } catch {
           /* skip */
@@ -146,9 +175,11 @@ async function pullRemote() {
   }
 }
 
-export async function logProgressChange(entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) {
+export async function logProgressChange(entry: Omit<SyncLog, 'id' | 'userId' | 'synced' | 'createdAt'>) {
+  const userId = getUserId()
   await db.syncLog.put({
     ...entry,
+    userId,
     synced: 0,
     createdAt: Date.now(),
   })

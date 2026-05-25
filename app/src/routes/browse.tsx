@@ -4,7 +4,6 @@ import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
 import { db, ensureTranslationSeeded, verseKey } from '../lib/db'
 import { createEmptyCard } from '../lib/srs'
-import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 import { SelectionBar } from './browse/selection-bar'
 
@@ -153,7 +152,6 @@ export function BrowsePage() {
     const keys = [...selectedVerses].map((v) => verseKey(bookIndex, chapter, v))
     const existingList = await Promise.all(keys.map((key) => db.progress.where({ verseId: key, translation }).first()))
     const toAddKeys = keys.filter((_, i) => !existingList[i])
-    const userId = cachedGet('auth_token') ? 'user' : ''
 
     if (toAddKeys.length === 0) {
       exitSelectionMode()
@@ -178,7 +176,6 @@ export function BrowsePage() {
     for (const p of newProgress) {
       const card = JSON.parse(p.cardJson)
       logProgressChange({
-        userId,
         tableName: 'progress',
         rowId: p.verseId,
         operation: 'create',
@@ -186,6 +183,9 @@ export function BrowsePage() {
           verseId: p.verseId,
           translation,
           cardJson: p.cardJson,
+          state: p.state,
+          dueDate: p.dueDate,
+          streak: p.streak,
           nextReview: new Date(card.due).toISOString(),
           lastReview: new Date().toISOString(),
         }),

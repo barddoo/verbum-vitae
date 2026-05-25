@@ -1,6 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { VerseRow } from 'shared/types'
-import { cachedGet } from './storage'
 
 export interface Verse extends VerseRow {
   id?: number
@@ -243,10 +242,9 @@ export async function addCollectionToMemory(
   collectionId: number,
   translation: string,
   _progressIdFn: () => string,
-  logChange: (entry: Omit<SyncLog, 'id' | 'synced' | 'createdAt'>) => void,
+  logChange: (entry: Omit<SyncLog, 'id' | 'userId' | 'synced' | 'createdAt'>) => void,
 ) {
   const [cv, { createEmptyCard }] = await Promise.all([db.collectionVerses.where({ collectionId }).toArray(), import('./srs')])
-  const userId = cachedGet('auth_token') ? 'user' : ''
 
   const toAdd: Progress[] = []
   await db.transaction('r', db.progress, async () => {
@@ -276,7 +274,6 @@ export async function addCollectionToMemory(
   for (const p of toAdd) {
     const card = JSON.parse(p.cardJson)
     logChange({
-      userId,
       tableName: 'progress',
       rowId: p.verseId,
       operation: 'create',
@@ -284,6 +281,9 @@ export async function addCollectionToMemory(
         verseId: p.verseId,
         translation: p.translation,
         cardJson: p.cardJson,
+        state: p.state,
+        dueDate: p.dueDate,
+        streak: p.streak,
         nextReview: new Date(card.due).toISOString(),
         lastReview: new Date().toISOString(),
       }),

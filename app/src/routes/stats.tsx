@@ -59,7 +59,7 @@ export function StatsPage() {
         </div>
         <div className="stat-card">
           <span className="stat-value">{progress.streak}</span>
-          <span className="stat-label">Dias</span>
+          <span className="stat-label">Sequência</span>
         </div>
         <div className="stat-card">
           <span className="stat-value">{progress.reviewsToday}</span>
@@ -173,7 +173,7 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
       <div className="sc-body">
         <div className="sc-months">
           {monthLabels.map((ml) => (
-            <span key={ml.cellIndex} className="sc-month" style={{ marginLeft: `${23 + (ml.cellIndex % 7) * 16}px` }}>
+            <span key={ml.cellIndex} className="sc-month" style={{ marginLeft: `${23 + Math.floor(ml.cellIndex / 7) * 16}px` }}>
               {ml.label}
             </span>
           ))}

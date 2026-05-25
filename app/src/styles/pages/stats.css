@@ -53,22 +53,24 @@
 }
 
 .sc-day-label {
-  text-align: center;
+  text-align: right;
   font-size: 0.5rem;
   color: var(--aged);
   text-transform: uppercase;
-  height: 0.625rem;
-  line-height: 0.625rem;
+  height: 0.8125rem;
+  line-height: 0.8125rem;
+  padding-right: 0.25rem;
 }
 
 .sc-weeks {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.1875rem;
 }
 
 .sc-week {
   display: flex;
+  flex-direction: column;
   gap: 0.1875rem;
 }
 
@@ -181,7 +183,7 @@
 .breakdown-bar-container {
   flex: 1;
   height: 0.875rem;
-  background: var(--leather);
+  background: var(--border);
   border-radius: 0.125rem;
   overflow: hidden;
 }
