@@ -223,6 +223,14 @@
 
 /* BOTTOM NAV */
 
+.is-reviewing .bottom-nav {
+  display: none;
+}
+
+.is-reviewing .app-footer {
+  padding-bottom: 1.5rem;
+}
+
 .bottom-nav {
   display: flex;
   justify-content: space-around;

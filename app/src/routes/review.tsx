@@ -1,6 +1,6 @@
 import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, type Translation } from 'shared/bible'
 import { db, fetchVersesBatch, parseVerseKey } from '../lib/db'
 import { getNextCard } from '../lib/scheduler'
@@ -37,6 +37,15 @@ export function ReviewPage() {
   const [filterBook] = useState<number | null>(null)
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
   const translation = (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION
+
+  useLayoutEffect(() => {
+    if (phase === 'session') {
+      document.body.classList.add('is-reviewing')
+    } else {
+      document.body.classList.remove('is-reviewing')
+    }
+    return () => document.body.classList.remove('is-reviewing')
+  }, [phase])
 
   const allProgress = useLiveQuery(
     () => db.progress.toArray().then((rows) => rows.filter((p) => p.translation === translation)),

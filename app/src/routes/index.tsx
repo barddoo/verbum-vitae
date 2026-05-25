@@ -54,7 +54,15 @@ function useInstallGuide() {
   const isAndroid = /android/i.test(ua)
   const isDesktop = !isIOS && !isAndroid
 
-  return { show: !isStandalone && !dismissed && (isIOS || isAndroid || !!deferredPrompt), deferredPrompt, isIOS, isAndroid, isDesktop, handleInstall, dismiss }
+  return {
+    show: !isStandalone && !dismissed && (isIOS || isAndroid || !!deferredPrompt),
+    deferredPrompt,
+    isIOS,
+    isAndroid,
+    isDesktop,
+    handleInstall,
+    dismiss,
+  }
 }
 
 export function HomePage() {
@@ -63,7 +71,7 @@ export function HomePage() {
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
   const mounted = useRef(true)
-  const { show, deferredPrompt, isIOS, isAndroid, isDesktop, handleInstall, dismiss } = useInstallGuide()
+  const { show, deferredPrompt, isIOS, isAndroid, handleInstall, dismiss } = useInstallGuide()
 
   const loadStats = useCallback(async () => {
     const allProgress = await db.progress.toArray()

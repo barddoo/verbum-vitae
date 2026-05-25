@@ -11,11 +11,11 @@ export function useLongPress({ onLongPress, onTap, enabled }: LongPressConfig) {
   const pointerStart = useRef({ x: 0, y: 0 })
   const didLongPress = useRef(false)
 
-  function handlePointerDown(v: number, e: React.PointerEvent<HTMLDivElement>) {
+  function handlePointerDown(v: number, e: React.PointerEvent<HTMLElement>) {
     if (enabled) return
     didLongPress.current = false
     pointerStart.current = { x: e.clientX, y: e.clientY }
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    e.currentTarget.setPointerCapture(e.pointerId)
     longPressTimer.current = setTimeout(() => {
       didLongPress.current = true
       navigator.vibrate?.(30)
@@ -23,7 +23,7 @@ export function useLongPress({ onLongPress, onTap, enabled }: LongPressConfig) {
     }, 500)
   }
 
-  function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+  function handlePointerMove(e: React.PointerEvent<HTMLElement>) {
     if (!longPressTimer.current) return
     const dx = e.clientX - pointerStart.current.x
     const dy = e.clientY - pointerStart.current.y

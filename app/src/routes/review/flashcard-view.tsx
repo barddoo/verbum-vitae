@@ -46,13 +46,15 @@ export function FlashcardView({
       <div className={`flip-card ${flipped ? 'flipped' : ''}`}>
         <div className="flip-card-inner">
           <div className="flip-card-front">
-            <h2 className="flashcard-ref">{reference}</h2>
-            <p className="flashcard-hint">Tente recitar o versículo mentalmente…</p>
-            {hintLevel > 0 && (
-              <div className="flashcard-hint-text">
-                <p>{getHiddenText()}</p>
-              </div>
-            )}
+            <div className="flip-card-top">
+              <h2 className="flashcard-ref">{reference}</h2>
+              <p className="flashcard-hint">Tente recitar o versículo mentalmente…</p>
+              {hintLevel > 0 && (
+                <div className="flashcard-hint-text">
+                  <p>{getHiddenText()}</p>
+                </div>
+              )}
+            </div>
             <div className="flashcard-actions">
               <button type="button" className="btn btn-secondary" onClick={() => setHintLevel((h) => h + 1)}>
                 Dica {hintLevel === 0 ? '(1ª letra)' : '(mais palavras)'}

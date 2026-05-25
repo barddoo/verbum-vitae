@@ -187,6 +187,20 @@
 
 /* REVIEW SESSION */
 
+.review-session .review-header {
+  position: sticky;
+  top: calc(-0.5rem + env(safe-area-inset-top, 0px));
+  z-index: 5;
+  background: linear-gradient(180deg, var(--ink) 60%, transparent);
+  -webkit-backdrop-filter: blur(0.375rem);
+  backdrop-filter: blur(0.375rem);
+  padding-top: 0.5rem;
+  margin: calc(-1rem - env(safe-area-inset-top, 0px)) calc(-1.25rem) 0.5rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  padding-bottom: 0.75rem;
+}
+
 .review-header {
   display: flex;
   align-items: center;
@@ -259,15 +273,17 @@
 }
 
 .mode-dot {
-  width: 0.625rem;
-  height: 0.625rem;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 50%;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   background: transparent;
   cursor: pointer;
-  padding: 0.375rem;
+  padding: 0.6875rem;
   box-sizing: content-box;
   transition: all 0.2s;
+  min-width: 0;
+  min-height: 0;
 }
 
 .mode-dot:hover {
@@ -291,6 +307,7 @@
 .flip-card-inner {
   position: relative;
   width: 100%;
+  display: grid;
   transition: transform 0.5s ease;
   transform-style: preserve-3d;
 }
@@ -301,6 +318,7 @@
 
 .flip-card-front,
 .flip-card-back {
+  grid-area: 1 / 1;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--radius);
@@ -313,15 +331,45 @@
 .flip-card-back {
   background: linear-gradient(175deg, var(--leather), var(--leather-gradient-end), var(--leather));
   border: 1px solid var(--border);
-  padding: 2.5rem 1.75rem;
+  padding: 1.75rem 1.25rem;
   text-align: center;
   box-shadow: 0 1px 0 rgba(212, 168, 83, 0.04) inset;
 }
 
+@media (min-width: 20rem) {
+  .flip-card-front,
+  .flip-card-back {
+    padding: 2.5rem 1.75rem;
+  }
+}
+
 .flip-card-front {
   position: relative;
-  min-height: 16.25rem;
+  height: 18rem;
   z-index: 2;
+  justify-content: space-between;
+  align-self: start;
+}
+
+.flip-card-top {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.flip-card-top::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 20rem) {
+  .flip-card-front {
+    height: 20rem;
+  }
 }
 
 .flip-card-front::before,
@@ -349,8 +397,6 @@
 }
 
 .flip-card-back {
-  position: absolute;
-  inset: 0;
   transform: rotateY(180deg);
 }
 
@@ -364,11 +410,18 @@
 
 .flashcard-ref {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--gold);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   letter-spacing: 0.0187rem;
+}
+
+@media (min-width: 20rem) {
+  .flashcard-ref {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .flashcard-hint {
@@ -390,7 +443,8 @@
   line-height: 1.8;
   letter-spacing: 1px;
   color: var(--aged);
-  word-break: break-all;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .flashcard-actions {
@@ -517,7 +571,8 @@
   background: var(--rubric-dim);
 }
 
-.grade-1:hover {
+.grade-1:hover,
+.grade-1:active {
   background: var(--rubric);
   border-color: var(--rubric);
   color: var(--parchment);
@@ -529,7 +584,8 @@
   background: var(--gold-dim);
 }
 
-.grade-2:hover {
+.grade-2:hover,
+.grade-2:active {
   background: var(--gold);
   border-color: var(--gold);
   color: var(--ink);
@@ -541,7 +597,8 @@
   background: var(--sage-dim);
 }
 
-.grade-3:hover {
+.grade-3:hover,
+.grade-3:active {
   background: var(--sage);
   border-color: var(--sage);
   color: var(--parchment);
@@ -553,7 +610,8 @@
   background: var(--sage-dim);
 }
 
-.grade-4:hover {
+.grade-4:hover,
+.grade-4:active {
   background: var(--sage);
   border-color: var(--sage);
   color: var(--parchment);
@@ -596,9 +654,15 @@
   background: linear-gradient(175deg, var(--leather), var(--leather-gradient-end), var(--leather));
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 2.5rem 1.75rem;
+  padding: 1.75rem 1.25rem;
   text-align: center;
   box-shadow: 0 1px 0 rgba(212, 168, 83, 0.04) inset;
+}
+
+@media (min-width: 20rem) {
+  .typing-card {
+    padding: 2.5rem 1.75rem;
+  }
 }
 
 .typing-input {
@@ -632,9 +696,15 @@
   background: linear-gradient(175deg, var(--leather), var(--leather-gradient-end), var(--leather));
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 3rem 1.75rem;
+  padding: 1.75rem 1.25rem;
   text-align: center;
   margin-bottom: 1.25rem;
+}
+
+@media (min-width: 20rem) {
+  .typing-result-card {
+    padding: 3rem 1.75rem;
+  }
 }
 
 .typing-accuracy-bar {

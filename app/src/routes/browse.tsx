@@ -312,8 +312,18 @@ export function BrowsePage() {
             <div className="book-list">
               {filteredBooks.flatMap(({ name, idx }) => {
                 const items = []
-                if (!bookQuery && idx === 0) items.push(<div key="at-label" className="book-section-label">Antigo Testamento</div>)
-                if (!bookQuery && idx === 39) items.push(<div key="nt-label" className="book-section-label">Novo Testamento</div>)
+                if (!bookQuery && idx === 0)
+                  items.push(
+                    <div key="at-label" className="book-section-label">
+                      Antigo Testamento
+                    </div>,
+                  )
+                if (!bookQuery && idx === 39)
+                  items.push(
+                    <div key="nt-label" className="book-section-label">
+                      Novo Testamento
+                    </div>,
+                  )
                 items.push(
                   <button
                     type="button"
@@ -380,21 +390,19 @@ export function BrowsePage() {
                 const add = isAdded(v)
                 const sel = selectedVerses.has(v)
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={i}
-                    role="button"
-                    tabIndex={0}
                     className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
                     onPointerDown={(e) => longPress.handlePointerDown(v, e)}
                     onPointerMove={longPress.handlePointerMove}
                     onPointerUp={() => longPress.handlePointerUp(v)}
                     onPointerCancel={longPress.handlePointerCancel}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleTap(v) } }}
                   >
                     <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
                     <span className="verse-text">{text}</span>
                     {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
-                  </div>
+                  </button>
                 )
               })}
         </div>

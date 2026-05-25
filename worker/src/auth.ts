@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { sign } from 'hono/jwt'
+import { uuidv7 } from 'shared/uuid'
 import { z } from 'zod'
 
 const PBKDF2_ITERATIONS = 100_000
@@ -67,7 +68,7 @@ authApp.post('/register', zValidator('json', registerSchema), async (c) => {
   const existing = await c.env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first()
   if (existing) return c.json({ error: 'Email já registrado' }, 409)
 
-  const id = crypto.randomUUID()
+  const id = uuidv7()
   const passwordHash = await hashPassword(password)
   const now = new Date().toISOString()
 

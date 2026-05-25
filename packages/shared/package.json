@@ -4,9 +4,11 @@
   "type": "module",
   "exports": {
     "./types": "./src/types.ts",
-    "./bible": "./src/bible.ts"
+    "./bible": "./src/bible.ts",
+    "./uuid": "./src/uuid.ts"
   },
   "dependencies": {
+    "uuid": "^14.0.0",
     "zod": "^4.4.3"
   }
 }

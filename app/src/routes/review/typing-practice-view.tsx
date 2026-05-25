@@ -24,6 +24,7 @@ export function TypingPracticeView({
   const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const hasRecordedRef = useRef(false)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   const words = useMemo(() => verseText.split(' '), [verseText])
 
@@ -34,6 +35,18 @@ export function TypingPracticeView({
     setInput('')
     inputRef.current?.focus()
   }, [verseId, translation, words.length])
+
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+    const vv = window.visualViewport
+    if (!vv) return
+    const onResize = () => {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+    vv.addEventListener('resize', onResize)
+    return () => vv.removeEventListener('resize', onResize)
+  }, [])
 
   function handleSubmit() {
     const cleanInput = input.trim().toLowerCase()
@@ -49,12 +62,17 @@ export function TypingPracticeView({
       const correctWords = cleanVerse.split(/\s+/)
       const correct = new Set<number>()
       const incorrect = new Set<number>()
+      const lengthMatch = typedWords.length === correctWords.length
       correctWords.forEach((w, i) => {
-        if (typedWords[i] === w) correct.add(i)
+        if (lengthMatch && typedWords[i] === w) correct.add(i)
         else incorrect.add(i)
       })
       recordWordAccuracy(verseId, translation, correct, incorrect, words)
     }
+  }
+
+  function handleFocus() {
+    setTimeout(() => cardRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 400)
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -66,7 +84,7 @@ export function TypingPracticeView({
 
   if (!submitted) {
     return (
-      <div className="flashcard">
+      <div className="flashcard" ref={cardRef}>
         <div className="typing-card">
           <h2 className="flashcard-ref">{reference}</h2>
           <textarea
@@ -75,6 +93,7 @@ export function TypingPracticeView({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
             placeholder="Digite o versículo de memória..."
             rows={4}
             aria-label="Digite o versículo de memória"
@@ -90,7 +109,7 @@ export function TypingPracticeView({
   }
 
   return (
-    <div className="flashcard">
+    <div className="flashcard" ref={cardRef}>
       <div className="flashcard-back typing-result-card">
         <h3 className="flashcard-ref-back">{reference}</h3>
         <HeatVerse words={words} heat={heat} />

@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { verify } from 'hono/jwt'
+import { uuidv7 } from 'shared/uuid'
 import { z } from 'zod'
 
 const PULL_LIMIT = 200
@@ -42,7 +43,7 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
   const stmts: D1PreparedStatement[] = []
 
   for (const entry of entries) {
-    const id = crypto.randomUUID()
+    const id = uuidv7()
     stmts.push(
       c.env.DB.prepare(
         'INSERT INTO sync_log (id, user_id, table_name, row_id, operation, data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
