@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { useEffect, useMemo, useState } from 'react'
 import { db } from '../lib/db'
 import { computeStreak } from '../lib/stats'
 
@@ -66,15 +67,11 @@ function useInstallGuide() {
 }
 
 export function HomePage() {
-  const [dueCount, setDueCount] = useState(0)
-  const [totalMemorized, setTotalMemorized] = useState(0)
-  const [streak, setStreak] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const mounted = useRef(true)
+  const allProgress = useLiveQuery(() => db.progress.toArray(), [])
   const { show, deferredPrompt, isIOS, isAndroid, handleInstall, dismiss } = useInstallGuide()
 
-  const loadStats = useCallback(async () => {
-    const allProgress = await db.progress.toArray()
+  const stats = useMemo(() => {
+    if (!allProgress) return null
     const now = Date.now()
     let due = 0
     for (const p of allProgress) {
@@ -85,24 +82,20 @@ export function HomePage() {
         /* skip */
       }
     }
-    setTotalMemorized(allProgress.length)
-    setDueCount(due)
-    setStreak(computeStreak(allProgress.map((p) => p.dueDate)))
-  }, [])
-
-  useEffect(() => {
-    mounted.current = true
-    loadStats().then(() => {
-      if (mounted.current) setLoading(false)
-    })
-    return () => {
-      mounted.current = false
+    return {
+      dueCount: due,
+      totalMemorized: allProgress.length,
+      streak: computeStreak(allProgress.map((p) => p.dueDate)),
     }
-  }, [loadStats])
+  }, [allProgress])
+
+  const dueCount = stats?.dueCount ?? 0
+  const totalMemorized = stats?.totalMemorized ?? 0
+  const streak = stats?.streak ?? 0
 
   return (
     <div className="page home-page">
-      {loading ? (
+      {!stats ? (
         loadingSpinner
       ) : (
         <>
