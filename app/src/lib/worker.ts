@@ -22,21 +22,21 @@ async function request(path: string, options: RequestInit = {}) {
 
 export const api = {
   auth: {
-    register: (email: string, password: string) => request('/auth/register', { method: 'POST', body: JSON.stringify({ email, password }) }),
-    login: (email: string, password: string) => request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+    register: (email: string, password: string) => request('/api/auth/register', { method: 'POST', body: JSON.stringify({ email, password }) }),
+    login: (email: string, password: string) => request('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   },
 
   sync: {
     push: (entries: { tableName: string; rowId: string; operation: string; data: string }[]) =>
-      request('/sync/push', { method: 'POST', body: JSON.stringify({ entries }) }),
-    pull: (cursor?: string) => request(`/sync/pull${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`),
+      request('/api/sync/push', { method: 'POST', body: JSON.stringify({ entries }) }),
+    pull: (cursor?: string) => request(`/api/sync/pull${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`),
   },
 
   verses: {
-    get: (translation: string, bookNumber: number, chapter: number) => request(`/verses/${translation}/${bookNumber}/${chapter}`),
+    get: (translation: string, bookNumber: number, chapter: number) => request(`/api/verses/${translation}/${bookNumber}/${chapter}`),
   },
 
   presence: {
-    count: () => request('/presence/count'),
+    count: () => request('/api/presence/count'),
   },
 }

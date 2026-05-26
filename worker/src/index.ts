@@ -18,7 +18,7 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-const ALLOWED_ORIGINS = ['https://verbum-vitae.pages.dev', 'https://verbum-vitae.workers.dev']
+const ALLOWED_ORIGINS = ['https://verbum-vitae.pages.dev', 'https://verbum-vitae.workers.dev', 'https://vvitae.com']
 
 app.use(
   '*',
