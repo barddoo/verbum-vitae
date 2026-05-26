@@ -355,7 +355,7 @@
 
 .flip-card-front {
   position: relative;
-  height: 18rem;
+  min-height: 18rem;
   z-index: 2;
   justify-content: space-between;
   align-self: start;
@@ -378,7 +378,7 @@
 
 @media (min-width: 20rem) {
   .flip-card-front {
-    height: 20rem;
+    min-height: 20rem;
   }
 }
 
