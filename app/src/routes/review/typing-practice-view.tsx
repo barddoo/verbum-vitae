@@ -26,7 +26,7 @@ export function TypingPracticeView({
   const hasRecordedRef = useRef(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const words = useMemo(() => verseText.split(' '), [verseText])
+  const words = useMemo(() => verseText.trim().split(/\s+/), [verseText])
 
   useEffect(() => {
     getWordHeat(verseId, translation, words.length).then(setHeat)
@@ -51,15 +51,17 @@ export function TypingPracticeView({
   function handleSubmit() {
     const cleanInput = input.trim().toLowerCase()
     const cleanVerse = verseText.trim().toLowerCase()
-    const dist = levenshtein(cleanInput, cleanVerse)
-    const maxLen = Math.max(cleanInput.length, cleanVerse.length)
+    const normalizedInput = removePunctuation(cleanInput)
+    const normalizedVerse = removePunctuation(cleanVerse)
+    const dist = levenshtein(normalizedInput, normalizedVerse)
+    const maxLen = Math.max(normalizedInput.length, normalizedVerse.length)
     const acc = maxLen > 0 ? Math.round((1 - dist / maxLen) * 100) : 0
     setAccuracy(acc)
     setSubmitted(true)
     if (!hasRecordedRef.current) {
       hasRecordedRef.current = true
-      const typedWords = cleanInput.split(/\s+/)
-      const correctWords = cleanVerse.split(/\s+/)
+      const typedWords = normalizedInput.split(/\s+/)
+      const correctWords = normalizedVerse.split(/\s+/)
       const correct = new Set<number>()
       const incorrect = new Set<number>()
       const lengthMatch = typedWords.length === correctWords.length
@@ -69,6 +71,13 @@ export function TypingPracticeView({
       })
       recordWordAccuracy(verseId, translation, correct, incorrect, words)
     }
+  }
+
+  function removePunctuation(s: string): string {
+    return s
+      .replace(/[.,;:!?"'—–\-()«»]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
   }
 
   function handleFocus() {

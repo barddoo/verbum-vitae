@@ -21,7 +21,7 @@ export function FlashcardView({
   const [hintLevel, setHintLevel] = useState(0)
   const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
 
-  const words = useMemo(() => verseText.split(' '), [verseText])
+  const words = useMemo(() => verseText.trim().split(/\s+/), [verseText])
 
   useEffect(() => {
     getWordHeat(verseId, translation, words.length).then(setHeat)
@@ -31,7 +31,7 @@ export function FlashcardView({
 
   const getHiddenText = useCallback((): string => {
     if (hintLevel === 0) return ''
-    const ws = verseText.split(' ')
+    const ws = verseText.trim().split(/\s+/)
     return ws
       .map((w, i) => {
         if (hintLevel === 1) return i < 3 ? w : w[0] + '_'.repeat(Math.max(w.length - 1, 1))

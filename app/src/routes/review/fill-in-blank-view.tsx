@@ -20,16 +20,19 @@ export function FillInBlankView({
   const [revealed, setRevealed] = useState(false)
   const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
 
-  const words = useMemo(() => verseText.split(' '), [verseText])
+  const words = useMemo(() => verseText.trim().split(/\s+/), [verseText])
 
   const blankIndices = useMemo(() => {
     const count = Math.max(1, Math.floor(words.length * 0.35))
     const indices = new Set<number>()
-    while (indices.size < count) indices.add(Math.floor(Math.random() * words.length))
+    let seed = 0
+    for (let i = 0; i < verseId.length; i++) seed = (seed * 31 + verseId.charCodeAt(i)) | 0
+    const rand = () => { seed = (seed * 1103515245 + 12345) | 0; return (seed >>> 0) / 4294967296 }
+    while (indices.size < count) indices.add(Math.floor(rand() * words.length))
     return indices
-  }, [words])
+  }, [verseId, words])
 
-  const displayParts = useMemo(() => words.map((w, i) => (blankIndices.has(i) ? null : w)), [words, blankIndices])
+  const displayParts = useMemo(() => words.map((w, i) => ({ word: w, blank: blankIndices.has(i) })), [words, blankIndices])
 
   useEffect(() => {
     getWordHeat(verseId, translation, words.length).then(setHeat)
@@ -46,7 +49,7 @@ export function FillInBlankView({
               <p>
                 {displayParts.map((part, i) => (
                   <span key={`${part}-${i}`}>
-                    {part === null ? <span className="blank-word">_____</span> : <span>{part}</span>}
+                    {part.blank ? <span className="blank-word">{'_'.repeat(part.word.length)}</span> : <span>{part.word}</span>}
                     {i < displayParts.length - 1 ? ' ' : ''}
                   </span>
                 ))}
