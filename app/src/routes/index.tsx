@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '../lib/db'
+import { usePresence } from '../lib/presence-context'
 import { computeStreak } from '../lib/stats'
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -67,6 +68,7 @@ function useInstallGuide() {
 }
 
 export function HomePage() {
+  const { count: presenceCount } = usePresence()
   const allProgress = useLiveQuery(() => db.progress.toArray(), [])
   const { show, deferredPrompt, isIOS, isAndroid, handleInstall, dismiss } = useInstallGuide()
 
@@ -101,6 +103,11 @@ export function HomePage() {
         <>
           <div className="hero-card">
             <h2 className="hero-greeting">{dueCount > 0 ? `${dueCount} versículos para revisar` : 'Nada pendente!'}</h2>
+            {presenceCount > 0 && (
+              <p className="hero-presence">
+                {presenceCount} pessoas {presenceCount === 1 ? 'está' : 'estão'} memorizando agora
+              </p>
+            )}
             {dueCount > 0 && (
               <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
                 Revisar Agora ({dueCount})

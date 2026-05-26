@@ -35,4 +35,8 @@ export const api = {
   verses: {
     get: (translation: string, bookNumber: number, chapter: number) => request(`/verses/${translation}/${bookNumber}/${chapter}`),
   },
+
+  presence: {
+    count: () => request('/presence/count'),
+  },
 }

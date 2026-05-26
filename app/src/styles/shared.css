@@ -114,7 +114,15 @@
   font-size: 1.3rem;
   color: var(--parchment);
   font-weight: 600;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.625rem;
+  letter-spacing: 0.0125rem;
+}
+
+.hero-presence {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--aged);
+  margin: 0 0 1.25rem;
   letter-spacing: 0.0125rem;
 }
 

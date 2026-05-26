@@ -140,6 +140,33 @@
   color: var(--gold);
 }
 
+.presence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  color: var(--aged);
+  letter-spacing: 0.0313rem;
+  white-space: nowrap;
+}
+
+.presence-dot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.presence-dot.online {
+  background: #4ade80;
+  box-shadow: 0 0 0.25rem rgba(74, 222, 128, 0.5);
+}
+
+.presence-dot.offline {
+  background: var(--border);
+}
+
 .offline-badge {
   font-family: var(--font-body);
   font-size: 0.6rem;

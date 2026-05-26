@@ -1,5 +1,6 @@
 import { RouterProvider } from '@tanstack/react-router'
 import { AuthProvider } from './lib/auth'
+import { PresenceProvider } from './lib/presence-context'
 import { SyncProvider } from './lib/sync-context'
 import { ThemeProvider } from './lib/theme'
 import { router } from './router'
@@ -9,7 +10,9 @@ export function App() {
     <ThemeProvider>
       <AuthProvider>
         <SyncProvider>
-          <RouterProvider router={router} />
+          <PresenceProvider>
+            <RouterProvider router={router} />
+          </PresenceProvider>
         </SyncProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -3,6 +3,7 @@ import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
 import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
+import { PresenceBadge } from './components/presence-badge'
 import { PwaInstallButton } from './components/pwa-install-button'
 import { SyncErrorBanner } from './components/sync-error-banner'
 import { SyncIndicator } from './components/sync-indicator'
@@ -73,6 +74,7 @@ function RootLayout() {
           </button>
           <PwaInstallButton />
           <ThemeToggle />
+          <PresenceBadge />
           {user && !isOnline && <span className="offline-badge">Offline</span>}
           {user && <SyncIndicator />}
           {user ? (

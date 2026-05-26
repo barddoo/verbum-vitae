@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { authRoutes } from './auth'
+import { PresenceDO } from './presence-do'
 import { syncRoutes } from './sync'
 import { versesRoutes } from './verses'
 
@@ -12,6 +13,7 @@ type Bindings = {
   VERSES_RATE_LIMITER: RateLimit
   CF_VERSION_METADATA: WorkerVersionMetadata
   ASSETS: { fetch: (req: Request) => Promise<Response> }
+  PRESENCE: DurableObjectNamespace
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -98,9 +100,25 @@ app.get('/api/health', (c) => {
   })
 })
 
+app.get('/ws/presence', async (c) => {
+  const upgrade = c.req.header('Upgrade')
+  if (!upgrade || upgrade !== 'websocket') {
+    return c.json({ error: 'Expected WebSocket upgrade' }, 426)
+  }
+  const stub = c.env.PRESENCE.get(c.env.PRESENCE.idFromName('global'))
+  return stub.fetch(c.req.raw)
+})
+
+app.get('/api/presence/count', async (c) => {
+  const stub = c.env.PRESENCE.get(c.env.PRESENCE.idFromName('global'))
+  return stub.fetch(c.req.raw)
+})
+
 app.get('*', async (c) => {
   const url = new URL(c.req.url)
   return c.env.ASSETS.fetch(new Request(`${url.origin}/index.html`))
 })
 
 export default app
+
+export { PresenceDO }
