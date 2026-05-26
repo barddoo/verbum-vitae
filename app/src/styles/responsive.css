@@ -17,6 +17,14 @@
     padding: 3.5rem 3rem;
   }
 
+  .community-presence-count {
+    font-size: 3rem;
+  }
+
+  .community-presence-unit {
+    font-size: 1.55rem;
+  }
+
   .hero-greeting {
     font-size: 1.7rem;
   }

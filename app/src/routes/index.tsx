@@ -94,6 +94,7 @@ export function HomePage() {
   const dueCount = stats?.dueCount ?? 0
   const totalMemorized = stats?.totalMemorized ?? 0
   const streak = stats?.streak ?? 0
+  const nf = useMemo(() => new Intl.NumberFormat('pt-BR'), [])
 
   return (
     <div className="page home-page">
@@ -102,16 +103,26 @@ export function HomePage() {
       ) : (
         <>
           <div className="hero-card">
-            <h2 className="hero-greeting">{dueCount > 0 ? `${dueCount} versículos para revisar` : 'Nada pendente!'}</h2>
-            {presenceCount > 0 && (
-              <p className="hero-presence">
-                {presenceCount} pessoas {presenceCount === 1 ? 'está' : 'estão'} memorizando agora
-              </p>
-            )}
+            <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} versículos para revisar` : 'Nada pendente!'}</h2>
             {dueCount > 0 && (
               <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
-                Revisar Agora ({dueCount})
+                Revisar Agora ({nf.format(dueCount)})
               </Link>
+            )}
+          </div>
+
+          <div className="community-presence-card" aria-live="polite">
+            {presenceCount > 0 ? (
+              <>
+                <span className="community-presence-main">
+                  <span className="community-presence-count">{nf.format(presenceCount)}</span>
+                  <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
+                </span>
+                <span className="community-presence-label">memorizando a Bíblia agora</span>
+                <span className="community-presence-encourage">Continue assim!</span>
+              </>
+            ) : (
+              <span className="community-presence-encourage">Continue memorizando a Bíblia!</span>
             )}
           </div>
 
@@ -120,7 +131,9 @@ export function HomePage() {
               <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
                 ✕
               </button>
-              <span className="install-guide-icon">📲</span>
+              <span className="install-guide-icon" aria-hidden="true">
+                📲
+              </span>
               <div className="install-guide-body">
                 <strong className="install-guide-title">Instalar como aplicativo</strong>
                 <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
@@ -134,7 +147,11 @@ export function HomePage() {
                       Abra este app no <strong>Safari</strong> (não funciona no Chrome)
                     </li>
                     <li>
-                      Toque no ícone <strong>Compartilhar</strong> <span className="install-guide-share-icon">📤</span> na barra inferior
+                      Toque no ícone <strong>Compartilhar</strong>{' '}
+                      <span className="install-guide-share-icon" aria-hidden="true">
+                        📤
+                      </span>{' '}
+                      na barra inferior
                     </li>
                     <li>
                       Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
@@ -172,15 +189,15 @@ export function HomePage() {
 
           <div className="stats-grid">
             <div className="stat-card">
-              <span className="stat-value">{totalMemorized}</span>
+              <span className="stat-value">{nf.format(totalMemorized)}</span>
               <span className="stat-label">Em aprendizado</span>
             </div>
             <div className="stat-card">
-              <span className="stat-value">{streak}</span>
+              <span className="stat-value">{nf.format(streak)}</span>
               <span className="stat-label">Dias de Streak</span>
             </div>
             <div className="stat-card">
-              <span className="stat-value">{dueCount}</span>
+              <span className="stat-value">{nf.format(dueCount)}</span>
               <span className="stat-label">Pendentes</span>
             </div>
           </div>
