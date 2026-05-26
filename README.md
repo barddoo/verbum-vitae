@@ -31,7 +31,7 @@ Live: **vvitae.com**
 bun install
 bun run dev          # starts Vite dev server
 bun run build        # production build
-bun run deploy       # build + deploy to Cloudflare
+bun run deploy       # apply remote D1 migrations + build + deploy
 bun run check        # TypeScript + Biome lint
 bun run fix          # auto-fix lint issues
 ```
@@ -118,14 +118,31 @@ Both scripts strip HTML tags (including `<sup>` footnote markers) and output `ap
 
 ## Database
 
-D1 migrations live in `worker/db/migrations/`. To apply:
+D1 migrations live in `worker/db/migrations/`. Wrangler uses that path via `worker/wrangler.toml`.
 
 ```bash
 # Local
 bun run db:migrate
 
 # Production
-bunx wrangler d1 execute verbum-vitae --file worker/db/migrations/0001_init.sql --remote
+bun run db:migrate:remote
+
+# Production deploy also runs remote migrations first
+bun run deploy
+```
+
+If a migration was applied manually with `wrangler d1 execute`, first verify the schema change exists, then mark the migration as applied so future `migrations apply` stays clean:
+
+```bash
+cd worker
+
+# Example: verify unique progress index exists
+bunx wrangler d1 execute verbum-vitae --remote \
+  --command "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'idx_progress_user_verse_translation_unique';"
+
+# Mark migration history only after verification
+bunx wrangler d1 execute verbum-vitae --remote \
+  --command "INSERT OR IGNORE INTO d1_migrations (name) VALUES ('0002_unique_progress_verse.sql');"
 ```
 
 ## License

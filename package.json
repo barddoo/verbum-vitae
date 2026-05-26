@@ -9,8 +9,10 @@
   "scripts": {
     "dev": "cd app && bun run dev",
     "build": "cd app && bun run build",
-    "deploy": "cd app && bun run build && cd ../worker && bunx wrangler deploy --tag $(git rev-parse --short HEAD)",
-    "db:migrate": "cd worker && bun run db:migrate",
+    "deploy": "bun run db:migrate:remote && cd app && bun run build && cd ../worker && bunx wrangler deploy --tag $(git rev-parse --short HEAD)",
+    "db:migrate": "bun run db:migrate:local",
+    "db:migrate:local": "cd worker && bunx wrangler d1 migrations apply verbum-vitae --local",
+    "db:migrate:remote": "cd worker && bunx wrangler d1 migrations apply verbum-vitae --remote",
     "db:generate": "cd worker && bun run db:generate",
     "check": "bun run check:ts && bun run check:biome",
     "check:biome": "biome check app/src app/index.html worker/src packages --write",
