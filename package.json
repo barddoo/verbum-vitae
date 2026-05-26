@@ -13,7 +13,7 @@
     "db:migrate": "cd worker && bun run db:migrate",
     "db:generate": "cd worker && bun run db:generate",
     "check": "bun run check:ts && bun run check:biome",
-    "check:biome": "biome check app/src app/index.html worker/src packages --no-errors-on-unmatched",
+    "check:biome": "biome check app/src app/index.html worker/src packages --write",
     "check:ts": "cd packages/shared && bunx tsc && cd ../../worker && bunx tsc && cd ../app && bunx tsc -b",
     "fix": "biome check --write --unsafe ."
   },

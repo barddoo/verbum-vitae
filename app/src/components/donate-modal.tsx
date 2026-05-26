@@ -18,7 +18,13 @@ export function DonateModal({ onClose }: DonateModalProps) {
 
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
-      <div className="modal donate-modal" role="dialog" aria-modal="true" aria-label="Apoiar o projeto" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal donate-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Apoiar o projeto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
           ✕
         </button>

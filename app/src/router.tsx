@@ -11,6 +11,7 @@ import { UpdateBanner } from './components/update-banner'
 
 const AuthModal = lazy(() => import('./components/auth-modal').then((m) => ({ default: m.AuthModal })))
 const WelcomeModal = lazy(() => import('./components/welcome-modal').then((m) => ({ default: m.WelcomeModal })))
+
 import { useAuth } from './lib/auth'
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -156,10 +157,18 @@ function RootLayout() {
         </nav>
       )}
 
-      {showAuth && <Suspense fallback={null}><AuthModal onClose={() => setShowAuth(false)} /></Suspense>}
+      {showAuth && (
+        <Suspense fallback={null}>
+          <AuthModal onClose={() => setShowAuth(false)} />
+        </Suspense>
+      )}
       {showDonate && <DonateModal onClose={() => setShowDonate(false)} />}
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
-      {showWelcome && <Suspense fallback={null}><WelcomeModal onClose={() => setShowWelcome(false)} /></Suspense>}
+      {showWelcome && (
+        <Suspense fallback={null}>
+          <WelcomeModal onClose={() => setShowWelcome(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }

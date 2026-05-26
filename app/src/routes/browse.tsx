@@ -4,6 +4,7 @@ import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
 import { db, ensureTranslationSeeded, verseKey } from '../lib/db'
 import { createEmptyCard } from '../lib/srs'
+import { cachedGet, cachedSet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 import { SelectionBar } from './browse/selection-bar'
 
@@ -18,9 +19,7 @@ interface SearchResult {
 const loadingSpinner = <div className="loading">Carregando…</div>
 
 export function BrowsePage() {
-  const [translation, setTranslation] = useState<Translation>(
-    () => (localStorage.getItem('translation') as Translation | null) ?? DEFAULT_TRANSLATION,
-  )
+  const [translation, setTranslation] = useState<Translation>(() => (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION)
   const [bookIndex, setBookIndex] = useState<number | null>(null)
   const [chapter, setChapter] = useState<number | null>(null)
   const [verses, setVerses] = useState<string[]>([])
@@ -239,7 +238,7 @@ export function BrowsePage() {
             value={translation}
             onChange={(e) => {
               const t = e.target.value as Translation
-              localStorage.setItem('translation', t)
+              cachedSet('translation', t)
               setTranslation(t)
             }}
           >

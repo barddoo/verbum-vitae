@@ -45,7 +45,13 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
   return (
     <div className="modal-backdrop" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()} role="presentation">
-      <div className="modal" role="dialog" aria-modal="true" aria-label={tab === 'login' ? 'Entrar' : 'Criar conta'} onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={tab === 'login' ? 'Entrar' : 'Criar conta'}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
           ✕
         </button>
@@ -60,9 +66,21 @@ export function AuthModal({ onClose }: AuthModalProps) {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          {error && <p className="auth-error" role="alert">{error}</p>}
+          {error && (
+            <p className="auth-error" role="alert">
+              {error}
+            </p>
+          )}
           <label htmlFor="auth-email">Email</label>
-          <input id="auth-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" spellCheck={false} required />
+          <input
+            id="auth-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            spellCheck={false}
+            required
+          />
           <label htmlFor="auth-password">Senha</label>
           <input
             id="auth-password"

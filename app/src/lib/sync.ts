@@ -17,6 +17,47 @@ function getUserId(): string {
   }
 }
 
+function syncCursorKey(): string {
+  const uid = getUserId()
+  return uid ? `sync_cursor:${uid}` : ''
+}
+
+function loadCursor(): string | undefined {
+  const key = syncCursorKey()
+  if (!key) return undefined
+  try {
+    const val = localStorage.getItem(key)
+    return val || undefined
+  } catch {
+    return undefined
+  }
+}
+
+function saveCursor(cursor: string | undefined) {
+  const key = syncCursorKey()
+  if (!key) return
+  try {
+    if (cursor) {
+      localStorage.setItem(key, cursor)
+    } else {
+      localStorage.removeItem(key)
+    }
+  } catch {
+    /* noop */
+  }
+}
+
+export function clearCursor() {
+  const key = syncCursorKey()
+  if (key) {
+    try {
+      localStorage.removeItem(key)
+    } catch {
+      /* noop */
+    }
+  }
+}
+
 let syncTimer: ReturnType<typeof setInterval> | null = null
 let isSyncing = false
 let retryCount = 0
@@ -104,74 +145,72 @@ async function pushPending() {
     return
   }
 
-  const pending = await db.syncLog.where({ synced: 0, userId }).limit(100).toArray()
-  if (pending.length === 0) return
+  const MAX_BATCHES = 5
+  for (let i = 0; i < MAX_BATCHES; i++) {
+    const pending = await db.syncLog.where({ synced: 0, userId }).limit(100).toArray()
+    if (pending.length === 0) break
 
-  const entries = pending.map((e) => ({
-    tableName: e.tableName,
-    rowId: e.rowId,
-    operation: e.operation,
-    data: e.data,
-  }))
+    const entries = pending.map((e) => ({
+      tableName: e.tableName,
+      rowId: e.rowId,
+      operation: e.operation,
+      data: e.data,
+    }))
 
-  await api.sync.push(entries)
+    await api.sync.push(entries)
 
-  const ids = pending.flatMap((e) => (e.id ? [e.id] : []))
-  await db.syncLog.where('id').anyOf(ids).modify({ synced: 1 })
+    const ids = pending.flatMap((e) => (e.id ? [e.id] : []))
+    await db.syncLog.where('id').anyOf(ids).modify({ synced: 1 })
+  }
 }
 
 async function pullRemote() {
-  let cursor: string | undefined
-  let _totalEntries = 0
+  let cursor = loadCursor()
 
   for (let i = 0; i < 10; i++) {
     const result = await api.sync.pull(cursor)
-    if (!result.entries?.length) break
+    if (!result.rows?.length) {
+      break
+    }
 
-    _totalEntries += result.entries.length
+    for (const row of result.rows) {
+      try {
+        const card = parseCardJson(row.cardJson)
+        const verseId = row.verseId as string
+        const translation = row.translation as string
 
-    await Promise.all(
-      result.entries.map(async (entry: { tableName: string; operation: string; data: string }) => {
-        if (entry.tableName !== 'progress') return
+        const hasUnsynced = await db.syncLog
+          .where({ synced: 0 })
+          .filter((log) => log.tableName === 'progress' && log.rowId === verseId)
+          .count()
 
-        try {
-          const data = JSON.parse(entry.data)
-          let card: { due: Date | string; state: number }
-          try {
-            card = parseCardJson(data.cardJson)
-          } catch {
-            card = { due: new Date(), state: 0 }
-          }
-          const verseId = data.verseId
-          const translation = data.translation
-          const exists = await db.progress.where({ verseId, translation }).first()
+        if (hasUnsynced > 0) continue
 
-          if (entry.operation === 'delete') {
-            if (exists) await db.progress.delete(exists.id!)
-            return
-          }
-
-          const fields = {
-            cardJson: data.cardJson,
-            state: typeof data.state === 'number' ? data.state : ((card.state as number) ?? 0),
-            dueDate: typeof data.dueDate === 'number' ? data.dueDate : new Date(card.due).getTime(),
-            streak: typeof data.streak === 'number' ? data.streak : 0,
-            updatedAt: Date.now(),
-          }
-
-          if (exists) {
-            await db.progress.update(exists.id!, fields)
-          } else {
-            await db.progress.put({ verseId, translation, ...fields })
-          }
-        } catch {
-          /* skip */
+        const existing = await db.progress.where({ verseId, translation }).first()
+        const fields = {
+          cardJson: row.cardJson as string,
+          state: card.state ?? 0,
+          dueDate: card.due.getTime(),
+          streak: typeof card.reps === 'number' ? card.reps : 0,
+          updatedAt: new Date(row.updatedAt as string).getTime(),
         }
-      }),
-    )
+
+        if (existing) {
+          await db.progress.update(existing.id!, fields)
+        } else {
+          await db.progress.put({ verseId, translation, ...fields })
+        }
+      } catch (err) {
+        console.warn('pull: skipping row', err)
+      }
+    }
+
+    if (result.nextCursor) {
+      cursor = result.nextCursor as string
+      saveCursor(cursor)
+    }
 
     if (!result.hasMore) break
-    cursor = result.nextCursor
   }
 }
 

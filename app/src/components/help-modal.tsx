@@ -33,14 +33,22 @@ const steps = [
 export function HelpModal({ onClose }: HelpModalProps) {
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
-      <div className="modal help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal help-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="help-modal-title"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
           ✕
         </button>
 
         <div className="help-header">
           <span className="help-icon">🕊️</span>
-          <h2 id="help-modal-title" className="help-title">Como usar o Verbum Vitae</h2>
+          <h2 id="help-modal-title" className="help-title">
+            Como usar o Verbum Vitae
+          </h2>
           <p className="help-subtitle">Memorize versículos com repetição espaçada.</p>
         </div>
 

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION } from 'shared/bible'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { addCollectionToMemory, db, fetchVersesBatch, getCollectionProgress, parseVerseKey } from '../lib/db'
+import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 
 interface CollectionEntry {
@@ -23,14 +24,25 @@ async function ensureCollectionsSeeded() {
     bundledCollections
       .filter((c) => !existingNames.has(c.name))
       .map(async (c) => {
-        const cId = (await db.collections.put({ name: c.name, description: c.description, icon: c.icon, isBuiltin: 1, createdAt: Date.now() }))!
+        const cId = (await db.collections.put({
+          name: c.name,
+          description: c.description,
+          icon: c.icon,
+          isBuiltin: 1,
+          createdAt: Date.now(),
+        }))!
         let order = 0
         const entries: { collectionId: number; verseId: string; translation: string; sortOrder: number }[] = []
         for (const ref of c.verses) {
           const verseId = verseRefToId(ref)
           if (Array.isArray(ref.verse)) {
             for (let v = ref.verse[0]; v <= ref.verse[1]; v++) {
-              entries.push({ collectionId: cId, verseId: `${ref.book}_${ref.chapter}_${v}`, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
+              entries.push({
+                collectionId: cId,
+                verseId: `${ref.book}_${ref.chapter}_${v}`,
+                translation: DEFAULT_TRANSLATION,
+                sortOrder: order++,
+              })
             }
           } else {
             entries.push({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
@@ -158,7 +170,7 @@ export function CollectionDetailPage() {
   async function handleAddAll() {
     if (!col) return
     setAdding(true)
-    const userTranslation = (localStorage.getItem('translation') as string | null) ?? DEFAULT_TRANSLATION
+    const userTranslation = (cachedGet('translation') as string | null) ?? DEFAULT_TRANSLATION
     const _addedCount = await addCollectionToMemory(col.dbId, userTranslation, () => '', logProgressChange)
     setAdded(true)
     setAdding(false)

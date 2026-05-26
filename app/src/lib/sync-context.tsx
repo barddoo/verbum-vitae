@@ -2,7 +2,7 @@ import { createContext, type ReactNode, use, useCallback, useEffect, useMemo, us
 import { useAuth } from './auth'
 import { db } from './db'
 import { cachedGet } from './storage'
-import { clearSyncStateCallback, syncNow as runSync, setSyncStateCallback, startAutoSync, stopAutoSync } from './sync'
+import { clearCursor, clearSyncStateCallback, syncNow as runSync, setSyncStateCallback, startAutoSync, stopAutoSync } from './sync'
 
 interface SyncState {
   isSyncing: boolean
@@ -78,6 +78,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           /* token already cleared */
         }
       }
+      clearCursor()
       setState({ isSyncing: false, lastSynced: null, error: null, pendingCount: 0 })
     }
   }, [token])

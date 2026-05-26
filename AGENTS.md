@@ -31,6 +31,7 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 
 ## Conventions
 
+- **No `any` type**. Use `unknown` + narrowing, or proper types. Only use `unknown` when truly needed.
 - **No tests exist**. No test infra.
 - `app/.env`: `VITE_API_URL=http://localhost:8787` for local worker dev.
 - `worker/.dev.vars`: `JWT_SECRET` for local auth.

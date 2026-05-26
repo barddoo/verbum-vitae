@@ -7,6 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 binding = "DB"
 database_name = "verbum-vitae"
 database_id = "2d0926ac-edbd-429b-94f0-523552514bce"
+migrations_dir = "db/migrations"
 
 [placement]
 mode = "smart"

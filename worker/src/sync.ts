@@ -1,14 +1,22 @@
 import { zValidator } from '@hono/zod-validator'
-import { Hono } from 'hono'
+import { and, eq, sql } from 'drizzle-orm'
+import type { BatchItem } from 'drizzle-orm/batch'
+import { drizzle } from 'drizzle-orm/d1'
+import { type Context, Hono } from 'hono'
 import { verify } from 'hono/jwt'
 import { uuidv7 } from 'shared/uuid'
 import { z } from 'zod'
+import * as schema from '../db/schema'
 
 const PULL_LIMIT = 200
 
-const syncApp = new Hono<{ Bindings: { DB: D1Database; JWT_SECRET: string } }>()
+type SyncEnv = {
+  Bindings: { DB: D1Database; JWT_SECRET: string }
+}
 
-async function getUser(c: any) {
+const syncApp = new Hono<SyncEnv>()
+
+async function getUser(c: Context<SyncEnv>) {
   const auth = c.req.header('Authorization')
   if (!auth?.startsWith('Bearer ')) return null
   const secret = c.env.JWT_SECRET
@@ -21,7 +29,11 @@ async function getUser(c: any) {
   }
 }
 
-function extractCardFields(cardJson: unknown): { ease: number; intervalDays: number; repetitions: number } {
+function extractCardFields(cardJson: unknown): {
+  ease: number
+  intervalDays: number
+  repetitions: number
+} {
   let ease = 2.5
   let intervalDays = 0
   let repetitions = 0
@@ -55,14 +67,21 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
 
   const { entries } = c.req.valid('json')
   const now = new Date().toISOString()
-  const stmts: D1PreparedStatement[] = []
+  const db = drizzle(c.env.DB, { schema })
+
+  const queries: BatchItem<'sqlite'>[] = []
 
   for (const entry of entries) {
-    const id = uuidv7()
-    stmts.push(
-      c.env.DB.prepare(
-        'INSERT INTO sync_log (id, user_id, table_name, row_id, operation, data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      ).bind(id, user.sub, entry.tableName, entry.rowId, entry.operation, entry.data, now),
+    queries.push(
+      db.insert(schema.syncLog).values({
+        id: uuidv7(),
+        userId: user.sub,
+        tableName: entry.tableName,
+        rowId: entry.rowId,
+        operation: entry.operation,
+        data: entry.data,
+        createdAt: now,
+      }),
     )
 
     if (entry.tableName === 'progress') {
@@ -72,52 +91,64 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
       } catch {
         return c.json({ error: 'Invalid entry data' }, 400)
       }
-      if (entry.operation === 'create') {
-        const { ease, intervalDays, repetitions } = extractCardFields(parsed.cardJson)
-        stmts.push(
-          c.env.DB.prepare(
-            'INSERT OR IGNORE INTO progress (id, user_id, verse_id, translation, card_json, ease, interval_days, repetitions, next_review, last_review, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-          ).bind(
-            entry.rowId,
-            user.sub,
-            parsed.verseId,
-            parsed.translation,
-            parsed.cardJson,
-            ease,
-            intervalDays,
-            repetitions,
-            parsed.nextReview || now,
-            parsed.lastReview || now,
-            now,
-            now,
-          ),
+
+      const verseId = parsed.verseId as string
+      const translation = parsed.translation as string
+      const cardJson = (parsed.cardJson as string) || ''
+      const { ease, intervalDays, repetitions } = extractCardFields(parsed.cardJson)
+      const nextReview = (parsed.nextReview as string) || now
+      const lastReview = (parsed.lastReview as string) || now
+      const progressId = uuidv7()
+
+      if (entry.operation === 'delete') {
+        queries.push(
+          db
+            .delete(schema.progress)
+            .where(
+              and(eq(schema.progress.userId, user.sub), eq(schema.progress.verseId, verseId), eq(schema.progress.translation, translation)),
+            ),
         )
-      } else if (entry.operation === 'update') {
-        const { ease, intervalDays, repetitions } = extractCardFields(parsed.cardJson)
-        stmts.push(
-          c.env.DB.prepare(
-            'UPDATE progress SET card_json = ?, ease = ?, interval_days = ?, repetitions = ?, next_review = ?, last_review = ?, updated_at = ? WHERE id = ?',
-          ).bind(
-            parsed.cardJson || '',
-            ease,
-            intervalDays,
-            repetitions,
-            parsed.nextReview || now,
-            parsed.lastReview || now,
-            now,
-            entry.rowId,
-          ),
+      } else {
+        queries.push(
+          db
+            .insert(schema.progress)
+            .values({
+              id: progressId,
+              userId: user.sub,
+              verseId,
+              translation,
+              cardJson,
+              ease,
+              intervalDays,
+              repetitions,
+              nextReview,
+              lastReview,
+              createdAt: now,
+              updatedAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [schema.progress.userId, schema.progress.verseId, schema.progress.translation],
+              set: {
+                cardJson,
+                ease,
+                intervalDays,
+                repetitions,
+                nextReview,
+                lastReview,
+                updatedAt: now,
+              },
+            }),
         )
-      } else if (entry.operation === 'delete') {
-        stmts.push(c.env.DB.prepare('DELETE FROM progress WHERE id = ?').bind(entry.rowId))
       }
     }
   }
 
   const CHUNK = 50
-  for (let i = 0; i < stmts.length; i += CHUNK) {
-    await c.env.DB.batch(stmts.slice(i, i + CHUNK))
+  for (let i = 0; i < queries.length; i += CHUNK) {
+    const chunk = queries.slice(i, i + CHUNK)
+    await db.batch(chunk as [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]])
   }
+
   return c.json({ pushed: entries.length })
 })
 
@@ -126,30 +157,40 @@ syncApp.get('/pull', async (c) => {
   if (!user) return c.json({ error: 'Não autenticado' }, 401)
 
   const cursor = c.req.query('cursor')
-  const db = c.env.DB
+  const db = drizzle(c.env.DB, { schema })
 
-  let result: D1Result<Record<string, unknown>>
+  const conditions: ReturnType<typeof sql>[] = [eq(schema.progress.userId, user.sub)]
+
   if (cursor) {
-    const [createdAt, lastId] = cursor.split('|')
-    if (!createdAt || !lastId) {
+    const [updatedAt, lastId] = cursor.split('|')
+    if (!updatedAt || !lastId) {
       return c.json({ error: 'Invalid cursor format' }, 400)
     }
-    result = await db
-      .prepare(
-        'SELECT * FROM sync_log WHERE user_id = ? AND (created_at > ? OR (created_at = ? AND id > ?)) ORDER BY created_at, id LIMIT ?',
-      )
-      .bind(user.sub, createdAt, createdAt, lastId, PULL_LIMIT)
-      .all()
-  } else {
-    result = await db.prepare('SELECT * FROM sync_log WHERE user_id = ? ORDER BY created_at, id LIMIT ?').bind(user.sub, PULL_LIMIT).all()
+    conditions.push(
+      sql`(${schema.progress.updatedAt} > ${updatedAt} OR (${schema.progress.updatedAt} = ${updatedAt} AND ${schema.progress.id} > ${lastId}))`,
+    )
   }
 
-  const entries = result.results as any[]
-  const last = entries.length > 0 ? entries[entries.length - 1] : null
+  const rows = await db
+    .select({
+      id: schema.progress.id,
+      verseId: schema.progress.verseId,
+      translation: schema.progress.translation,
+      cardJson: schema.progress.cardJson,
+      updatedAt: schema.progress.updatedAt,
+    })
+    .from(schema.progress)
+    .where(and(...conditions))
+    .orderBy(schema.progress.updatedAt, schema.progress.id)
+    .limit(PULL_LIMIT)
+
+  const last = rows.length > 0 ? rows[rows.length - 1] : null
+  const nextCursor = last ? `${last.updatedAt}|${last.id}` : null
+
   return c.json({
-    entries,
-    nextCursor: last ? `${last.created_at}|${last.id}` : null,
-    hasMore: entries.length === PULL_LIMIT,
+    rows,
+    nextCursor,
+    hasMore: rows.length === PULL_LIMIT,
   })
 })
 
