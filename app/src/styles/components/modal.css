@@ -223,7 +223,9 @@
   color: var(--aged);
   cursor: pointer;
   border-bottom: 0.125rem solid transparent;
-  transition: color 0.2s, border-bottom-color 0.2s;
+  transition:
+    color 0.2s,
+    border-bottom-color 0.2s;
 }
 
 .modal-tab:hover {

@@ -30,7 +30,11 @@
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, opacity 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    opacity 0.2s,
+    border-color 0.2s;
   text-decoration: none;
   letter-spacing: 0.0125rem;
 }

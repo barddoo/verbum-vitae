@@ -153,7 +153,9 @@
   font-size: 0.88rem;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: color 0.15s, background-color 0.15s;
+  transition:
+    color 0.15s,
+    background-color 0.15s;
   touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;
