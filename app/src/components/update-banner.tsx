@@ -15,7 +15,7 @@ interface HealthResponse {
 
 async function fetchHealth(): Promise<HealthResponse | null> {
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/health`)
+    const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/health`)
     if (!res.ok) return null
     return await (res.json() as Promise<HealthResponse>)
   } catch {
