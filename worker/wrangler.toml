@@ -60,6 +60,3 @@ class_name = "PresenceDO"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["PresenceDO"]
-
-[env.production]
-name = "verbum-vitae-api"
