@@ -1,61 +1,3 @@
-## Feature 1 — "X pessoas estão memorizando agora"
-
-**Stack:** Worker + Durable Object + KV
-
-One global `PresenceDO` holds `Map<WebSocket, true>` of active sessions. User opens session page → client upgrades to WebSocket → Worker routes to DO → DO stores socket, broadcasts new count to all connected sockets. On disconnect: remove, re-broadcast. No storage, no DB.
-
-```
-Client → GET /ws/presence (Upgrade: websocket)
-Worker → env.PRESENCE.get(idFromName('global'))
-DO     → acceptWebSocket(server)
-DO     → broadcast({ count: sessions.size }) to all
-```
-
-Clients that can't WebSocket (SSR, crawlers): `GET /api/presence/count` returns KV value, 30s TTL, updated by DO on every change.
-
-**Worker routing:**
-```js
-export default {
-  async fetch(req, env) {
-    if (new URL(req.url).pathname === '/ws/presence') {
-      const stub = env.PRESENCE.get(env.PRESENCE.idFromName('global'))
-      return stub.fetch(req)
-    }
-  }
-}
-```
-
-**Presence DO:**
-```js
-export class PresenceDO {
-  sessions = new Map()
-
-  async fetch(req) {
-    if (req.headers.get('Upgrade') !== 'websocket')
-      return Response.json({ count: this.sessions.size })
-
-    const [client, server] = Object.values(new WebSocketPair())
-    this.ctx.acceptWebSocket(server)
-    this.sessions.set(server, true)
-    this.broadcast()
-    return new Response(null, { status: 101, webSocket: client })
-  }
-
-  webSocketClose(ws) { this.sessions.delete(ws); this.broadcast() }
-  webSocketError(ws) { this.sessions.delete(ws); this.broadcast() }
-
-  broadcast() {
-    const msg = JSON.stringify({ count: this.sessions.size })
-    for (const ws of this.sessions.keys())
-      try { ws.send(msg) } catch { this.sessions.delete(ws) }
-  }
-}
-```
-
-> `acceptWebSocket` uses Hibernation API — DO sleeps between messages, no idle CPU cost across hundreds of open sockets.
-
----
-
 ## Feature 2 — Versículo comunitário semanal
 
 Every week, whole vvitae community memorizes same verse. Inspired by YouVersion's "Plans with Friends" — shared schedules drive conversation. Adapted as shared memorization goal with live completion counter + countdown.
@@ -297,3 +239,131 @@ export class VerseDO {
 **Why rate limit in DO, not Worker?** Worker stateless — can't know amens sent per socket. DO owns socket → correct place.
 
 **Why no D1 storage for amens?** Amens = social signal, not completion data. Value is live animation, not aggregate. Storing adds latency, schema complexity, cost for zero product gain. Need "most reacted verse" later → add counter in Scheduled Worker from DO state.
+
+---
+
+## Feature 4 — Modos de revisão variados por maturidade do cartão
+
+Three exercise modes exist: `flashcard` (mental recall), `fill-blank` (cloze), `typing` (free recall). Currently the user picks one mode for the whole session.
+
+**Design decision: mode tied to card `state`, not random.**
+
+Random interleaving has research backing (contextual interference effect) but ignores card maturity — grading a brand-new verse "again" because free typing is hard distorts SRS scheduling. The grade should reflect memory strength, not exercise difficulty.
+
+Duolingo-inspired approach: simpler exercises for new concepts, harder for familiar ones.
+
+| Card state                       | Assigned mode | Rationale                                |
+| -------------------------------- | ------------- | ---------------------------------------- |
+| `new` / `learning`               | `flashcard`   | Build schema first, low-stakes exposure  |
+| `review`                         | `fill-blank`  | Active cloze recall, spaced gap          |
+| `relearning`                     | `fill-blank`  | Reintroduce gently after lapse           |
+| mature (`stability > threshold`) | `typing`      | Full free recall for consolidated memory |
+
+**Implementation:** extend `DueItem` with `assignedMode: PracticeMode`. Derive at session load from `card.state` and `card.stability`. Keep manual mode selector for users who want full control — `assignedMode` only activates when user picks `'mixed'` (or a future default).
+
+**Why not Anki's approach?** Anki fixes mode per card template at creation time — no dynamic switching. Works for Anki's single-user, manual-deck model. Here cards are generated automatically from verse additions, so mode must be derived programmatically.
+
+**Why not purely random?** Random mode ignores the SRS grade signal. A hard typing exercise on a new card inflates "Again" ratings → card gets over-scheduled → user sees same new verse too often → burnout.
+
+---
+
+## Feature 5 — Versículo na sua foto — compartilhamento pós-memorização
+
+Triggers at peak emotional moment — right after the user completes a memorization session. Proven mechanic: YouVersion hit 1 million shares in under two weeks with "I read this." The "I memorized this" hook carries higher emotional charge → higher share rate. Fits WhatsApp Status natively (vertical image, no caption needed).
+
+**Stack:** satori + resvg-wasm, one Worker route (`GET /api/share/image?verseId=&translation=`)
+
+```
+User completes session
+  → "Compartilhar" button appears on SessionComplete screen
+  → GET /api/share/image?verseId=45_8_28&translation=NVI
+  → Worker renders verse text + reference + app logo → PNG
+  → navigator.share({ files: [png] }) or fallback download
+```
+
+**Worker route — server-side image generation:**
+
+```js
+import satori from 'satori'
+import { Resvg } from '@resvg/resvg-wasm'
+
+export async function handleShareImage(req, env) {
+  const { verseId, translation } = new URL(req.url).searchParams
+  const verse = await fetchVerse(verseId, translation, env)
+
+  const svg = await satori(
+    <div style={{ background: '#1a1a2e', width: 1080, height: 1080, ... }}>
+      <p style={{ fontSize: 48, color: '#fff' }}>{verse.text}</p>
+      <p style={{ fontSize: 32, color: '#aaa' }}>{verse.ref}</p>
+      <p style={{ fontSize: 24, color: '#666' }}>Memorizado em remember.bible</p>
+    </div>,
+    { width: 1080, height: 1080, fonts: [...] }
+  )
+
+  const resvg = new Resvg(svg)
+  const png = resvg.render().asPng()
+
+  return new Response(png, {
+    headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=86400' }
+  })
+}
+```
+
+**Client — Web Share API with PNG file:**
+
+```js
+async function shareVerse(verseId, translation) {
+  const url = `/api/share/image?verseId=${verseId}&translation=${translation}`
+  const blob = await fetch(url).then(r => r.blob())
+  const file = new File([blob], 'versiculo.png', { type: 'image/png' })
+
+  if (navigator.canShare?.({ files: [file] })) {
+    await navigator.share({ files: [file], title: 'Versículo memorizado' })
+  } else {
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'versiculo.png'
+    a.click()
+  }
+}
+```
+
+### Key decisions
+
+**Why satori not canvas?** Canvas requires a browser context. satori runs in a Worker (edge, no DOM), produces deterministic SVG from JSX, resvg-wasm converts to PNG. Zero cold-start overhead beyond wasm init.
+
+**Why cache the image?** Same verse + translation always produces same PNG. `Cache-Control: public, max-age=86400` lets CDN serve repeat shares for free. Vary only on `verseId+translation`.
+
+**Why trigger at session complete, not verse add?** Session complete = emotional peak. User just proved they know the verse. Verse add = zero proof → share feels premature, WeeklyVerse social proof not yet earned.
+
+---
+
+## Feature 6 — Convite para grupo do WhatsApp — mensagem pré-formatada
+
+Near-zero dev cost: a `wa.me/?text=` deep link with pre-filled verse text, community progress, and app invite URL. Brazilian church WhatsApp groups are the highest-trust distribution channel available — one tap reaches dozens of people who already share a faith context. No OG image needed. Ships in hours.
+
+**Stack:** zero — pure client-side link construction
+
+```js
+function buildWhatsAppInvite({ verseRef, verseText, communityCount, appUrl }) {
+  const text = [
+    `📖 Estou memorizando *${verseRef}*:`,
+    `_"${verseText}"_`,
+    ``,
+    `Já somos ${communityCount.toLocaleString('pt-BR')} pessoas memorizando juntas.`,
+    `Vem memorizar também → ${appUrl}`,
+  ].join('\n')
+
+  return `https://wa.me/?text=${encodeURIComponent(text)}`
+}
+```
+
+**Placement:** secondary CTA on SessionComplete screen, below the primary share image button. Also surfaced on the home page community count banner ("Convidar amigos →").
+
+### Key decisions
+
+**Why `wa.me/?text=` not WhatsApp Business API?** No server, no approval process, no cost. `wa.me/?text=` opens WhatsApp with pre-filled text — user picks the group themselves. Business API requires message templates + approval + per-message cost, overkill for organic invite.
+
+**Why pre-fill verse text not just a link?** The verse text in the message is the hook — group members read it before deciding to tap the link. A bare link gets ignored. A recognizable verse from someone they trust gets opened.
+
+**Why no tracking on the invite link?** UTM params or short links add infra. At this stage, conversion signal comes from user signups + community count growth, not per-link attribution.

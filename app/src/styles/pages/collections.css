@@ -189,7 +189,7 @@
 
 .collection-detail-actions {
   position: fixed;
-  bottom: 3.5rem;
+  bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
   max-width: 32.5rem;
