@@ -234,6 +234,7 @@ export function ReviewPage() {
       <SessionComplete
         completed={completed}
         gradeHistory={gradeHistory}
+        reviewedItems={items}
         onGoBack={goBack}
         onNewSession={() => {
           setCurrentIndex(0)

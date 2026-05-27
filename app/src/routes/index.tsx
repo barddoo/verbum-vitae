@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '../lib/db'
 import { usePresence } from '../lib/presence-context'
+import { buildWhatsAppInvite } from '../lib/sharing'
 import { computeStreak } from '../lib/stats'
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -120,9 +121,17 @@ export function HomePage() {
                 </span>
                 <span className="community-presence-label">memorizando a Bíblia agora</span>
                 <span className="community-presence-encourage">Continue assim!</span>
+                <a href={buildWhatsAppInvite()} target="_blank" rel="noopener noreferrer" className="community-invite-link">
+                  Compartilhar no WhatsApp →
+                </a>
               </>
             ) : (
-              <span className="community-presence-encourage">Continue memorizando a Bíblia!</span>
+              <>
+                <span className="community-presence-encourage">Continue memorizando a Bíblia!</span>
+                <a href={buildWhatsAppInvite()} target="_blank" rel="noopener noreferrer" className="community-invite-link">
+                  Compartilhar no WhatsApp →
+                </a>
+              </>
             )}
           </div>
 

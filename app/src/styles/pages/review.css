@@ -868,3 +868,14 @@
 .grade-breakdown-4 {
   color: var(--sage);
 }
+
+.btn-whatsapp {
+  background: #25d366;
+  color: #fff;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.btn-whatsapp:hover {
+  background: #1fb855;
+}

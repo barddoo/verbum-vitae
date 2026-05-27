@@ -27,7 +27,10 @@ export function FillInBlankView({
     const indices = new Set<number>()
     let seed = 0
     for (let i = 0; i < verseId.length; i++) seed = (seed * 31 + verseId.charCodeAt(i)) | 0
-    const rand = () => { seed = (seed * 1103515245 + 12345) | 0; return (seed >>> 0) / 4294967296 }
+    const rand = () => {
+      seed = (seed * 1103515245 + 12345) | 0
+      return (seed >>> 0) / 4294967296
+    }
     while (indices.size < count) indices.add(Math.floor(rand() * words.length))
     return indices
   }, [verseId, words])
