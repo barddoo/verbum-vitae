@@ -357,6 +357,24 @@
   line-height: 1.5;
 }
 
+.help-feedback {
+  font-size: 0.8rem;
+  color: var(--aged);
+  text-align: center;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.help-feedback a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.help-feedback a:hover {
+  text-decoration: underline;
+}
+
 .help-cta {
   width: 100%;
 }
@@ -383,6 +401,20 @@
   font-weight: 700;
   color: var(--parchment);
   margin: 0 0 0.5rem;
+}
+
+.welcome-free-badge,
+.help-free-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sage);
+  background: var(--sage-dim);
+  border: 1px solid rgba(90, 138, 106, 0.25);
+  border-radius: 1rem;
+  padding: 0.2rem 0.6rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.03rem;
 }
 
 .welcome-subtitle {
@@ -413,6 +445,27 @@
   font-size: 0.75rem;
   color: var(--gold);
   font-style: normal;
+}
+
+.welcome-tip {
+  margin-bottom: 1.5rem;
+  padding: 0.875rem 1rem;
+  background: var(--gold-dim);
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+.welcome-tip-text {
+  font-size: 0.85rem;
+  color: var(--aged);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.welcome-tip-text strong {
+  color: var(--gold);
+  font-weight: 600;
 }
 
 .welcome-cta {

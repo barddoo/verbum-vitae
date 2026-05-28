@@ -49,6 +49,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
           <h2 id="help-modal-title" className="help-title">
             Como usar o Verbum Vitae
           </h2>
+          <span className="help-free-badge">Grátis para sempre</span>
           <p className="help-subtitle">Memorize versículos com repetição espaçada.</p>
         </div>
 
@@ -63,6 +64,10 @@ export function HelpModal({ onClose }: HelpModalProps) {
             </li>
           ))}
         </ol>
+
+        <p className="help-feedback">
+          Encontrou um bug ou quer sugerir uma funcionalidade? <a href="mailto:vvitae.com.galleria929@passmail.net">Envie um email</a>
+        </p>
 
         <button type="button" className="btn btn-primary help-cta" onClick={onClose}>
           Entendido!

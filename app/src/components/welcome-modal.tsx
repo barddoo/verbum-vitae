@@ -22,6 +22,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
           <h2 id="welcome-title" className="welcome-title">
             Bem-vindo ao Verbum Vitae
           </h2>
+          <span className="welcome-free-badge">Grátis para sempre</span>
           <p className="welcome-subtitle">Obrigado por usar este app. Que a Palavra de Deus habite ricamente em você.</p>
         </div>
 
@@ -29,6 +30,13 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
           <p className="welcome-verse-text">Guardei no coração a tua palavra para não pecar contra ti.</p>
           <cite className="welcome-verse-ref">Salmos 119:11 — NVI</cite>
         </blockquote>
+
+        <div className="welcome-tip">
+          <p className="welcome-tip-text">
+            A melhor forma de começar é pelas <strong>Coleções</strong> — escolha um tema e comece a memorizar versículos organizados para
+            você.
+          </p>
+        </div>
 
         <button type="button" className="btn btn-primary welcome-cta" onClick={handleClose}>
           Começar

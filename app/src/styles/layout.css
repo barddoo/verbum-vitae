@@ -386,10 +386,15 @@
 .main-content {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   max-height: calc(100dvh - 3.5rem);
 }
 
 /* BOTTOM NAV */
+
+.is-reviewing .main-content {
+  max-height: calc(100dvh - 3.5rem - env(safe-area-inset-top, 0px));
+}
 
 .is-reviewing .bottom-nav {
   display: none;
