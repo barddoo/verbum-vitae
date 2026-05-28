@@ -1,18 +1,21 @@
 import { useState } from 'react'
 
 const BTC_ADDRESS = 'bc1qs4n8h0z5perjqefgwjm8wfmzxm92sujum5uy3a'
+const CHURCH_PIX_KEY = '10.703.989/0001-53'
 
 interface DonateModalProps {
   onClose: () => void
 }
 
-export function DonateModal({ onClose }: DonateModalProps) {
-  const [copied, setCopied] = useState(false)
+type CopyTarget = 'btc' | 'church'
 
-  function handleCopy() {
-    navigator.clipboard.writeText(BTC_ADDRESS).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+export function DonateModal({ onClose }: DonateModalProps) {
+  const [copied, setCopied] = useState<CopyTarget | null>(null)
+
+  function handleCopy(type: CopyTarget, value: string) {
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(type)
+      setTimeout(() => setCopied(null), 2000)
     })
   }
 
@@ -39,8 +42,21 @@ export function DonateModal({ onClose }: DonateModalProps) {
           <span className="donate-btc-label">Bitcoin</span>
           <div className="donate-btc-row">
             <code className="donate-btc-addr">{BTC_ADDRESS}</code>
-            <button type="button" className="donate-copy-btn" onClick={handleCopy} aria-live="polite">
-              {copied ? '✓' : 'Copiar'}
+            <button type="button" className="donate-copy-btn" onClick={() => handleCopy('btc', BTC_ADDRESS)} aria-live="polite">
+              {copied === 'btc' ? '✓' : 'Copiar'}
+            </button>
+          </div>
+        </div>
+
+        <div className="donate-church">
+          <span className="donate-church-label">Doe para a Igreja de Cristo</span>
+          <p className="donate-church-hint">
+            Se preferir, doe diretamente para uma igreja local. Abaixo, a chave Pix da minha — use a sua se quiser:
+          </p>
+          <div className="donate-btc-row">
+            <code className="donate-btc-addr">{CHURCH_PIX_KEY}</code>
+            <button type="button" className="donate-copy-btn" onClick={() => handleCopy('church', CHURCH_PIX_KEY)} aria-live="polite">
+              {copied === 'church' ? '✓' : 'Copiar'}
             </button>
           </div>
         </div>
