@@ -18,6 +18,7 @@ export interface Progress {
 
 export interface Collection {
   id?: number
+  slug: string
   name: string
   description: string
   icon: string
@@ -74,10 +75,17 @@ db.version(3).stores({
 })
 
 db.version(4).stores({
-  verses: '++id, &[bookNumber+chapter+verse+translation], [bookNumber+chapter], bookNumber, translation',
-  progress: '++id, &[verseId+translation], dueDate, state, [dueDate+state], translation',
+  verses: '++id, &[verseId+translation], dueDate, state, [dueDate+state], translation',
   wordStats: '++id, &[verseId+translation+wordIndex], [verseId+translation]',
   collections: '++id, &name, isBuiltin',
+  collectionVerses: '++id, &[collectionId+verseId+translation], collectionId',
+  syncLog: '++id, userId, tableName, rowId, synced, createdAt',
+})
+
+db.version(5).stores({
+  verses: '++id, &[verseId+translation], dueDate, state, [dueDate+state], translation',
+  wordStats: '++id, &[verseId+translation+wordIndex], [verseId+translation]',
+  collections: '++id, &slug, &name, isBuiltin',
   collectionVerses: '++id, &[collectionId+verseId+translation], collectionId',
   syncLog: '++id, userId, tableName, rowId, synced, createdAt',
 })

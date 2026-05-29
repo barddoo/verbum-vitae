@@ -1,8 +1,12 @@
 import { memo, useEffect, useMemo, useState } from 'react'
+import { MemorizedVersesTab } from '../components/memorized-verses-tab'
 import { db } from '../lib/db'
 import { computeStreak } from '../lib/stats'
 
+type Tab = 'resumo' | 'versiculos'
+
 export function StatsPage() {
+  const [tab, setTab] = useState<Tab>('resumo')
   const [progress, setProgress] = useState<{
     total: number
     byState: Record<string, number>
@@ -52,65 +56,92 @@ export function StatsPage() {
     <div className="page stats-page">
       <h2>Progresso</h2>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <span className="stat-value">{progress.total}</span>
-          <span className="stat-label">Versículos</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-value">{progress.streak}</span>
-          <span className="stat-label">Sequência</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-value">{progress.reviewsToday}</span>
-          <span className="stat-label">Hoje</span>
-        </div>
+      <div className="stats-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'resumo'}
+          className={`stats-tab${tab === 'resumo' ? ' active' : ''}`}
+          onClick={() => setTab('resumo')}
+        >
+          Resumo
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'versiculos'}
+          className={`stats-tab${tab === 'versiculos' ? ' active' : ''}`}
+          onClick={() => setTab('versiculos')}
+        >
+          Versículos
+        </button>
       </div>
 
-      <StreakCalendar reviewDays={reviewDays} />
-
-      <div className="stats-breakdown">
-        <h3>Por estágio</h3>
-        {Object.entries(progress.byState).map(([state, count]) => (
-          <div key={state} className="breakdown-row">
-            <span className="breakdown-label">{state}</span>
-            <div className="breakdown-bar-container">
-              <div className="breakdown-bar" style={{ width: `${progress.total > 0 ? (count / progress.total) * 100 : 0}%` }} />
+      {tab === 'resumo' && (
+        <>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <span className="stat-value">{progress.total}</span>
+              <span className="stat-label">Versículos</span>
             </div>
-            <span className="breakdown-count">{count}</span>
+            <div className="stat-card">
+              <span className="stat-value">{progress.streak}</span>
+              <span className="stat-label">Sequência</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-value">{progress.reviewsToday}</span>
+              <span className="stat-label">Hoje</span>
+            </div>
           </div>
-        ))}
-      </div>
 
-      {progress.total > 0 && (
-        <div className="stats-danger-zone">
-          {!confirming ? (
-            <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
-              Recomeçar do zero
-            </button>
-          ) : (
-            <div className="stats-confirm">
-              <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
-              <div className="stats-confirm-actions">
-                <button type="button" className="btn btn-danger" onClick={clearProgress}>
-                  Sim, limpar
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>
-                  Cancelar
-                </button>
+          <StreakCalendar reviewDays={reviewDays} />
+
+          <div className="stats-breakdown">
+            <h3>Por estágio</h3>
+            {Object.entries(progress.byState).map(([state, count]) => (
+              <div key={state} className="breakdown-row">
+                <span className="breakdown-label">{state}</span>
+                <div className="breakdown-bar-container">
+                  <div className="breakdown-bar" style={{ width: `${progress.total > 0 ? (count / progress.total) * 100 : 0}%` }} />
+                </div>
+                <span className="breakdown-count">{count}</span>
               </div>
+            ))}
+          </div>
+
+          {progress.total > 0 && (
+            <div className="stats-danger-zone">
+              {!confirming ? (
+                <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
+                  Recomeçar do zero
+                </button>
+              ) : (
+                <div className="stats-confirm">
+                  <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
+                  <div className="stats-confirm-actions">
+                    <button type="button" className="btn btn-danger" onClick={clearProgress}>
+                      Sim, limpar
+                    </button>
+                    <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
-        </div>
+
+          {progress.total === 0 && (
+            <div className="stats-empty">
+              Nenhum versículo estudado ainda.
+              <br />
+              Comece a revisar para ver seu progresso aqui.
+            </div>
+          )}
+        </>
       )}
 
-      {progress.total === 0 && (
-        <div className="stats-empty">
-          Nenhum versículo estudado ainda.
-          <br />
-          Comece a revisar para ver seu progresso aqui.
-        </div>
-      )}
+      {tab === 'versiculos' && <MemorizedVersesTab />}
     </div>
   )
 }

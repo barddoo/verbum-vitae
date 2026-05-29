@@ -212,7 +212,7 @@ const collectionsListRoute = createRoute({
 
 const collectionDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/collections/$id',
+  path: '/collections/$slug',
   component: CollectionDetailPage,
 })
 

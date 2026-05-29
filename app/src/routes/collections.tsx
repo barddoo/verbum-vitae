@@ -3,12 +3,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION } from 'shared/bible'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { addCollectionToMemory, db, fetchVersesBatch, getCollectionProgress, parseVerseKey } from '../lib/db'
+import { slugify } from '../lib/slugify'
 import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 
 interface CollectionEntry {
   id: number
   dbId: number
+  slug: string
   name: string
   description: string
   icon: string
@@ -19,12 +21,20 @@ interface CollectionEntry {
 }
 
 async function ensureCollectionsSeeded() {
-  const existingNames = new Set((await db.collections.toArray()).map((c) => c.name))
+  const existing = await db.collections.toArray()
+  const existingNames = new Set(existing.map((c) => c.name))
+  const bundledSlugByName = new Map(bundledCollections.map((c) => [c.name, c.id]))
+
+  await Promise.all(
+    existing.filter((c) => !c.slug).map((c) => db.collections.update(c.id!, { slug: bundledSlugByName.get(c.name) || slugify(c.name) })),
+  )
+
   await Promise.all(
     bundledCollections
       .filter((c) => !existingNames.has(c.name))
       .map(async (c) => {
         const cId = (await db.collections.put({
+          slug: c.id,
           name: c.name,
           description: c.description,
           icon: c.icon,
@@ -72,6 +82,7 @@ export function CollectionsListPage() {
         return {
           id: col.id!,
           dbId: col.id!,
+          slug: col.slug,
           name: col.name,
           description: col.description,
           icon: col.icon,
@@ -94,7 +105,7 @@ export function CollectionsListPage() {
       <p className="collections-subtitle">Conjuntos de versículos para memorizar</p>
       <div className="collection-grid">
         {collections.map((col) => (
-          <Link key={col.dbId} to="/collections/$id" params={{ id: String(col.dbId) }} className="collection-card-link">
+          <Link key={col.dbId} to="/collections/$slug" params={{ slug: col.slug }} className="collection-card-link">
             <div className="collection-card">
               <div className="collection-card-icon">{col.icon}</div>
               <div className="collection-card-body">
@@ -123,7 +134,7 @@ export function CollectionsListPage() {
 }
 
 export function CollectionDetailPage() {
-  const { id } = useParams({ from: '/collections/$id' })
+  const { slug } = useParams({ from: '/collections/$slug' })
   const _navigate = useNavigate()
   const [col, setCol] = useState<CollectionEntry | null>(null)
   const [verses, setVerses] = useState<{ verseId: string; reference: string; text: string; memorized: boolean }[]>([])
@@ -132,17 +143,26 @@ export function CollectionDetailPage() {
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
-    const dbId = Number(id)
-    const c = await db.collections.get(dbId)
+    const c = await db.collections.where({ slug }).first()
     if (!c) return
 
+    const dbId = c.id!
     const [progressResult, cvs, allProgress] = await Promise.all([
       getCollectionProgress(dbId, DEFAULT_TRANSLATION),
       db.collectionVerses.where({ collectionId: dbId }).sortBy('sortOrder'),
       db.progress.toArray(),
     ])
 
-    setCol({ id: dbId, dbId, name: c.name, description: c.description, icon: c.icon, isBuiltin: c.isBuiltin, ...progressResult })
+    setCol({
+      id: dbId,
+      dbId,
+      slug: c.slug,
+      name: c.name,
+      description: c.description,
+      icon: c.icon,
+      isBuiltin: c.isBuiltin,
+      ...progressResult,
+    })
 
     const memSet = new Set<string>()
     for (const p of allProgress) memSet.add(p.verseId + p.translation)
@@ -161,11 +181,11 @@ export function CollectionDetailPage() {
     }
     setVerses(verseList)
     setLoading(false)
-  }, [id])
+  }, [slug])
 
   useEffect(() => {
     load()
-  }, [id, load])
+  }, [slug, load])
 
   async function handleAddAll() {
     if (!col) return
