@@ -8,20 +8,48 @@ const OUTPUT_DIR = `${import.meta.dirname}/../app/public/textos`
 
 function decodeHtmlEntities(text: string): string {
   const entities: Record<string, string> = {
-    '&agrave;': 'à', '&aacute;': 'á', '&acirc;': 'â', '&atilde;': 'ã', '&auml;': 'ä',
-    '&eacute;': 'é', '&ecirc;': 'ê', '&egrave;': 'è', '&euml;': 'ë',
-    '&iacute;': 'í', '&icirc;': 'î', '&igrave;': 'ì',
-    '&oacute;': 'ó', '&ocirc;': 'ô', '&otilde;': 'õ', '&ouml;': 'ö',
-    '&uacute;': 'ú', '&ucirc;': 'û', '&ugrave;': 'ù', '&uuml;': 'ü',
-    '&ccedil;': 'ç', '&yacute;': 'ý',
-    '&Aacute;': 'Á', '&Agrave;': 'À', '&Acirc;': 'Â', '&Atilde;': 'Ã',
-    '&Eacute;': 'É', '&Ecirc;': 'Ê',
+    '&agrave;': 'à',
+    '&aacute;': 'á',
+    '&acirc;': 'â',
+    '&atilde;': 'ã',
+    '&auml;': 'ä',
+    '&eacute;': 'é',
+    '&ecirc;': 'ê',
+    '&egrave;': 'è',
+    '&euml;': 'ë',
+    '&iacute;': 'í',
+    '&icirc;': 'î',
+    '&igrave;': 'ì',
+    '&oacute;': 'ó',
+    '&ocirc;': 'ô',
+    '&otilde;': 'õ',
+    '&ouml;': 'ö',
+    '&uacute;': 'ú',
+    '&ucirc;': 'û',
+    '&ugrave;': 'ù',
+    '&uuml;': 'ü',
+    '&ccedil;': 'ç',
+    '&yacute;': 'ý',
+    '&Aacute;': 'Á',
+    '&Agrave;': 'À',
+    '&Acirc;': 'Â',
+    '&Atilde;': 'Ã',
+    '&Eacute;': 'É',
+    '&Ecirc;': 'Ê',
     '&Iacute;': 'Í',
-    '&Oacute;': 'Ó', '&Ocirc;': 'Ô', '&Otilde;': 'Õ',
-    '&Uacute;': 'Ú', '&Ucirc;': 'Û',
+    '&Oacute;': 'Ó',
+    '&Ocirc;': 'Ô',
+    '&Otilde;': 'Õ',
+    '&Uacute;': 'Ú',
+    '&Ucirc;': 'Û',
     '&Ccedil;': 'Ç',
-    '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'",
-    '&ndash;': '–', '&mdash;': '—',
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#39;': "'",
+    '&ndash;': '–',
+    '&mdash;': '—',
     '&hellip;': '…',
   }
   return text.replace(/&[a-zA-Z0-9#]+;/g, (m) => entities[m] || m)
@@ -48,7 +76,10 @@ async function fetchPlainText(url: string): Promise<string> {
 // ---------------------- Heidelberg ----------------------
 
 function buildHeidelberg(raw: string) {
-  const lines = raw.split('\n').map((l) => l.trim()).filter((l) => l.length > 0)
+  const lines = raw
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0)
 
   type Section = { name: string; items: { q: string; a: string }[] }
   const sections: Section[] = []
@@ -112,7 +143,7 @@ function buildHeidelberg(raw: string) {
 
     // Append to current item
     if (collecting === 'q') {
-      currentQ += ' ' + line
+      currentQ += ` ${line}`
       // Check if this appended text contains R.
       const rIdx = currentQ.search(/\b[Rr]\.\s+/)
       if (rIdx >= 0) {
@@ -121,7 +152,7 @@ function buildHeidelberg(raw: string) {
         collecting = 'done'
       }
     } else if (collecting === 'a') {
-      currentA += ' ' + line
+      currentA += ` ${line}`
     }
   }
 
@@ -146,7 +177,7 @@ function buildWestminster(raw: string) {
   // Extract the numbered catechism from the page
   // Format: "1. Question text\nAnswer paragraph\n2. Question text\n..."
   const items: { q: string; a: string }[] = []
-  const regex = /(\d+)\.\s+([^]*?)(?=\n\d+\.\s|\n*$)/g
+  const _regex = /(\d+)\.\s+([^]*?)(?=\n\d+\.\s|\n*$)/g
 
   // First, find where the catechism content starts (after "1. Qual é...")
   const startIdx = raw.indexOf('1. Qual')

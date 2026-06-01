@@ -123,6 +123,16 @@
   align-items: center;
 }
 
+@media (max-width: 22.5rem) {
+  .top-bar-right {
+    gap: 0.25rem;
+  }
+
+  .user-badge {
+    max-width: 5rem;
+  }
+}
+
 .theme-toggle {
   background: none;
   border: none;
@@ -439,6 +449,14 @@
   text-transform: uppercase;
   letter-spacing: 0.05rem;
   min-height: 3.5rem;
+}
+
+@media (max-width: 22.5rem) {
+  .bottom-nav .nav-item {
+    font-size: 0.52rem;
+    padding: 0.5rem 0.125rem;
+    letter-spacing: 0.02rem;
+  }
 }
 
 .bottom-nav .nav-item.active {

@@ -102,6 +102,62 @@ bun scripts/convert-bolls.ts /tmp/NAA.json naa
 
 Both scripts strip HTML tags (including `<sup>` footnote markers) and output `app/public/bible-{key}.json` + a brotli-compressed `.br` sibling. Bible files are not precached by the service worker — they're fetched on first use and cached for 1 year.
 
+## Creeds & catechisms
+
+Non-bible texts live in `app/public/textos/` as JSON files matching the schema in `seedNonBibleText()` (`app/src/lib/db.ts`). Two formats:
+
+### Creed (`type: "creed"`)
+
+Hand-written JSON with `sections → articles` (each article a plain string):
+
+```json
+{
+  "type": "creed",
+  "id": "apostles",
+  "name": "Credo Apostólico",
+  "sections": [
+    { "name": "Deus Pai",     "articles": ["Creio em Deus Pai…"] },
+    { "name": "Jesus Cristo", "articles": ["E em Jesus Cristo…", "Padeceu sob…"] },
+    { "name": "Espírito Santo","articles": ["Creio no Espírito Santo…", "Na santa igreja…"] }
+  ]
+}
+```
+
+Place file at `app/public/textos/{id}.json` (e.g. `apostles.json`, `nicene.json`). Then add the source to `AVAILABLE_SOURCES` in `app/src/lib/text-sources.ts`.
+
+Creeds are short enough (~12 articles each) that manual creation is simplest. Just follow the existing `nicene.json` and `apostles.json` as templates.
+
+### Catechism (`type: "catechism"`)
+
+Each section has `items` with Q&A pairs:
+
+```json
+{
+  "type": "catechism",
+  "id": "heidelberg",
+  "name": "Catecismo de Heidelberg",
+  "sectionLabel": "Domingo",
+  "itemLabel": "Pergunta",
+  "sections": [
+    { "name": "Domingo 1", "items": [
+      { "q": "Qual é o teu único consolo…", "a": "Que eu, de corpo e alma…" }
+    ]}
+  ]
+}
+```
+
+**Generating from web sources:**
+
+```bash
+# Heidelberg + Westminster (scrapes live web pages, may need maintenance)
+bun run scripts/build-catechisms.ts
+
+# Westminster from IPB hardcoded data (stable)
+bun run scripts/build-westminster-ipb.ts
+```
+
+Scripts output directly to `app/public/textos/`. After adding a new text source, add its metadata to `AVAILABLE_SOURCES` in `app/src/lib/text-sources.ts` with a `sectionCount`.
+
 ## Environment variables
 
 ### Worker (`.dev.vars` locally, Cloudflare dashboard in prod)

@@ -24,7 +24,10 @@ async function fetchText(url: string): Promise<string> {
 }
 
 function parseHeidelberg(text: string) {
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean)
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
 
   const sections: { name: string; items: { q: string; a: string }[] }[] = []
   let currentSection: { name: string; items: { q: string; a: string }[] } | null = null
@@ -82,7 +85,7 @@ function parseHeidelberg(text: string) {
     }
 
     if (collecting === 'q' && line.length > 10) {
-      currentQ += ' ' + line
+      currentQ += ` ${line}`
       // Check if this continuation contains "R."
       const rIdx = currentQ.indexOf('R.')
       if (rIdx >= 0) {
@@ -93,7 +96,7 @@ function parseHeidelberg(text: string) {
     } else if (collecting === 'none' && line.length > 10 && !line.match(/^\(\d+/)) {
       // Could be continuation of answer if it starts with lowercase or common words
       if (currentA && line[0] === line[0].toLowerCase() && !line.startsWith('http')) {
-        currentA += ' ' + line
+        currentA += ` ${line}`
       }
     }
   }
@@ -112,15 +115,18 @@ function parseHeidelberg(text: string) {
     sections: sections.map((s) => ({
       name: s.name,
       items: s.items.map((item) => ({
-        q: item.q.replace(/^[Pp]ergunta\s*\d*[\.:]?\s*/i, '').trim(),
-        a: item.a.replace(/^[Rr]esposta\s*[\.:]?\s*/i, '').trim(),
+        q: item.q.replace(/^[Pp]ergunta\s*\d*[.:]?\s*/i, '').trim(),
+        a: item.a.replace(/^[Rr]esposta\s*[.:]?\s*/i, '').trim(),
       })),
     })),
   }
 }
 
 function parseWestminster(text: string) {
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean)
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
 
   const items: { q: string; a: string }[] = []
   let currentQ = ''
@@ -147,13 +153,13 @@ function parseWestminster(text: string) {
     // Answer starts with capital letter after a question
     if (collecting === 'q' && line.length > 5 && !line.match(/^\d+\./) && !line.startsWith('(')) {
       if (!currentQ.endsWith('?') && !currentQ.endsWith('?')) {
-        currentQ += ' ' + line
+        currentQ += ` ${line}`
       } else {
         currentA = line
         collecting = 'none'
       }
     } else if (collecting === 'none' && currentA && line.length > 5 && !line.match(/^\d+\./) && !line.startsWith('(')) {
-      currentA += ' ' + line
+      currentA += ` ${line}`
     }
   }
 

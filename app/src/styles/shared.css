@@ -8,11 +8,9 @@
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(0.5rem);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -37,6 +35,7 @@
     border-color 0.2s;
   text-decoration: none;
   letter-spacing: 0.0125rem;
+  touch-action: manipulation;
 }
 
 .btn:disabled {
@@ -111,7 +110,7 @@
 
 .hero-greeting {
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: clamp(1.3rem, 5vw, 1.7rem);
   color: var(--parchment);
   font-weight: 600;
   margin-bottom: 0.625rem;
@@ -143,12 +142,12 @@
 }
 
 .community-presence-count {
-  font-size: 2.2rem;
+  font-size: clamp(2.2rem, 11vw, 3rem);
   line-height: 1.1;
 }
 
 .community-presence-unit {
-  font-size: 1.25rem;
+  font-size: clamp(1.25rem, 6.5vw, 1.55rem);
 }
 
 .community-presence-label {
@@ -345,7 +344,7 @@
 
 .stat-value {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: clamp(1.8rem, 8vw, 2.2rem);
   font-weight: 700;
   display: block;
   color: var(--gold);

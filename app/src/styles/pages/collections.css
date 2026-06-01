@@ -85,6 +85,7 @@
   font-size: 0.7rem;
   color: var(--aged);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .collection-progress-bar {

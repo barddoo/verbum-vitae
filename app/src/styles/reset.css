@@ -29,6 +29,14 @@
   --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
 }
 
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
 [data-theme="light"] {
   --ink: #f8f7fb;
   --leather: #eeedf5;

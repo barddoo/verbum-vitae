@@ -13,7 +13,7 @@ function getInitialTheme(): Theme {
 function applyTheme(t: Theme) {
   document.documentElement.dataset.theme = t
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-  if (meta) meta.content = t === 'light' ? '#faf4ec' : '#0d0806'
+  if (meta) meta.content = t === 'light' ? '#f8f7fb' : '#0f1117'
 }
 
 const ThemeContext = createContext<{ theme: Theme; toggleTheme: () => void } | null>(null)

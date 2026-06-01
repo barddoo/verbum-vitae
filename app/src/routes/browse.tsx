@@ -303,162 +303,163 @@ export function BrowsePage() {
   }
 
   return (
-    <div className="page browse-page">
-      <SourcePicker current={source} onChange={handleSourceChange} />
+    <>
+      <div className="page browse-page">
+        <SourcePicker current={source} onChange={handleSourceChange} />
 
-      <div className="browse-top">
-        {isBible && (
-          <div className="translate-picker">
-            <select
-              aria-label="Selecionar tradução"
-              value={translation}
-              onChange={(e) => {
-                const t = e.target.value as Translation
-                cachedSet('translation', t)
-                setTranslation(t)
-              }}
-            >
-              {TRANSLATIONS.map((t) => (
-                <option key={t} value={t}>
-                  {TRANSLATION_LABELS[t]}
-                </option>
-              ))}
-            </select>
+        <div className="browse-top">
+          {isBible && (
+            <div className="translate-picker">
+              <select
+                aria-label="Selecionar tradução"
+                value={translation}
+                onChange={(e) => {
+                  const t = e.target.value as Translation
+                  cachedSet('translation', t)
+                  setTranslation(t)
+                }}
+              >
+                {TRANSLATIONS.map((t) => (
+                  <option key={t} value={t}>
+                    {TRANSLATION_LABELS[t]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className="search-bar">
+            <input
+              type="search"
+              className="search-input"
+              placeholder={isBible ? 'Buscar versículos…' : 'Buscar…'}
+              aria-label="Buscar"
+              name="verse-search"
+              autoComplete="off"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button type="button" className="search-clear" aria-label="Limpar busca" onClick={clearSearch}>
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {isBible && searchQuery.trim().length >= 2 && (
+          <div className="search-results" aria-live="polite" aria-atomic="false">
+            {searching ? (
+              <div className="loading">Buscando…</div>
+            ) : searchResults.length === 0 ? (
+              <p className="search-empty">Nenhum resultado para &quot;{searchQuery}&quot;</p>
+            ) : (
+              searchResults.map((r) => (
+                <button type="button" key={r.ref} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
+                  <span className="search-result-ref">{r.ref}</span>
+                  <span className="search-result-text">{highlightMatch(r.text, searchQuery)}</span>
+                </button>
+              ))
+            )}
           </div>
         )}
 
-        <div className="search-bar">
-          <input
-            type="search"
-            className="search-input"
-            placeholder={isBible ? 'Buscar versículos…' : 'Buscar…'}
-            aria-label="Buscar"
-            name="verse-search"
-            autoComplete="off"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button type="button" className="search-clear" aria-label="Limpar busca" onClick={clearSearch}>
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
-
-      {isBible && searchQuery.trim().length >= 2 && (
-        <div className="search-results" aria-live="polite" aria-atomic="false">
-          {searching ? (
-            <div className="loading">Buscando…</div>
-          ) : searchResults.length === 0 ? (
-            <p className="search-empty">Nenhum resultado para &quot;{searchQuery}&quot;</p>
-          ) : (
-            searchResults.map((r) => (
-              <button type="button" key={r.ref} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
-                <span className="search-result-ref">{r.ref}</span>
-                <span className="search-result-text">{highlightMatch(r.text, searchQuery)}</span>
-              </button>
-            ))
-          )}
-        </div>
-      )}
-
-      {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
-        <div className="book-list">
-          {filteredBooks.length === 0 ? (
-            <p className="search-empty">Nenhum livro encontrado</p>
-          ) : (
-            filteredBooks.flatMap(({ name, idx }) => {
-              const items = []
-              if (isBible) {
-                if (!bookQuery && idx === 0)
-                  items.push(
-                    <div key="at-label" className="book-section-label">
-                      Antigo Testamento
-                    </div>,
-                  )
-                if (!bookQuery && idx === 39)
-                  items.push(
-                    <div key="nt-label" className="book-section-label">
-                      Novo Testamento
-                    </div>,
-                  )
-              }
-              items.push(
-                <button type="button" key={`${idx}-${name}`} className="book-item" onClick={() => handleBookClick(idx)}>
-                  {name}
-                </button>,
-              )
-              return items
-            })
-          )}
-        </div>
-      ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
-        <div className="chapter-view">
-          <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
-            ← Voltar
-          </button>
-          <h3>{isBible ? BOOKS[bookIndex!] : source.name}</h3>
-          <div className="chapter-grid">
-            {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
-              <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
-                {isBible ? c : `${source.sectionLabel} ${c}`}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : !searchQuery || searchQuery.trim().length < 2 ? (
-        <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
-          <button type="button" className="back-btn" onClick={() => (isBible ? setChapter(null) : setBookIndex(null))}>
-            ← {isBible ? BOOKS[bookIndex!] : source.name}
-          </button>
-          <div className="verse-header">
-            {selectionMode ? (
-              <>
-                <span className="select-mode-label">
-                  {selectedVerses.size > 0
-                    ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
-                    : 'Toque para selecionar'}
-                </span>
-                <button type="button" className="select-mode-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
-                  ✕
-                </button>
-              </>
+        {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
+          <div className="book-list">
+            {filteredBooks.length === 0 ? (
+              <p className="search-empty">Nenhum livro encontrado</p>
             ) : (
-              <>
-                <h3>{isBible ? `${BOOKS[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
-                <p className="verse-hint">Segure para selecionar</p>
-              </>
+              filteredBooks.flatMap(({ name, idx }) => {
+                const items = []
+                if (isBible) {
+                  if (!bookQuery && idx === 0)
+                    items.push(
+                      <div key="at-label" className="book-section-label">
+                        Antigo Testamento
+                      </div>,
+                    )
+                  if (!bookQuery && idx === 39)
+                    items.push(
+                      <div key="nt-label" className="book-section-label">
+                        Novo Testamento
+                      </div>,
+                    )
+                }
+                items.push(
+                  <button type="button" key={`${idx}-${name}`} className="book-item" onClick={() => handleBookClick(idx)}>
+                    {name}
+                  </button>,
+                )
+                return items
+              })
             )}
           </div>
-          {loadingVerses
-            ? loadingSpinner
-            : verses.map((text, i) => {
-                const v = i + 1
-                const mem = isMemorized(v)
-                const add = isAdded(v)
-                const sel = selectedVerses.has(v)
-                const label = isBible ? v : `${source.itemLabel} ${v}`
-                return (
-                  <button
-                    type="button"
-                    key={i}
-                    className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                    onPointerDown={(e) => longPress.handlePointerDown(v, e)}
-                    onPointerMove={longPress.handlePointerMove}
-                    onPointerUp={() => longPress.handlePointerUp(v)}
-                    onPointerCancel={longPress.handlePointerCancel}
-                  >
-                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : label}</span>
-                    <span className="verse-text">{text}</span>
-                    {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
+        ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
+          <div className="chapter-view">
+            <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
+              ← Voltar
+            </button>
+            <h3>{isBible ? BOOKS[bookIndex!] : source.name}</h3>
+            <div className="chapter-grid">
+              {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
+                <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
+                  {isBible ? c : `${source.sectionLabel} ${c}`}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : !searchQuery || searchQuery.trim().length < 2 ? (
+          <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
+            <button type="button" className="back-btn" onClick={() => (isBible ? setChapter(null) : setBookIndex(null))}>
+              ← {isBible ? BOOKS[bookIndex!] : source.name}
+            </button>
+            <div className="verse-header">
+              {selectionMode ? (
+                <>
+                  <span className="select-mode-label">
+                    {selectedVerses.size > 0
+                      ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
+                      : 'Toque para selecionar'}
+                  </span>
+                  <button type="button" className="select-mode-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
+                    ✕
                   </button>
-                )
-              })}
-        </div>
-      ) : null}
-
+                </>
+              ) : (
+                <>
+                  <h3>{isBible ? `${BOOKS[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
+                  <p className="verse-hint">Segure para selecionar</p>
+                </>
+              )}
+            </div>
+            {loadingVerses
+              ? loadingSpinner
+              : verses.map((text, i) => {
+                  const v = i + 1
+                  const mem = isMemorized(v)
+                  const add = isAdded(v)
+                  const sel = selectedVerses.has(v)
+                  const label = isBible ? v : `${source.itemLabel} ${v}`
+                  return (
+                    <button
+                      type="button"
+                      key={i}
+                      className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
+                      onPointerDown={(e) => longPress.handlePointerDown(v, e)}
+                      onPointerMove={longPress.handlePointerMove}
+                      onPointerUp={() => longPress.handlePointerUp(v)}
+                      onPointerCancel={longPress.handlePointerCancel}
+                    >
+                      <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : label}</span>
+                      <span className="verse-text">{text}</span>
+                      {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
+                    </button>
+                  )
+                })}
+          </div>
+        ) : null}
+      </div>
       <SelectionBar count={selectedVerses.size} previewText={previewText} onClear={exitSelectionMode} onMemorize={memorizeSelected} />
-    </div>
+    </>
   )
 }

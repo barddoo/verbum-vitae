@@ -41,7 +41,7 @@ function RootLayout() {
     modalReducer,
     (['welcome'] as Modal[]).filter(() => !localStorage.getItem('welcomed')),
   )
-  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 900px)').matches)
 
   const setShowAuth = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'auth' })
   const setShowDonate = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'donate' })
@@ -53,7 +53,7 @@ function RootLayout() {
   const showWelcome = modals.includes('welcome')
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)')
+    const mq = window.matchMedia('(min-width: 900px)')
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
