@@ -1,8 +1,9 @@
 import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { BOOKS, DEFAULT_TRANSLATION, type Translation } from 'shared/bible'
-import { db, fetchVersesBatch, parseVerseKey } from '../lib/db'
+import { DEFAULT_TRANSLATION, type Translation } from 'shared/bible'
+import { db, fetchVersesBatch, parseTextKey } from '../lib/db'
+import { verseIdToReference } from '../lib/format'
 import { getNextCard } from '../lib/scheduler'
 import { type Card, type Grade, getDueCards } from '../lib/srs'
 import { cachedGet } from '../lib/storage'
@@ -21,6 +22,8 @@ interface DueItem {
   verseText: string
   card: Card
   translation: string
+  isQA: boolean
+  question?: string
 }
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -33,7 +36,9 @@ export function ReviewPage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [completed, setCompleted] = useState(0)
   const [sessionLoading, setSessionLoading] = useState(false)
-  const [practiceMode, setPracticeMode] = useState<PracticeMode>(() => (localStorage.getItem('review_mode') as PracticeMode) || 'flashcard')
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>(
+    () => (localStorage.getItem('review_mode') as PracticeMode) || 'fill-blank',
+  )
   const [filterBook] = useState<number | null>(null)
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
   const translation = (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION
@@ -47,10 +52,7 @@ export function ReviewPage() {
     return () => document.body.classList.remove('is-reviewing')
   }, [phase])
 
-  const allProgress = useLiveQuery(
-    () => db.progress.toArray().then((rows) => rows.filter((p) => p.translation === translation)),
-    [translation],
-  )
+  const allProgress = useLiveQuery(() => db.progress.toArray(), [])
 
   const totalAll = allProgress?.length ?? 0
   const totalDue = allProgress ? getDueCards(allProgress).length : 0
@@ -73,7 +75,7 @@ export function ReviewPage() {
       selected = allProgress.filter((p) => dueCards.some((dc) => dc.verseId === p.verseId))
     }
     if (filterBook !== null) {
-      selected = selected.filter((p) => parseVerseKey(p.verseId).bookNumber === filterBook)
+      selected = selected.filter((p) => parseTextKey(p.verseId).sectionIndex === filterBook)
     }
     if (selected.length === 0) {
       setSessionLoading(false)
@@ -88,19 +90,33 @@ export function ReviewPage() {
     const loaded: DueItem[] = []
     for (const p of selected) {
       const card = cardMap.get(p.verseId) || JSON.parse(p.cardJson || '{}')
-      const text = verseTexts.get(p.verseId) || ''
-      const parsed = parseVerseKey(p.verseId)
-      const bookName = BOOKS[parsed.bookNumber]
-      const ref = parsed.verseEnd
-        ? `${bookName} ${parsed.chapter}:${parsed.verseStart}-${parsed.verseEnd}`
-        : `${bookName} ${parsed.chapter}:${parsed.verseStart}`
+      const rawText = verseTexts.get(p.verseId) || ''
+      const parsed = parseTextKey(p.verseId)
+      const isQA = parsed.sourceType === 'catechism' || parsed.sourceType === 'creed'
+
+      let verseText = rawText
+      let question: string | undefined
+      if (parsed.sourceType === 'catechism' && rawText.includes('Q.')) {
+        const qaParts = rawText.split('\n\nA. ')
+        const parsedQuestion = qaParts[0]?.replace(/^Q\.\s*/, '').trim() || ''
+        const parsedAnswer = qaParts.length > 1 ? qaParts[1].trim() : ''
+        if (parsedQuestion && parsedAnswer) {
+          question = parsedQuestion
+          verseText = parsedAnswer
+        } else if (parsedQuestion) {
+          verseText = parsedQuestion
+        }
+      }
+
       loaded.push({
         progressId: p.id!,
         verseId: p.verseId,
-        reference: ref,
-        verseText: text,
+        reference: verseIdToReference(p.verseId),
+        verseText,
         card: typeof card === 'string' ? JSON.parse(card) : card,
         translation: p.translation,
+        isQA,
+        question,
       })
     }
 
@@ -171,14 +187,14 @@ export function ReviewPage() {
         <div className="review-queue-hero">
           <span className="review-queue-big-num">{reviewCount}</span>
           <span className="review-queue-big-label">
-            {totalAll === 0 ? 'nenhum versículo memorizado' : reviewCount === 1 ? 'versículo para revisar' : 'versículos para revisar'}
+            {totalAll === 0 ? 'nenhum texto memorizado' : reviewCount === 1 ? 'texto para revisar' : 'textos para revisar'}
           </span>
           {filterStatus === 'due' && totalAll > totalDue && totalAll > 0 && (
             <span className="review-queue-total-hint">{totalAll} total</span>
           )}
         </div>
         <div className="review-mode-grid">
-          {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
+          {(['fill-blank', 'flashcard', 'typing'] as PracticeMode[]).map((m) => (
             <button
               type="button"
               key={m}
@@ -201,12 +217,12 @@ export function ReviewPage() {
           </div>
         ) : (
           <button type="button" className="btn btn-primary btn-large btn-start" onClick={startReview} disabled={totalAll === 0}>
-            {totalAll === 0 ? 'Adicione versículos para começar' : 'Iniciar Revisão'}
+            {totalAll === 0 ? 'Adicione textos para começar' : 'Iniciar Revisão'}
           </button>
         )}
         {totalAll === 0 && (
           <p className="queue-empty-hint">
-            Vá para <a href="/browse">Bíblia</a> para adicionar versículos.
+            Vá para <a href="/browse">Textos</a> para adicionar itens.
           </p>
         )}
       </div>
@@ -218,7 +234,7 @@ export function ReviewPage() {
       <div className="page review-page">
         <div className="empty-state">
           <h2>Nada para revisar!</h2>
-          <p>{filterStatus === 'due' ? 'Todos os versículos estão em dia.' : 'Nenhum versículo encontrado.'}</p>
+          <p>{filterStatus === 'due' ? 'Todos os textos estão em dia.' : 'Nenhum texto encontrado.'}</p>
           <div className="empty-actions">
             <button type="button" className="btn btn-secondary" onClick={goBack}>
               Voltar
@@ -245,6 +261,8 @@ export function ReviewPage() {
     )
   }
 
+  const currentItem = items[currentIndex]
+
   return (
     <div className="page review-page review-session">
       <div className="review-header">
@@ -256,7 +274,7 @@ export function ReviewPage() {
             {currentIndex + 1}/{items.length}
           </span>
           <div className="practice-mode-selector">
-            {(['flashcard', 'fill-blank', 'typing'] as PracticeMode[]).map((m) => (
+            {(['fill-blank', 'flashcard', 'typing'] as PracticeMode[]).map((m) => (
               <button
                 type="button"
                 key={m}
@@ -281,32 +299,35 @@ export function ReviewPage() {
 
       {practiceMode === 'flashcard' && (
         <FlashcardView
-          key={items[currentIndex].verseId + currentIndex}
-          reference={items[currentIndex].reference}
-          verseText={items[currentIndex].verseText}
-          translation={items[currentIndex].translation}
-          verseId={items[currentIndex].verseId}
+          key={currentItem.verseId + currentIndex}
+          reference={currentItem.reference}
+          verseText={currentItem.verseText}
+          translation={currentItem.translation}
+          verseId={currentItem.verseId}
           onGrade={handleGrade}
+          question={currentItem.question}
         />
       )}
       {practiceMode === 'fill-blank' && (
         <FillInBlankView
-          key={items[currentIndex].verseId + currentIndex}
-          reference={items[currentIndex].reference}
-          verseText={items[currentIndex].verseText}
-          translation={items[currentIndex].translation}
-          verseId={items[currentIndex].verseId}
+          key={currentItem.verseId + currentIndex}
+          reference={currentItem.reference}
+          verseText={currentItem.verseText}
+          translation={currentItem.translation}
+          verseId={currentItem.verseId}
           onGrade={handleGrade}
+          question={currentItem.question}
         />
       )}
       {practiceMode === 'typing' && (
         <TypingPracticeView
-          key={items[currentIndex].verseId + currentIndex}
-          reference={items[currentIndex].reference}
-          verseText={items[currentIndex].verseText}
-          translation={items[currentIndex].translation}
-          verseId={items[currentIndex].verseId}
+          key={currentItem.verseId + currentIndex}
+          reference={currentItem.reference}
+          verseText={currentItem.verseText}
+          translation={currentItem.translation}
+          verseId={currentItem.verseId}
           onGrade={handleGrade}
+          question={currentItem.question}
         />
       )}
     </div>

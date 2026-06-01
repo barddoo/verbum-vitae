@@ -176,8 +176,11 @@ async function pullRemote() {
     for (const row of result.rows) {
       try {
         const card = parseCardJson(row.cardJson)
-        const verseId = row.verseId as string
+        let verseId = row.verseId as string
         const translation = row.translation as string
+        if (verseId.includes('_')) {
+          verseId = `b:${verseId.replace(/_/g, ':')}`
+        }
 
         const hasUnsynced = await db.syncLog
           .where({ synced: 0 })

@@ -1,7 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { VerseRow } from 'shared/types'
 
-export interface Verse extends VerseRow {
+export interface TextItem extends VerseRow {
   id?: number
 }
 
@@ -57,7 +57,7 @@ export interface SyncLog {
 }
 
 export const db = new Dexie('RememberBible') as Dexie & {
-  verses: EntityTable<Verse, 'id'>
+  verses: EntityTable<TextItem, 'id'>
   progress: EntityTable<Progress, 'id'>
   wordStats: EntityTable<WordStats, 'id'>
   collections: EntityTable<Collection, 'id'>
@@ -92,73 +92,174 @@ db.version(5).stores({
   syncLog: '++id, userId, tableName, rowId, synced, createdAt',
 })
 
-export function verseKey(bookNumber: number, chapter: number, verse: number, endVerse?: number): string {
-  return endVerse ? `${bookNumber}_${chapter}_${verse}:${endVerse}` : `${bookNumber}_${chapter}_${verse}`
+db.version(6)
+  .stores({
+    verses:
+      '++id, &[sourceType+sourceId+bookNumber+chapter+verse+translation], [sourceType+sourceId+bookNumber+chapter], sourceType, translation, [sourceType+sourceId+translation], [sourceType+sourceId+bookNumber+translation]',
+    progress: '++id, &[verseId+translation], dueDate, state, [dueDate+state], translation',
+    wordStats: '++id, &[verseId+translation+wordIndex], [verseId+translation]',
+    collections: '++id, &slug, &name, isBuiltin',
+    collectionVerses: '++id, &[collectionId+verseId+translation], collectionId',
+    syncLog: '++id, userId, tableName, rowId, synced, createdAt',
+  })
+  .upgrade(async (tx) => {
+    const oldKey = (vk: string) => `b:${vk.replace(/_/g, ':')}`
+
+    await tx.table('verses').toCollection().modify({ sourceType: 'b', sourceId: '' })
+    await tx
+      .table('progress')
+      .toCollection()
+      .modify((p) => {
+        p.verseId = oldKey(p.verseId)
+      })
+    await tx
+      .table('wordStats')
+      .toCollection()
+      .modify((s) => {
+        s.verseId = oldKey(s.verseId)
+      })
+    await tx
+      .table('collectionVerses')
+      .toCollection()
+      .modify((cv) => {
+        cv.verseId = oldKey(cv.verseId)
+      })
+    await tx
+      .table('syncLog')
+      .toCollection()
+      .modify((log) => {
+        log.rowId = oldKey(log.rowId)
+      })
+  })
+
+export type TextSourceType = 'bible' | 'creed' | 'catechism'
+
+export interface TextKeyParsed {
+  sourceType: TextSourceType
+  sourceId: string
+  sectionIndex: number
+  blockIndex: number
+  itemIndex: number
+  itemEnd?: number
 }
 
-export interface VerseKeyParsed {
-  bookNumber: number
-  chapter: number
-  verseStart: number
-  verseEnd?: number
+const TEXT_TYPE_CHAR: Record<TextSourceType, string> = { bible: 'b', creed: 'c', catechism: 'k' }
+const CHAR_TO_TYPE: Record<string, TextSourceType> = { b: 'bible', c: 'creed', k: 'catechism' }
+
+export function textKey(
+  sourceType: TextSourceType,
+  sourceId: string,
+  section: number,
+  block: number,
+  item: number,
+  itemEnd?: number,
+): string {
+  const ch = TEXT_TYPE_CHAR[sourceType]
+  const coords = itemEnd != null ? `${section}:${block}:${item}:${itemEnd}` : `${section}:${block}:${item}`
+  return sourceType === 'bible' ? `${ch}:${coords}` : `${ch}:${sourceId}:${coords}`
 }
 
-export function parseVerseKey(key: string): VerseKeyParsed {
-  const parts = key.split('_')
-  const bookNumber = parseInt(parts[0], 10)
-  const chapter = parseInt(parts[1], 10)
-  const verseParts = parts[2].split(':')
+export function parseTextKey(key: string): TextKeyParsed {
+  const parts = key.split(':')
+  const typeChar = parts[0]
+  const sourceType = CHAR_TO_TYPE[typeChar] || 'bible'
+
+  if (sourceType === 'bible') {
+    const [section, block, item, itemEnd] = parts.slice(1).map(Number)
+    return { sourceType, sourceId: '', sectionIndex: section, blockIndex: block, itemIndex: item, itemEnd }
+  }
+
+  const sourceId = parts[1]
+  const [section, block, item, itemEnd] = parts.slice(2).map(Number)
   return {
-    bookNumber,
-    chapter,
-    verseStart: parseInt(verseParts[0], 10),
-    verseEnd: verseParts[1] ? parseInt(verseParts[1], 10) : undefined,
+    sourceType,
+    sourceId,
+    sectionIndex: section,
+    blockIndex: block,
+    itemIndex: item || 0,
+    itemEnd,
   }
 }
 
-const seedingByTranslation = new Map<string, Promise<void>>()
+export function verseKey(bookNumber: number, chapter: number, verse: number, endVerse?: number): string {
+  return textKey('bible', '', bookNumber, chapter, verse, endVerse)
+}
+
+export const parseVerseKey = parseTextKey
+
+const seedingByKey = new Map<string, Promise<void>>()
 
 export async function ensureTranslationSeeded(translation: string) {
-  if (!seedingByTranslation.has(translation)) {
-    seedingByTranslation.set(translation, seedVerses(translation as Verse['translation']))
+  const key = `b:${translation}`
+  if (!seedingByKey.has(key)) {
+    seedingByKey.set(key, seedBibleText(translation))
   }
-  return seedingByTranslation.get(translation)!
+  return seedingByKey.get(key)!
+}
+
+export async function ensureNonBibleTextSeeded(sourceType: TextSourceType, sourceId: string) {
+  const key = `${sourceType}:${sourceId}`
+  if (!seedingByKey.has(key)) {
+    seedingByKey.set(key, seedNonBibleText(sourceType, sourceId))
+  }
+  return seedingByKey.get(key)!
 }
 
 export async function fetchVersesBatch(keys: { verseId: string; translation: string }[]): Promise<Map<string, string>> {
-  const translations = [...new Set(keys.map((k) => k.translation))]
-  await Promise.all(translations.map((t) => ensureTranslationSeeded(t)))
+  const sourceKeys = [
+    ...new Set(
+      keys.map((k) => {
+        const p = parseTextKey(k.verseId)
+        return p.sourceType === 'bible' ? `b:${k.translation}` : `${p.sourceType}:${p.sourceId}`
+      }),
+    ),
+  ]
+
+  await Promise.all(
+    sourceKeys.map((sk) => {
+      const [st, si] = sk.split(':')
+      if (st === 'b') return ensureTranslationSeeded(si)
+      return ensureNonBibleTextSeeded(st as TextSourceType, si)
+    }),
+  )
+
   const chapterGroups = new Map<string, { keys: { verseId: string; translation: string }[] }>()
   for (const k of keys) {
-    const p = parseVerseKey(k.verseId)
-    const ck = `${p.bookNumber}_${p.chapter}`
+    const p = parseTextKey(k.verseId)
+    const dbSourceType = p.sourceType === 'bible' ? 'b' : p.sourceType
+    const ck = `${dbSourceType}:${p.sourceId}:${p.sectionIndex}:${p.blockIndex}`
     if (!chapterGroups.has(ck)) chapterGroups.set(ck, { keys: [] })
     chapterGroups.get(ck)!.keys.push(k)
   }
 
   const results = await Promise.all(
     [...chapterGroups].map(async ([ck, group]) => {
-      const [bookNumStr, chapterNumStr] = ck.split('_')
-      const rows = await db.verses
-        .where('[bookNumber+chapter]')
-        .equals([parseInt(bookNumStr, 10), parseInt(chapterNumStr, 10)])
-        .toArray()
+      const parts = ck.split(':')
+      const dbType = parts[0]
+      const si = parts[1]
+      const sectionIdx = parseInt(parts[2], 10)
+      const blockIdx = parseInt(parts[3], 10)
+      const rows = await db.verses.where('[sourceType+sourceId+bookNumber+chapter]').equals([dbType, si, sectionIdx, blockIdx]).toArray()
+
       const entries: [string, string][] = []
       for (const k of group.keys) {
-        const p = parseVerseKey(k.verseId)
-        const endVerse = p.verseEnd || p.verseStart
-        const filtered = rows.filter((r) => r.translation === k.translation && r.verse >= p.verseStart && r.verse <= endVerse)
+        const p = parseTextKey(k.verseId)
+        const endItem = p.itemEnd || p.itemIndex
+        const filtered = rows.filter((r) => r.translation === k.translation && r.verse >= p.itemIndex && r.verse <= endItem)
         entries.push([k.verseId, filtered.map((r) => r.text).join(' ')])
       }
       return entries
     }),
   )
+
   return new Map(results.flat())
 }
 
-async function seedVerses(translation: Verse['translation']) {
-  const count = await db.verses.where({ translation }).count()
+async function seedBibleText(translation: string) {
+  const count = await db.verses.where({ sourceType: 'b', sourceId: '', translation }).count()
   if (count > 0) return
+
+  let jsonData: { books: string[]; verses: { b: number; c: number; v: number; t: string }[] } | null = null
 
   try {
     const res = await fetch(`/bible-${translation}.json.br`)
@@ -168,9 +269,7 @@ async function seedVerses(translation: Verse['translation']) {
         const ds = new DecompressionStream('br' as CompressionFormat)
         const blob = new Blob([buf])
         const decompressed = await new Response(blob.stream().pipeThrough(ds)).text()
-        const data = JSON.parse(decompressed)
-        await bulkInsert(data, translation)
-        return
+        jsonData = JSON.parse(decompressed)
       } catch {
         console.warn('Brotli unsupported, using uncompressed fallback')
       }
@@ -179,26 +278,94 @@ async function seedVerses(translation: Verse['translation']) {
     /* network error */
   }
 
-  const fallback = await fetch(`/bible-${translation}.json`)
-  if (!fallback.ok) return
-  const data = await fallback.json()
-  await bulkInsert(data, translation)
-}
+  if (!jsonData) {
+    const fallback = await fetch(`/bible-${translation}.json`)
+    if (!fallback.ok) return
+    jsonData = (await fallback.json()) as typeof jsonData
+  }
 
-async function bulkInsert(
-  data: { books: string[]; verses: { b: number; c: number; v: number; t: string }[] },
-  translation: Verse['translation'],
-) {
-  const verses: Verse[] = data.verses.map((v) => ({
+  if (!jsonData) return
+
+  const items: TextItem[] = jsonData.verses.map((v) => ({
+    sourceType: 'b',
+    sourceId: '',
     bookNumber: v.b,
     chapter: v.c,
     verse: v.v,
     text: v.t.replace(/<[^>]+>/g, '').trim(),
     translation,
   }))
+
   const chunkSize = 500
-  for (let i = 0; i < verses.length; i += chunkSize) {
-    await db.verses.bulkAdd(verses.slice(i, i + chunkSize))
+  for (let i = 0; i < items.length; i += chunkSize) {
+    await db.verses.bulkAdd(items.slice(i, i + chunkSize))
+  }
+}
+
+interface CreedJSON {
+  type: 'creed'
+  id: string
+  name: string
+  sections: { name: string; articles: string[] }[]
+}
+
+interface CatechismJSON {
+  type: 'catechism'
+  id: string
+  name: string
+  sectionLabel: string
+  itemLabel: string
+  sections: { name: string; items: { q: string; a: string }[] }[]
+}
+
+type NonBibleJSON = CreedJSON | CatechismJSON
+
+async function seedNonBibleText(sourceType: TextSourceType, sourceId: string) {
+  const count = await db.verses.where({ sourceType, sourceId }).count()
+  if (count > 0) return
+
+  const res = await fetch(`/textos/${sourceId}.json`)
+  if (!res.ok) return
+  const data: NonBibleJSON = await res.json()
+
+  const items: TextItem[] = []
+
+  if (data.type === 'creed') {
+    for (let si = 0; si < data.sections.length; si++) {
+      const section = data.sections[si]
+      for (let ai = 0; ai < section.articles.length; ai++) {
+        items.push({
+          sourceType,
+          sourceId,
+          bookNumber: si,
+          chapter: ai,
+          verse: 0,
+          text: section.articles[ai].trim(),
+          translation: sourceId,
+        })
+      }
+    }
+  } else {
+    for (let si = 0; si < data.sections.length; si++) {
+      const section = data.sections[si]
+      for (let ii = 0; ii < section.items.length; ii++) {
+        const item = section.items[ii]
+        items.push({
+          sourceType,
+          sourceId,
+          bookNumber: si,
+          chapter: ii,
+          verse: 0,
+          text: `Q. ${item.q}\n\nA. ${item.a}`,
+          translation: sourceId,
+        })
+      }
+    }
+  }
+
+  const chunkSize = 500
+  for (let i = 0; i < items.length; i += chunkSize) {
+    await db.verses.bulkAdd(items.slice(i, i + chunkSize))
   }
 }
 
@@ -223,12 +390,28 @@ export async function recordWordAccuracy(
     ...[...correctWords].map(async (idx) => {
       const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
       if (existing) await db.wordStats.update(existing.id!, { correctCount: existing.correctCount + 1 })
-      else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 1, incorrectCount: 0 })
+      else
+        await db.wordStats.put({
+          verseId,
+          translation,
+          wordIndex: idx,
+          word: allWords[idx] || '',
+          correctCount: 1,
+          incorrectCount: 0,
+        })
     }),
     ...[...incorrectWords].map(async (idx) => {
       const existing = await db.wordStats.where({ verseId, translation, wordIndex: idx }).first()
       if (existing) await db.wordStats.update(existing.id!, { incorrectCount: existing.incorrectCount + 1 })
-      else await db.wordStats.put({ verseId, translation, wordIndex: idx, word: allWords[idx] || '', correctCount: 0, incorrectCount: 1 })
+      else
+        await db.wordStats.put({
+          verseId,
+          translation,
+          wordIndex: idx,
+          word: allWords[idx] || '',
+          correctCount: 0,
+          incorrectCount: 1,
+        })
     }),
   ])
 }

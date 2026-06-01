@@ -51,7 +51,11 @@ export const VerseProgressCard = memo(function VerseProgressCard({
       <div className="verse-card-meta">
         <span className={`state-badge ${stateClass}`}>{stateLabel}</span>
         <span className="verse-card-due">{dueLabel}</span>
-        {streak > 0 && <span className="verse-card-streak">{streak}&#x1F525;</span>}
+        {streak > 0 && (
+          <span className="verse-card-streak" title="Respostas corretas seguidas">
+            {streak}&#x1F525;
+          </span>
+        )}
       </div>
     </div>
   )

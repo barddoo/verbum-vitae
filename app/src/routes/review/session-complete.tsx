@@ -36,39 +36,29 @@ export function SessionComplete({
     <div className="page review-page">
       <div className="session-complete">
         <h2>Sessão concluída!</h2>
-        <p className="session-complete-count">{completed} versículos revisados</p>
+        <p className="session-complete-count">{completed} textos revisados</p>
         {completed > 0 && (
           <div className="session-grade-breakdown">
-            <span className="grade-breakdown-item grade-breakdown-1" title="Esqueci">
-              {gradeCounts[0]} ✗
-            </span>
-            <span className="grade-breakdown-item grade-breakdown-2" title="Difícil">
-              {gradeCounts[1]} △
-            </span>
-            <span className="grade-breakdown-item grade-breakdown-3" title="Bom">
-              {gradeCounts[2]} ✓
-            </span>
-            <span className="grade-breakdown-item grade-breakdown-4" title="Fácil">
-              {gradeCounts[3]} ★
-            </span>
+            {[1, 2, 3, 4].map((r, i) => (
+              <div key={r} className={`grade-breakdown-item grade-breakdown-${r}`}>
+                <span>{['', 'Esqueci', 'Difícil', 'Ok', 'Fácil'][r]}</span>
+                <span>{gradeCounts[i]}</span>
+              </div>
+            ))}
           </div>
         )}
         <div className="session-complete-actions">
-          <button type="button" className="btn btn-primary" onClick={onGoBack}>
-            Voltar ao painel
+          <button type="button" className="btn btn-primary" onClick={onNewSession}>
+            Nova Sessão
           </button>
-          <button type="button" className="btn btn-secondary" onClick={onNewSession}>
-            Repetir sessão
+          <button type="button" className="btn btn-secondary" onClick={onGoBack}>
+            Voltar
           </button>
-          <a
-            href={inviteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-whatsapp"
-            aria-label="Convidar amigos pelo WhatsApp"
-          >
-            Compartilhar no WhatsApp
-          </a>
+          {inviteUrl && (
+            <a href={inviteUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+              Compartilhar
+            </a>
+          )}
         </div>
       </div>
     </div>

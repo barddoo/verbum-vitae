@@ -1,4 +1,6 @@
 interface VerseRef {
+  sourceType?: string
+  sourceId?: string
   book: number
   chapter: number
   verse: number | [number, number]
@@ -215,8 +217,11 @@ export const bundledCollections: BundledCollection[] = [
 ]
 
 export function verseRefToId(ref: VerseRef): string {
+  const stChar = ref.sourceType === 'creed' ? 'c' : ref.sourceType === 'catechism' ? 'k' : 'b'
+  const si = ref.sourceId || ''
   if (Array.isArray(ref.verse)) {
-    return `${ref.book}_${ref.chapter}_${ref.verse[0]}:${ref.verse[1]}`
+    if (si) return `${stChar}:${si}:${ref.book}:${ref.chapter}:${ref.verse[0]}:${ref.verse[1]}`
+    return `${stChar}:${ref.book}:${ref.chapter}:${ref.verse[0]}:${ref.verse[1]}`
   }
-  return `${ref.book}_${ref.chapter}_${ref.verse}`
+  return si ? `${stChar}:${si}:${ref.book}:${ref.chapter}:${ref.verse}` : `${stChar}:${ref.book}:${ref.chapter}:${ref.verse}`
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Progress } from '../lib/db'
-import { db, fetchVersesBatch, parseVerseKey } from '../lib/db'
+import { db, fetchVersesBatch, parseTextKey } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
 import { logProgressChange } from '../lib/sync'
 import { VerseProgressCard } from './verse-progress-card'
@@ -64,7 +64,7 @@ export function MemorizedVersesTab() {
     setItems((prev) => prev.filter((item) => item.progress.verseId !== verseId))
   }
 
-  const parseBookNumber = useCallback((verseId: string) => parseVerseKey(verseId).bookNumber, [])
+  const parseBookNumber = useCallback((verseId: string) => parseTextKey(verseId).sectionIndex, [])
 
   const filtered = useMemo(() => {
     let result = items
@@ -121,9 +121,9 @@ export function MemorizedVersesTab() {
   if (items.length === 0) {
     return (
       <div className="stats-empty">
-        Nenhum versículo memorizado ainda.
+        Nenhum texto memorizado ainda.
         <br />
-        Adicione versículos na Bíblia para vê-los aqui.
+        Adicione textos na página Textos para vê-los aqui.
       </div>
     )
   }
@@ -147,8 +147,8 @@ export function MemorizedVersesTab() {
         <input
           type="text"
           className="verse-search"
-          placeholder="Buscar versículo…"
-          aria-label="Buscar versículo"
+          placeholder="Buscar…"
+          aria-label="Buscar"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           spellCheck={false}
@@ -175,7 +175,7 @@ export function MemorizedVersesTab() {
         ))}
       </div>
 
-      {filtered.length === 0 && <div className="stats-empty">Nenhum versículo encontrado.</div>}
+      {filtered.length === 0 && <div className="stats-empty">Nenhum texto encontrado.</div>}
     </div>
   )
 }

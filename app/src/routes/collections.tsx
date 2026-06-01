@@ -1,8 +1,9 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useCallback, useEffect, useState } from 'react'
-import { BOOKS, DEFAULT_TRANSLATION } from 'shared/bible'
+import { DEFAULT_TRANSLATION } from 'shared/bible'
 import { bundledCollections, verseRefToId } from '../data/collections'
-import { addCollectionToMemory, db, fetchVersesBatch, getCollectionProgress, parseVerseKey } from '../lib/db'
+import { addCollectionToMemory, db, fetchVersesBatch, getCollectionProgress } from '../lib/db'
+import { verseIdToReference } from '../lib/format'
 import { slugify } from '../lib/slugify'
 import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
@@ -49,7 +50,7 @@ async function ensureCollectionsSeeded() {
             for (let v = ref.verse[0]; v <= ref.verse[1]; v++) {
               entries.push({
                 collectionId: cId,
-                verseId: `${ref.book}_${ref.chapter}_${v}`,
+                verseId: `b:${ref.book}:${ref.chapter}:${v}`,
                 translation: DEFAULT_TRANSLATION,
                 sortOrder: order++,
               })
@@ -102,7 +103,7 @@ export function CollectionsListPage() {
   return (
     <div className="page collections-page">
       <h2 className="collections-title">Coleções</h2>
-      <p className="collections-subtitle">Conjuntos de versículos para memorizar</p>
+      <p className="collections-subtitle">Conjuntos de textos para memorizar</p>
       <div className="collection-grid">
         {collections.map((col) => (
           <Link key={col.dbId} to="/collections/$slug" params={{ slug: col.slug }} className="collection-card-link">
@@ -172,11 +173,7 @@ export function CollectionDetailPage() {
     const verseList: typeof verses = []
     for (const cv of cvs) {
       const text = verseTexts.get(cv.verseId) || ''
-      const parsed = parseVerseKey(cv.verseId)
-      const bookName = BOOKS[parsed.bookNumber]
-      const ref = parsed.verseEnd
-        ? `${bookName} ${parsed.chapter}:${parsed.verseStart}-${parsed.verseEnd}`
-        : `${bookName} ${parsed.chapter}:${parsed.verseStart}`
+      const ref = verseIdToReference(cv.verseId)
       verseList.push({ verseId: cv.verseId, reference: ref, text, memorized: memSet.has(cv.verseId + cv.translation) })
     }
     setVerses(verseList)
@@ -224,7 +221,7 @@ export function CollectionDetailPage() {
       <div className="collection-detail-progress">
         <div className="collection-detail-stats">
           <span>
-            {col.memorized}/{col.total} versículos
+            {col.memorized}/{col.total}
           </span>
           <span>{col.percent}%</span>
         </div>

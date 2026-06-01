@@ -1,12 +1,27 @@
 import { BOOKS } from 'shared/bible'
-import { parseVerseKey } from './db'
+import { SOURCE_LABELS } from 'shared/texts'
+import { parseTextKey } from './db'
 
 export function verseIdToReference(verseId: string): string {
-  const { bookNumber, chapter, verseStart, verseEnd } = parseVerseKey(verseId)
-  const bookName = BOOKS[bookNumber]
-  if (!bookName) return verseId
-  const ref = `${bookName} ${chapter}:${verseStart}`
-  return verseEnd ? `${ref}-${verseEnd}` : ref
+  const p = parseTextKey(verseId)
+
+  if (p.sourceType === 'bible') {
+    const bookName = BOOKS[p.sectionIndex]
+    if (!bookName) return verseId
+    const ref = `${bookName} ${p.blockIndex}:${p.itemIndex}`
+    return p.itemEnd ? `${ref}-${p.itemEnd}` : ref
+  }
+
+  const meta = SOURCE_LABELS[`${p.sourceType}:${p.sourceId}`]
+  const name = meta?.name || p.sourceId
+  const label = meta?.itemLabel || 'Item'
+  const num = p.blockIndex + 1
+
+  if (p.sourceType === 'catechism') {
+    return `${name} — ${label} ${num}`
+  }
+
+  return `${name} — ${label} ${num}`
 }
 
 export function formatRelativeDueDate(dueDate: number): string {

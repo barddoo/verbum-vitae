@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
-import { db, ensureTranslationSeeded, verseKey } from '../lib/db'
+import { db, ensureNonBibleTextSeeded, ensureTranslationSeeded, type TextSourceType, textKey } from '../lib/db'
 import { createEmptyCard } from '../lib/srs'
 import { cachedGet, cachedSet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
+import { AVAILABLE_SOURCES, type SourceOption } from '../lib/text-sources'
 import { SelectionBar } from './browse/selection-bar'
 
 interface SearchResult {
@@ -18,7 +19,27 @@ interface SearchResult {
 
 const loadingSpinner = <div className="loading">Carregando…</div>
 
+function SourcePicker({ current, onChange }: { current: SourceOption; onChange: (s: SourceOption) => void }) {
+  return (
+    <div className="source-picker">
+      <div className="source-picker-options">
+        {AVAILABLE_SOURCES.map((s) => (
+          <button
+            type="button"
+            key={`${s.type}:${s.id}`}
+            className={`source-chip ${current.type === s.type && current.id === s.id ? 'active' : ''}`}
+            onClick={() => onChange(s)}
+          >
+            {s.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function BrowsePage() {
+  const [source, setSource] = useState<SourceOption>(() => AVAILABLE_SOURCES[0])
   const [translation, setTranslation] = useState<Translation>(() => (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION)
   const [bookIndex, setBookIndex] = useState<number | null>(null)
   const [chapter, setChapter] = useState<number | null>(null)
@@ -35,31 +56,53 @@ export function BrowsePage() {
   const [searching, setSearching] = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const isBible = source.type === 'bible'
+
+  const translationForSource = isBible ? translation : source.id
+
   const loadMemorizedVerses = useCallback(async () => {
-    await ensureTranslationSeeded(translation)
-    const progress = await db.progress.where({ translation }).toArray()
+    if (isBible) {
+      await ensureTranslationSeeded(translation)
+    } else {
+      await ensureNonBibleTextSeeded(source.type as TextSourceType, source.id)
+    }
+    const progress = await db.progress.where({ translation: translationForSource }).toArray()
     setMemorizedVerses(new Set(progress.map((p) => p.verseId)))
-  }, [translation])
+  }, [isBible, translation, source.type, source.id, translationForSource])
 
   const loadChapter = useCallback(async () => {
     if (bookIndex === null || chapter === null) return
-    setLoadingVerses(true)
-    await ensureTranslationSeeded(translation)
-    const rows = await db.verses.where({ bookNumber: bookIndex, chapter, translation }).sortBy('verse')
-    setVerses(rows.map((r) => r.text))
-    setLoadingVerses(false)
-    setSelectionMode(false)
-    setSelectionAnchor(null)
-    setSelectedVerses(new Set())
-  }, [bookIndex, chapter, translation])
+    if (isBible) {
+      setLoadingVerses(true)
+      await ensureTranslationSeeded(translation)
+      const rows = await db.verses.where({ sourceType: 'b', sourceId: '', bookNumber: bookIndex, chapter, translation }).sortBy('verse')
+      setVerses(rows.map((r) => r.text))
+      setLoadingVerses(false)
+      setSelectionMode(false)
+      setSelectionAnchor(null)
+      setSelectedVerses(new Set())
+    } else {
+      setLoadingVerses(true)
+      await ensureNonBibleTextSeeded(source.type as TextSourceType, source.id)
+      const rows = await db.verses
+        .where({ sourceType: source.type, sourceId: source.id, bookNumber: bookIndex, translation: translationForSource })
+        .sortBy('chapter')
+      setVerses(rows.map((r) => r.text))
+      setLoadingVerses(false)
+      setSelectionMode(false)
+      setSelectionAnchor(null)
+      setSelectedVerses(new Set())
+    }
+  }, [bookIndex, chapter, isBible, translation, source.type, source.id, translationForSource])
 
   const doSearch = useCallback(
     async (query: string) => {
+      if (!isBible) return
       setSearching(true)
       await ensureTranslationSeeded(translation)
       const lower = query.toLowerCase()
       const all = await db.verses
-        .where({ translation })
+        .where({ sourceType: 'b', sourceId: '', translation })
         .filter((v) => v.text.toLowerCase().includes(lower))
         .limit(50)
         .toArray()
@@ -73,17 +116,17 @@ export function BrowsePage() {
       setSearchResults(results)
       setSearching(false)
     },
-    [translation],
+    [translation, isBible],
   )
 
   useEffect(() => {
     loadMemorizedVerses()
-  }, [translation, loadMemorizedVerses])
+  }, [translation, source, loadMemorizedVerses])
 
   useEffect(() => {
     if (bookIndex === null || chapter === null) return
     loadChapter()
-  }, [bookIndex, chapter, translation, loadChapter])
+  }, [bookIndex, chapter, translation, source, loadChapter])
 
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
@@ -148,8 +191,10 @@ export function BrowsePage() {
 
   async function memorizeSelected() {
     if (bookIndex === null || chapter === null || selectedVerses.size === 0) return
-    const keys = [...selectedVerses].map((v) => verseKey(bookIndex, chapter, v))
-    const existingList = await Promise.all(keys.map((key) => db.progress.where({ verseId: key, translation }).first()))
+    const keys = [...selectedVerses].map((v) => verseTextKey(v))
+    const existingList = await Promise.all(
+      keys.map((key) => db.progress.where({ verseId: key, translation: translationForSource }).first()),
+    )
     const toAddKeys = keys.filter((_, i) => !existingList[i])
 
     if (toAddKeys.length === 0) {
@@ -161,7 +206,7 @@ export function BrowsePage() {
       const card = createEmptyCard()
       return {
         verseId: key,
-        translation,
+        translation: translationForSource,
         cardJson: JSON.stringify(card),
         state: 0,
         dueDate: card.due.getTime(),
@@ -180,7 +225,7 @@ export function BrowsePage() {
         operation: 'create',
         data: JSON.stringify({
           verseId: p.verseId,
-          translation,
+          translation: translationForSource,
           cardJson: p.cardJson,
           state: p.state,
           dueDate: p.dueDate,
@@ -198,22 +243,50 @@ export function BrowsePage() {
   }
 
   const filteredBooks = useMemo(() => {
+    if (!isBible) {
+      return Array.from({ length: source.sectionCount }, (_, i) => ({ name: `${source.sectionLabel} ${i + 1}`, idx: i }))
+    }
     return BOOKS.reduce<{ name: string; idx: number }[]>((acc, name, i) => {
       if (!bookQuery || name.toLowerCase().includes(bookQuery.toLowerCase())) acc.push({ name, idx: i })
       return acc
     }, [])
-  }, [bookQuery])
+  }, [bookQuery, isBible, source])
 
   const sortedSelected = useMemo(() => [...selectedVerses].toSorted((a, b) => a - b), [selectedVerses])
-  const chapterCount = bookIndex !== null ? CHAPTER_COUNTS[bookIndex] : 0
+  const chapterCount = isBible && bookIndex !== null ? CHAPTER_COUNTS[bookIndex] : verses.length
+
+  function handleBookClick(idx: number) {
+    if (isBible) {
+      setBookIndex(idx)
+      setChapter(null)
+    } else {
+      setBookIndex(idx)
+      setChapter(1)
+    }
+  }
   const previewText = sortedSelected.length > 0 ? verses[sortedSelected[0] - 1] : ''
 
+  function verseTextKey(v: number) {
+    if (isBible) return textKey('bible', '', bookIndex!, chapter!, v)
+    return textKey(source.type as TextSourceType, source.id, bookIndex!, v - 1, 0)
+  }
+
   function isMemorized(v: number) {
-    return memorizedVerses.has(verseKey(bookIndex!, chapter!, v))
+    return memorizedVerses.has(verseTextKey(v))
   }
 
   function isAdded(v: number) {
-    return justAdded.has(verseKey(bookIndex!, chapter!, v))
+    return justAdded.has(verseTextKey(v))
+  }
+
+  function handleSourceChange(s: SourceOption) {
+    setSource(s)
+    setBookIndex(null)
+    setChapter(null)
+    setVerses([])
+    setSearchQuery('')
+    setSearchResults([])
+    setBookQuery('')
   }
 
   function highlightMatch(text: string, query: string) {
@@ -231,31 +304,35 @@ export function BrowsePage() {
 
   return (
     <div className="page browse-page">
+      <SourcePicker current={source} onChange={handleSourceChange} />
+
       <div className="browse-top">
-        <div className="translate-picker">
-          <select
-            aria-label="Selecionar tradução"
-            value={translation}
-            onChange={(e) => {
-              const t = e.target.value as Translation
-              cachedSet('translation', t)
-              setTranslation(t)
-            }}
-          >
-            {TRANSLATIONS.map((t) => (
-              <option key={t} value={t}>
-                {TRANSLATION_LABELS[t]}
-              </option>
-            ))}
-          </select>
-        </div>
+        {isBible && (
+          <div className="translate-picker">
+            <select
+              aria-label="Selecionar tradução"
+              value={translation}
+              onChange={(e) => {
+                const t = e.target.value as Translation
+                cachedSet('translation', t)
+                setTranslation(t)
+              }}
+            >
+              {TRANSLATIONS.map((t) => (
+                <option key={t} value={t}>
+                  {TRANSLATION_LABELS[t]}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="search-bar">
           <input
             type="search"
             className="search-input"
-            placeholder="Buscar versículos…"
-            aria-label="Buscar versículos"
+            placeholder={isBible ? 'Buscar versículos…' : 'Buscar…'}
+            aria-label="Buscar"
             name="verse-search"
             autoComplete="off"
             value={searchQuery}
@@ -269,12 +346,12 @@ export function BrowsePage() {
         </div>
       </div>
 
-      {searchQuery.trim().length >= 2 && (
+      {isBible && searchQuery.trim().length >= 2 && (
         <div className="search-results" aria-live="polite" aria-atomic="false">
           {searching ? (
             <div className="loading">Buscando…</div>
           ) : searchResults.length === 0 ? (
-            <p className="search-empty">Nenhum resultado para "{searchQuery}"</p>
+            <p className="search-empty">Nenhum resultado para &quot;{searchQuery}&quot;</p>
           ) : (
             searchResults.map((r) => (
               <button type="button" key={r.ref} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
@@ -287,30 +364,13 @@ export function BrowsePage() {
       )}
 
       {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
-        <>
-          <div className="search-bar book-search">
-            <input
-              type="search"
-              className="search-input"
-              placeholder="Buscar livro…"
-              aria-label="Buscar livro"
-              name="book-search"
-              autoComplete="off"
-              value={bookQuery}
-              onChange={(e) => setBookQuery(e.target.value)}
-            />
-            {bookQuery && (
-              <button type="button" className="search-clear" aria-label="Limpar busca de livro" onClick={() => setBookQuery('')}>
-                ✕
-              </button>
-            )}
-          </div>
+        <div className="book-list">
           {filteredBooks.length === 0 ? (
             <p className="search-empty">Nenhum livro encontrado</p>
           ) : (
-            <div className="book-list">
-              {filteredBooks.flatMap(({ name, idx }) => {
-                const items = []
+            filteredBooks.flatMap(({ name, idx }) => {
+              const items = []
+              if (isBible) {
                 if (!bookQuery && idx === 0)
                   items.push(
                     <div key="at-label" className="book-section-label">
@@ -323,42 +383,34 @@ export function BrowsePage() {
                       Novo Testamento
                     </div>,
                   )
-                items.push(
-                  <button
-                    type="button"
-                    key={name}
-                    className="book-item"
-                    onClick={() => {
-                      setBookIndex(idx)
-                      setChapter(null)
-                    }}
-                  >
-                    {name}
-                  </button>,
-                )
-                return items
-              })}
-            </div>
+              }
+              items.push(
+                <button type="button" key={`${idx}-${name}`} className="book-item" onClick={() => handleBookClick(idx)}>
+                  {name}
+                </button>,
+              )
+              return items
+            })
           )}
-        </>
+        </div>
       ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
         <div className="chapter-view">
           <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
             ← Voltar
           </button>
-          <h3>{BOOKS[bookIndex!]}</h3>
+          <h3>{isBible ? BOOKS[bookIndex!] : source.name}</h3>
           <div className="chapter-grid">
             {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
               <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
-                {c}
+                {isBible ? c : `${source.sectionLabel} ${c}`}
               </button>
             ))}
           </div>
         </div>
       ) : !searchQuery || searchQuery.trim().length < 2 ? (
         <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
-          <button type="button" className="back-btn" onClick={() => setChapter(null)}>
-            ← {BOOKS[bookIndex!]}
+          <button type="button" className="back-btn" onClick={() => (isBible ? setChapter(null) : setBookIndex(null))}>
+            ← {isBible ? BOOKS[bookIndex!] : source.name}
           </button>
           <div className="verse-header">
             {selectionMode ? (
@@ -374,10 +426,8 @@ export function BrowsePage() {
               </>
             ) : (
               <>
-                <h3>
-                  {BOOKS[bookIndex!]} {chapter}
-                </h3>
-                <p className="verse-hint">Segure um versículo para selecionar</p>
+                <h3>{isBible ? `${BOOKS[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
+                <p className="verse-hint">Segure para selecionar</p>
               </>
             )}
           </div>
@@ -388,6 +438,7 @@ export function BrowsePage() {
                 const mem = isMemorized(v)
                 const add = isAdded(v)
                 const sel = selectedVerses.has(v)
+                const label = isBible ? v : `${source.itemLabel} ${v}`
                 return (
                   <button
                     type="button"
@@ -398,7 +449,7 @@ export function BrowsePage() {
                     onPointerUp={() => longPress.handlePointerUp(v)}
                     onPointerCancel={longPress.handlePointerCancel}
                   >
-                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : v}</span>
+                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : label}</span>
                     <span className="verse-text">{text}</span>
                     {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
                   </button>

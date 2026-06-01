@@ -1,16 +1,18 @@
 import { z } from 'zod'
 
 export const VerseSchema = z.object({
-  bookNumber: z.number().int().min(0).max(65),
+  sourceType: z.string(),
+  sourceId: z.string(),
+  bookNumber: z.number().int().min(0),
   chapter: z.number().int().min(1),
-  verse: z.number().int().min(1),
+  verse: z.number().int().min(0),
   text: z.string(),
-  translation: z.enum(['ara', 'acf', 'nvi', 'a21', 'nvt', 'naa']),
+  translation: z.string(),
 })
 
 export const ProgressSchema = z.object({
   verseId: z.string(),
-  translation: z.enum(['ara', 'acf', 'nvi', 'a21', 'nvt', 'naa']),
+  translation: z.string(),
   cardJson: z.string(),
   updatedAt: z.iso.datetime(),
 })

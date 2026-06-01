@@ -1,8 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { getWordHeat } from '../../lib/db'
 import type { Grade } from '../../lib/srs'
 import { GradingButtons } from './grading-buttons'
-import { HeatVerse } from './heat-verse'
+
+const WORD_SPLIT = /\s+/
+const STRIP_NON_ALPHA = /[^a-zA-ZÀ-ÿ]/g
+
+function heatClass(accuracy: number): string {
+  if (accuracy < 0) return ''
+  if (accuracy >= 0.8) return 'heat-good'
+  if (accuracy >= 0.5) return 'heat-ok'
+  return 'heat-bad'
+}
 
 export function FillInBlankView({
   reference,
@@ -10,67 +19,68 @@ export function FillInBlankView({
   translation,
   verseId,
   onGrade,
+  question,
 }: {
   reference: string
   verseText: string
   translation: string
   verseId: string
   onGrade: (r: Grade) => void
+  question?: string
 }) {
   const [revealed, setRevealed] = useState(false)
-  const [heat, setHeat] = useState<{ index: number; accuracy: number }[]>([])
+  const [heat, setHeat] = useState<Map<number, number>>(new Map())
 
-  const words = useMemo(() => verseText.trim().split(/\s+/), [verseText])
+  const words = useMemo(() => verseText.trim().split(WORD_SPLIT), [verseText])
+
+  const today = Math.floor(Date.now() / 86400000)
 
   const blankIndices = useMemo(() => {
-    const count = Math.max(1, Math.floor(words.length * 0.35))
-    const indices = new Set<number>()
-    let seed = 0
+    const eligible = words.map((_, i) => i).filter((i) => i !== 0 && words[i].replace(STRIP_NON_ALPHA, '').length >= 3)
+    const pool = eligible.length > 0 ? eligible : words.map((_, i) => i).filter((i) => i !== 0)
+    if (pool.length === 0) return new Set<number>()
+    const count = Math.max(1, Math.floor(pool.length * 0.35))
+    let seed = today
     for (let i = 0; i < verseId.length; i++) seed = (seed * 31 + verseId.charCodeAt(i)) | 0
     const rand = () => {
       seed = (seed * 1103515245 + 12345) | 0
       return (seed >>> 0) / 4294967296
     }
-    while (indices.size < count) indices.add(Math.floor(rand() * words.length))
+    const indices = new Set<number>()
+    while (indices.size < count) indices.add(pool[Math.floor(rand() * pool.length)])
     return indices
-  }, [verseId, words])
-
-  const displayParts = useMemo(() => words.map((w, i) => ({ word: w, blank: blankIndices.has(i) })), [words, blankIndices])
+  }, [verseId, words, today])
 
   useEffect(() => {
-    getWordHeat(verseId, translation, words.length).then(setHeat)
+    getWordHeat(verseId, translation, words.length).then((h) => {
+      const map = new Map<number, number>()
+      for (const item of h) map.set(item.index, item.accuracy)
+      setHeat(map)
+    })
     setRevealed(false)
   }, [verseId, translation, words.length])
 
   return (
-    <div className="flashcard">
-      <div className={`flip-card ${revealed ? 'flipped' : ''}`}>
-        <div className="flip-card-inner">
-          <div className="flip-card-front">
-            <h2 className="flashcard-ref">{reference}</h2>
-            <div className="fill-blank-text">
-              <p>
-                {displayParts.map((part, i) => (
-                  <span key={`${part}-${i}`}>
-                    {part.blank ? <span className="blank-word">{'_'.repeat(part.word.length)}</span> : <span>{part.word}</span>}
-                    {i < displayParts.length - 1 ? ' ' : ''}
-                  </span>
-                ))}
-              </p>
-              <p className="blank-count">Preencha mentalmente {blankIndices.size} palavra(s)</p>
-            </div>
-            <div className="flashcard-actions">
-              <button type="button" className="btn btn-primary" onClick={() => setRevealed(true)}>
-                Revelar
-              </button>
-            </div>
-          </div>
-          <div className="flip-card-back">
-            <h3 className="flashcard-ref-back">{reference}</h3>
-            <HeatVerse words={words} heat={heat} />
-            <p className="flashcard-translation-label">{translation.toUpperCase()}</p>
-          </div>
-        </div>
+    <div className="fill-blank">
+      <h2 className="view-ref">{reference}</h2>
+      {question && <p className="flashcard-question">{question}</p>}
+      <div className="fill-blank-text">
+        {words.map((word, i) => {
+          const blank = blankIndices.has(i)
+          const hcls = revealed && !blank ? heatClass(heat.get(i) ?? -1) : ''
+          return (
+            <Fragment key={i}>
+              <span className={`fill-blank-word ${blank ? 'blank-word' : ''} ${hcls}`}>
+                {revealed || !blank ? word : '_'.repeat(word.length)}
+              </span>{' '}
+            </Fragment>
+          )
+        })}
+      </div>
+      <div className="fill-blank-actions">
+        <button type="button" className="btn btn-secondary" onClick={() => setRevealed(!revealed)}>
+          {revealed ? 'Ocultar' : 'Revelar'}
+        </button>
       </div>
       {revealed && <GradingButtons onGrade={onGrade} />}
     </div>

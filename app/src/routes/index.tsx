@@ -104,7 +104,7 @@ export function HomePage() {
       ) : (
         <>
           <div className="hero-card">
-            <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} versículos para revisar` : 'Nada pendente!'}</h2>
+            <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} para revisar` : 'Nada pendente!'}</h2>
             {dueCount > 0 && (
               <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
                 Revisar Agora ({nf.format(dueCount)})
@@ -119,7 +119,7 @@ export function HomePage() {
                   <span className="community-presence-count">{nf.format(presenceCount)}</span>
                   <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
                 </span>
-                <span className="community-presence-label">memorizando a Bíblia agora</span>
+                <span className="community-presence-label">memorizando agora</span>
                 <span className="community-presence-encourage">Continue assim!</span>
                 <a href={buildWhatsAppInvite()} target="_blank" rel="noopener noreferrer" className="community-invite-link">
                   Compartilhar no WhatsApp →
@@ -127,7 +127,7 @@ export function HomePage() {
               </>
             ) : (
               <>
-                <span className="community-presence-encourage">Continue memorizando a Bíblia!</span>
+                <span className="community-presence-encourage">Continue memorizando!</span>
                 <a href={buildWhatsAppInvite()} target="_blank" rel="noopener noreferrer" className="community-invite-link">
                   Compartilhar no WhatsApp →
                 </a>

@@ -5,6 +5,7 @@
   "exports": {
     "./types": "./src/types.ts",
     "./bible": "./src/bible.ts",
+    "./texts": "./src/texts.ts",
     "./uuid": "./src/uuid.ts"
   },
   "dependencies": {

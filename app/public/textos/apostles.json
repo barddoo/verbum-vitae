@@ -1,0 +1,33 @@
+{
+  "type": "creed",
+  "id": "apostles",
+  "name": "Credo Apostólico",
+  "sections": [
+    {
+      "name": "Deus Pai",
+      "articles": [
+        "Creio em Deus Pai, Todo-Poderoso, Criador do céu e da terra."
+      ]
+    },
+    {
+      "name": "Jesus Cristo",
+      "articles": [
+        "E em Jesus Cristo, seu único Filho, nosso Senhor, que foi concebido pelo poder do Espírito Santo, nasceu da virgem Maria.",
+        "Padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado; desceu à mansão dos mortos.",
+        "Ressuscitou ao terceiro dia.",
+        "Subiu aos céus; está sentado à direita de Deus Pai Todo-Poderoso.",
+        "Donde há de vir a julgar os vivos e os mortos."
+      ]
+    },
+    {
+      "name": "Espírito Santo",
+      "articles": [
+        "Creio no Espírito Santo.",
+        "Na santa igreja católica; na comunhão dos santos.",
+        "Na remissão dos pecados.",
+        "Na ressurreição da carne.",
+        "Na vida eterna. Amém."
+      ]
+    }
+  ]
+}

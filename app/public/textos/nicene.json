@@ -1,0 +1,33 @@
+{
+  "type": "creed",
+  "id": "nicene",
+  "name": "Credo Niceno-Constantinopolitano",
+  "sections": [
+    {
+      "name": "Deus Pai",
+      "articles": [
+        "Cremos em um só Deus, Pai Todo-Poderoso, Criador do céu e da terra, de todas as coisas visíveis e invisíveis."
+      ]
+    },
+    {
+      "name": "Jesus Cristo",
+      "articles": [
+        "E em um só Senhor Jesus Cristo, Filho unigênito de Deus, gerado do Pai antes de todos os séculos: Deus de Deus, Luz da Luz, verdadeiro Deus de verdadeiro Deus; gerado, não feito, consubstancial ao Pai; por quem todas as coisas foram feitas.",
+        "O qual, por nós homens e por nossa salvação, desceu dos céus e se encarnou pelo Espírito Santo, no seio da virgem Maria, e se fez homem.",
+        "Foi crucificado por nós sob Pôncio Pilatos; padeceu e foi sepultado.",
+        "Ressuscitou ao terceiro dia, conforme as Escrituras.",
+        "Subiu aos céus e está sentado à direita do Pai.",
+        "E de novo há de vir, com glória, para julgar os vivos e os mortos; e o seu reino não terá fim."
+      ]
+    },
+    {
+      "name": "Espírito Santo",
+      "articles": [
+        "E no Espírito Santo, Senhor e Vivificador, que procede do Pai e do Filho, que com o Pai e o Filho conjuntamente é adorado e glorificado, que falou pelos profetas.",
+        "E na Igreja una, santa, católica e apostólica.",
+        "Confesso um só batismo para remissão dos pecados.",
+        "Espero a ressurreição dos mortos e a vida do mundo vindouro. Amém."
+      ]
+    }
+  ]
+}

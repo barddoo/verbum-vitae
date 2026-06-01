@@ -644,7 +644,10 @@
   font-size: 1.05rem;
   line-height: 2;
   color: var(--parchment);
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35em;
 }
 
 .blank-word {

@@ -8,8 +8,8 @@ export function buildWhatsAppInvite({ verseRef, verseText }: WhatsAppInviteParam
 
   const lines =
     verseRef && verseText
-      ? [`Estou memorizando *${verseRef}*:`, `_"${verseText}"_`, '', `Vem memorizar a Bíblia também → ${appUrl}`]
-      : [`Estou memorizando a Bíblia!`, '', `Vem memorizar também → ${appUrl}`]
+      ? [`Estou memorizando *${verseRef}*:`, `_"${verseText}"_`, '', `Vem memorizar também → ${appUrl}`]
+      : [`Estou memorizando!`, '', `Vem memorizar também → ${appUrl}`]
 
   return `https://wa.me/?text=${encodeURIComponent(lines.join('\n'))}`
 }
