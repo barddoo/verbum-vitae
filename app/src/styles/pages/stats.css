@@ -413,6 +413,49 @@
   border-color: var(--gold-dim);
 }
 
+.verse-card--selectable {
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.verse-card--selectable:hover {
+  border-color: rgba(212, 168, 83, 0.3);
+  background: var(--leather-hover);
+}
+
+.verse-card--selected {
+  border-color: rgba(212, 168, 83, 0.5);
+  background: var(--gold-dim);
+}
+
+.verse-card--selected:hover {
+  border-color: var(--gold);
+}
+
+.verse-card-check {
+  font-size: 0.9rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-weight: 700;
+  flex-shrink: 0;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.verse-card-check.checked {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
 .verse-card-header {
   display: flex;
   align-items: center;

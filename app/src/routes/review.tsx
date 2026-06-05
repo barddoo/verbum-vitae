@@ -1,12 +1,10 @@
 import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { DEFAULT_TRANSLATION, type Translation } from 'shared/bible'
-import { db, fetchVersesBatch, parseTextKey } from '../lib/db'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { type CollectionVerse, db, fetchVersesBatch, parseTextKey } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
 import { getNextCard } from '../lib/scheduler'
-import { type Card, type Grade, getDueCards } from '../lib/srs'
-import { cachedGet } from '../lib/storage'
+import { type Card, type Grade, getDueCards, parseCardJson } from '../lib/srs'
 import { logProgressChange } from '../lib/sync'
 import { FillInBlankView } from './review/fill-in-blank-view'
 import { FlashcardView } from './review/flashcard-view'
@@ -14,6 +12,9 @@ import { SessionComplete } from './review/session-complete'
 import { TypingPracticeView } from './review/typing-practice-view'
 
 type PracticeMode = 'flashcard' | 'fill-blank' | 'typing'
+type CardStateFilter = 'all' | 'new' | 'learning' | 'review'
+
+const LIMIT_OPTIONS = [5, 10, 20, 50] as const
 
 interface DueItem {
   progressId: number
@@ -39,10 +40,23 @@ export function ReviewPage() {
   const [practiceMode, setPracticeMode] = useState<PracticeMode>(
     () => (localStorage.getItem('review_mode') as PracticeMode) || 'fill-blank',
   )
-  const [filterBook] = useState<number | null>(null)
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
-  const translation = (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION
-
+  const [skipped, setSkipped] = useState(0)
+  const [filterVerseIds, setFilterVerseIds] = useState<string[] | null>(() => {
+    const saved = localStorage.getItem('review_verse_selection')
+    if (saved) {
+      localStorage.removeItem('review_verse_selection')
+      return JSON.parse(saved) as string[]
+    }
+    return null
+  })
+  const [filterCollectionId, setFilterCollectionId] = useState<number | null>(null)
+  const [filterCardState, setFilterCardState] = useState<CardStateFilter>('all')
+  const [sessionLimit, setSessionLimit] = useState<number | null>(() => {
+    const saved = localStorage.getItem('review_session_limit')
+    return saved ? Number(saved) : null
+  })
+  const sessionOffsetRef = useRef(0)
   useLayoutEffect(() => {
     if (phase === 'session') {
       document.body.classList.add('is-reviewing')
@@ -53,6 +67,11 @@ export function ReviewPage() {
   }, [phase])
 
   const allProgress = useLiveQuery(() => db.progress.toArray(), [])
+  const collections = useLiveQuery(() => db.collections.toArray(), [])
+  const collectionVerseIds = useLiveQuery<CollectionVerse[] | null>(
+    () => (filterCollectionId != null ? db.collectionVerses.where({ collectionId: filterCollectionId }).toArray() : Promise.resolve(null)),
+    [filterCollectionId],
+  )
 
   const totalAll = allProgress?.length ?? 0
   const totalDue = allProgress ? getDueCards(allProgress).length : 0
@@ -60,27 +79,69 @@ export function ReviewPage() {
 
   const filterStatus = totalDue > 0 ? 'due' : 'all'
 
+  const filteredProgress = useMemo(() => {
+    if (!allProgress) return []
+
+    // pinned verse selection bypasses all other filters
+    if (filterVerseIds !== null) {
+      const idSet = new Set(filterVerseIds)
+      return allProgress.filter((p) => idSet.has(p.verseId))
+    }
+
+    let base: typeof allProgress
+    if (filterStatus === 'due') {
+      const dueCards = getDueCards(allProgress)
+      const dueSet = new Set(dueCards.map((d) => d.verseId))
+      base = allProgress.filter((p) => dueSet.has(p.verseId))
+    } else {
+      base = allProgress
+    }
+
+    if (filterCollectionId !== null) {
+      if (!collectionVerseIds) return []
+      const cvSet = new Set(collectionVerseIds.map((cv) => cv.verseId))
+      base = base.filter((p) => cvSet.has(p.verseId))
+    }
+
+    if (filterCardState !== 'all') {
+      base = base.filter((p) => {
+        try {
+          const card = parseCardJson(p.cardJson)
+          if (filterCardState === 'new') return card.state === 0
+          if (filterCardState === 'learning') return card.state === 1 || card.state === 3
+          if (filterCardState === 'review') return card.state === 2
+        } catch {
+          return false
+        }
+        return true
+      })
+    }
+
+    return base
+  }, [allProgress, filterVerseIds, filterStatus, filterCollectionId, collectionVerseIds, filterCardState])
+
+  const reviewCount = sessionLimit ? Math.min(filteredProgress.length, sessionLimit) : filteredProgress.length
+
   function setAndPersistMode(m: PracticeMode) {
     setPracticeMode(m)
     localStorage.setItem('review_mode', m)
   }
 
+  function setAndPersistLimit(limit: number | null) {
+    setSessionLimit(limit)
+    if (limit !== null) {
+      localStorage.setItem('review_session_limit', String(limit))
+    } else {
+      localStorage.removeItem('review_session_limit')
+    }
+  }
+
   const startReview = useCallback(async () => {
-    if (!allProgress) return
+    if (!allProgress || filteredProgress.length === 0) return
     setSessionLoading(true)
 
-    let selected = allProgress
-    if (filterStatus === 'due') {
-      const dueCards = getDueCards(allProgress)
-      selected = allProgress.filter((p) => dueCards.some((dc) => dc.verseId === p.verseId))
-    }
-    if (filterBook !== null) {
-      selected = selected.filter((p) => parseTextKey(p.verseId).sectionIndex === filterBook)
-    }
-    if (selected.length === 0) {
-      setSessionLoading(false)
-      return
-    }
+    const end = sessionLimit ? sessionOffsetRef.current + sessionLimit : filteredProgress.length
+    const selected = filteredProgress.slice(sessionOffsetRef.current, end)
 
     const cards = getDueCards(selected)
     const cardMap = new Map(cards.map((c) => [c.verseId, c.card]))
@@ -123,10 +184,15 @@ export function ReviewPage() {
     setItems(loaded)
     setCurrentIndex(0)
     setCompleted(0)
+    setSkipped(0)
     setGradeHistory([])
     setPhase('session')
     setSessionLoading(false)
-  }, [allProgress, filterStatus, filterBook, translation])
+  }, [allProgress, filteredProgress, sessionLimit])
+
+  useEffect(() => {
+    sessionOffsetRef.current = 0
+  }, [filteredProgress])
 
   useEffect(() => {
     if (!loading && autostart === '1' && totalAll > 0 && phase === 'queue' && !autostartFired.current) {
@@ -170,18 +236,27 @@ export function ReviewPage() {
     setTimeout(() => setCurrentIndex((prev) => prev + 1), 100)
   }
 
+  function handleSkip() {
+    setSkipped((prev) => prev + 1)
+    setTimeout(() => setCurrentIndex((prev) => prev + 1), 100)
+  }
+
   function goBack() {
     setPhase('queue')
     setItems([])
     setCurrentIndex(0)
     setCompleted(0)
+    setSkipped(0)
     setGradeHistory([])
+    sessionOffsetRef.current = 0
   }
 
   if (loading || sessionLoading) return <div className="page">{loadingSpinner}</div>
 
   if (phase === 'queue') {
-    const reviewCount = filterStatus === 'due' ? totalDue : totalAll
+    const hasCollections = collections && collections.length > 0
+    const noFiltersActive = filterVerseIds === null && filterCollectionId === null && filterCardState === 'all'
+
     return (
       <div className="page review-page">
         <div className="review-queue-hero">
@@ -189,10 +264,95 @@ export function ReviewPage() {
           <span className="review-queue-big-label">
             {totalAll === 0 ? 'nenhum texto memorizado' : reviewCount === 1 ? 'texto para revisar' : 'textos para revisar'}
           </span>
-          {filterStatus === 'due' && totalAll > totalDue && totalAll > 0 && (
+          {filterStatus === 'due' && noFiltersActive && totalAll > totalDue && totalAll > 0 && (
             <span className="review-queue-total-hint">{totalAll} total</span>
           )}
         </div>
+
+        {filterVerseIds !== null ? (
+          <div className="review-pinned-filter">
+            <span className="review-pinned-label">
+              {filterVerseIds.length} {filterVerseIds.length === 1 ? 'versículo selecionado' : 'versículos selecionados'}
+            </span>
+            <button type="button" className="review-pinned-clear" onClick={() => setFilterVerseIds(null)} aria-label="Limpar seleção">
+              ×
+            </button>
+          </div>
+        ) : (
+          <>
+            {hasCollections && (
+              <div className="review-filter-section">
+                <span className="review-filter-label">Coleção</span>
+                <div className="source-picker-options">
+                  <button
+                    type="button"
+                    className={`source-chip ${filterCollectionId === null ? 'active' : ''}`}
+                    onClick={() => setFilterCollectionId(null)}
+                  >
+                    Todas
+                  </button>
+                  {collections.map((c) => (
+                    <button
+                      type="button"
+                      key={c.id}
+                      className={`source-chip ${filterCollectionId === c.id ? 'active' : ''}`}
+                      onClick={() => setFilterCollectionId(filterCollectionId === c.id ? null : c.id!)}
+                    >
+                      {c.icon ? `${c.icon} ${c.name}` : c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="review-filter-section">
+              <span className="review-filter-label">Estado</span>
+              <div className="review-filter-toggle">
+                {(
+                  [
+                    ['all', 'Todos'],
+                    ['new', 'Novos'],
+                    ['learning', 'Aprendendo'],
+                    ['review', 'Revisando'],
+                  ] as [CardStateFilter, string][]
+                ).map(([val, label]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    className={`filter-toggle-btn ${filterCardState === val ? 'active' : ''}`}
+                    onClick={() => setFilterCardState(val)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="review-filter-section">
+              <span className="review-filter-label">Limite por sessão</span>
+              <div className="review-filter-toggle">
+                {LIMIT_OPTIONS.map((limit) => (
+                  <button
+                    key={limit}
+                    type="button"
+                    className={`filter-toggle-btn ${sessionLimit === limit ? 'active' : ''}`}
+                    onClick={() => setAndPersistLimit(limit)}
+                  >
+                    {limit}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={`filter-toggle-btn ${sessionLimit === null ? 'active' : ''}`}
+                  onClick={() => setAndPersistLimit(null)}
+                >
+                  Todos
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
         <div className="review-mode-grid">
           {(['fill-blank', 'flashcard', 'typing'] as PracticeMode[]).map((m) => (
             <button
@@ -210,20 +370,30 @@ export function ReviewPage() {
             </button>
           ))}
         </div>
-        {filterStatus === 'due' && totalDue === 0 && totalAll > 0 ? (
+
+        {totalAll === 0 ? (
+          <>
+            <button type="button" className="btn btn-primary btn-large btn-start" disabled>
+              Adicione textos para começar
+            </button>
+            <p className="queue-empty-hint">
+              Vá para <a href="/browse">Textos</a> para adicionar itens.
+            </p>
+          </>
+        ) : filteredProgress.length === 0 && noFiltersActive ? (
           <div className="queue-up-to-date">
             <p className="queue-up-to-date-msg">Você está em dia!</p>
             <p className="queue-up-to-date-hint">Volte amanhã para a próxima revisão.</p>
           </div>
+        ) : filteredProgress.length === 0 ? (
+          <div className="queue-up-to-date">
+            <p className="queue-up-to-date-msg">Sem resultados</p>
+            <p className="queue-up-to-date-hint">Nenhum texto encontrado com esses filtros.</p>
+          </div>
         ) : (
-          <button type="button" className="btn btn-primary btn-large btn-start" onClick={startReview} disabled={totalAll === 0}>
-            {totalAll === 0 ? 'Adicione textos para começar' : 'Iniciar Revisão'}
+          <button type="button" className="btn btn-primary btn-large btn-start" onClick={startReview}>
+            Iniciar Revisão
           </button>
-        )}
-        {totalAll === 0 && (
-          <p className="queue-empty-hint">
-            Vá para <a href="/browse">Textos</a> para adicionar itens.
-          </p>
         )}
       </div>
     )
@@ -249,13 +419,20 @@ export function ReviewPage() {
     return (
       <SessionComplete
         completed={completed}
+        skippedCount={skipped}
         gradeHistory={gradeHistory}
         reviewedItems={items}
+        remainingCount={Math.max(0, filteredProgress.length - sessionOffsetRef.current - items.length)}
         onGoBack={goBack}
         onNewSession={() => {
           setCurrentIndex(0)
           setCompleted(0)
+          setSkipped(0)
           setGradeHistory([])
+        }}
+        onContinue={() => {
+          sessionOffsetRef.current += items.length
+          startReview()
         }}
       />
     )
@@ -295,6 +472,11 @@ export function ReviewPage() {
       </div>
       <div className="review-progress-bar">
         <div className="review-progress-fill" style={{ width: `${(currentIndex / items.length) * 100}%` }} />
+      </div>
+      <div className="review-skip-row">
+        <button type="button" className="btn-skip" onClick={handleSkip} aria-label="Pular versículo">
+          Pular →
+        </button>
       </div>
 
       {practiceMode === 'flashcard' && (

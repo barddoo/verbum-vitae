@@ -13,16 +13,22 @@ interface DueItem {
 
 export function SessionComplete({
   completed,
+  skippedCount,
   gradeHistory,
   reviewedItems,
+  remainingCount,
   onGoBack,
   onNewSession,
+  onContinue,
 }: {
   completed: number
+  skippedCount: number
   gradeHistory: Grade[]
   reviewedItems: DueItem[]
+  remainingCount: number
   onGoBack: () => void
   onNewSession: () => void
+  onContinue: () => void
 }) {
   const gradeCounts = useMemo(() => [1, 2, 3, 4].map((r) => gradeHistory.filter((g) => g === r).length), [gradeHistory])
 
@@ -36,7 +42,15 @@ export function SessionComplete({
     <div className="page review-page">
       <div className="session-complete">
         <h2>Sessão concluída!</h2>
-        <p className="session-complete-count">{completed} textos revisados</p>
+        <p className="session-complete-count">
+          {completed} {completed === 1 ? 'texto revisado' : 'textos revisados'}
+          {skippedCount > 0 && (
+            <span className="session-skipped-count">
+              {' '}
+              · {skippedCount} pulado{skippedCount !== 1 ? 's' : ''}
+            </span>
+          )}
+        </p>
         {completed > 0 && (
           <div className="session-grade-breakdown">
             {[1, 2, 3, 4].map((r, i) => (
@@ -48,9 +62,15 @@ export function SessionComplete({
           </div>
         )}
         <div className="session-complete-actions">
-          <button type="button" className="btn btn-primary" onClick={onNewSession}>
-            Nova Sessão
-          </button>
+          {remainingCount > 0 ? (
+            <button type="button" className="btn btn-primary" onClick={onContinue}>
+              Próxima sessão ({remainingCount})
+            </button>
+          ) : (
+            <button type="button" className="btn btn-primary" onClick={onNewSession}>
+              Nova Sessão
+            </button>
+          )}
           <button type="button" className="btn btn-secondary" onClick={onGoBack}>
             Voltar
           </button>

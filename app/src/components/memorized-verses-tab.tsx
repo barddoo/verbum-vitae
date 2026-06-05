@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Progress } from '../lib/db'
 import { db, fetchVersesBatch, parseTextKey } from '../lib/db'
@@ -14,11 +15,14 @@ interface Item {
 }
 
 export function MemorizedVersesTab() {
+  const navigate = useNavigate()
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
   const [filterState, setFilterState] = useState<FilterState>(null)
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortKey>('dueDate')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [selectionMode, setSelectionMode] = useState(false)
 
   useEffect(() => {
     loadVerses()
@@ -43,6 +47,25 @@ export function MemorizedVersesTab() {
 
     setItems(joined)
     setLoading(false)
+  }
+
+  function toggleSelect(verseId: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(verseId)) next.delete(verseId)
+      else next.add(verseId)
+      return next
+    })
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set())
+    setSelectionMode(false)
+  }
+
+  function reviewSelected() {
+    localStorage.setItem('review_verse_selection', JSON.stringify([...selectedIds]))
+    navigate({ to: '/review' })
   }
 
   async function handleRemove(verseId: string) {
@@ -159,6 +182,15 @@ export function MemorizedVersesTab() {
           <option value="state">Estágio</option>
           <option value="streak">Sequência</option>
         </select>
+        {!selectionMode ? (
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectionMode(true)}>
+            Selecionar
+          </button>
+        ) : (
+          <button type="button" className="btn btn-secondary btn-sm" onClick={clearSelection}>
+            Cancelar
+          </button>
+        )}
       </div>
 
       <div className="verse-list">
@@ -171,11 +203,30 @@ export function MemorizedVersesTab() {
             dueDate={item.progress.dueDate}
             streak={item.progress.streak}
             onRemove={handleRemove}
+            selected={selectedIds.has(item.progress.verseId)}
+            onSelect={selectionMode ? toggleSelect : undefined}
           />
         ))}
       </div>
 
       {filtered.length === 0 && <div className="stats-empty">Nenhum texto encontrado.</div>}
+
+      {selectedIds.size > 0 && (
+        <div className="selection-bar">
+          <div className="selection-bar-info">
+            <span className="selection-bar-count">{selectedIds.size}</span>
+            <span className="selection-bar-preview">{selectedIds.size === 1 ? 'versículo selecionado' : 'versículos selecionados'}</span>
+          </div>
+          <div className="selection-bar-actions">
+            <button type="button" className="btn btn-primary" onClick={reviewSelected}>
+              Revisar
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={clearSelection}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

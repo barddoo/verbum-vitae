@@ -8,6 +8,8 @@ interface VerseProgressCardProps {
   dueDate: number
   streak: number
   onRemove: (verseId: string) => void
+  selected?: boolean
+  onSelect?: (verseId: string) => void
 }
 
 const STATE_LABELS = ['Novo', 'Aprendendo', 'Revisando', 'Reaprendendo']
@@ -20,28 +22,68 @@ export const VerseProgressCard = memo(function VerseProgressCard({
   dueDate,
   streak,
   onRemove,
+  selected,
+  onSelect,
 }: VerseProgressCardProps) {
   const [confirming, setConfirming] = useState(false)
   const reference = verseIdToReference(verseId)
   const dueLabel = formatRelativeDueDate(dueDate)
   const stateLabel = STATE_LABELS[state] || 'Novo'
   const stateClass = STATE_CLASSES[state] || STATE_CLASSES[0]
+  const selectionMode = onSelect !== undefined
 
   return (
-    <div className="verse-card">
+    <div
+      className={`verse-card${selectionMode ? ' verse-card--selectable' : ''}${selected ? ' verse-card--selected' : ''}`}
+      onClick={selectionMode ? () => onSelect(verseId) : undefined}
+      tabIndex={selectionMode ? 0 : undefined}
+      onKeyDown={
+        selectionMode
+          ? (e) => {
+              if (e.key === ' ' || e.key === 'Enter') onSelect(verseId)
+            }
+          : undefined
+      }
+    >
       <div className="verse-card-header">
         <span className="verse-card-ref">{reference}</span>
-        {!confirming ? (
-          <button type="button" className="verse-card-remove" onClick={() => setConfirming(true)} aria-label={`Remover ${reference}`}>
+        {selectionMode ? (
+          <span className={`verse-card-check${selected ? ' checked' : ''}`} aria-hidden="true">
+            {selected ? '✓' : ''}
+          </span>
+        ) : !confirming ? (
+          <button
+            type="button"
+            className="verse-card-remove"
+            onClick={(e) => {
+              e.stopPropagation()
+              setConfirming(true)
+            }}
+            aria-label={`Remover ${reference}`}
+          >
             ×
           </button>
         ) : (
           <div className="verse-card-confirm">
             <span className="verse-card-confirm-text">Remover?</span>
-            <button type="button" className="verse-card-confirm-yes" onClick={() => onRemove(verseId)}>
+            <button
+              type="button"
+              className="verse-card-confirm-yes"
+              onClick={(e) => {
+                e.stopPropagation()
+                onRemove(verseId)
+              }}
+            >
               Sim
             </button>
-            <button type="button" className="verse-card-confirm-no" onClick={() => setConfirming(false)}>
+            <button
+              type="button"
+              className="verse-card-confirm-no"
+              onClick={(e) => {
+                e.stopPropagation()
+                setConfirming(false)
+              }}
+            >
               Não
             </button>
           </div>
