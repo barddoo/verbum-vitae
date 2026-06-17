@@ -122,21 +122,23 @@ function RootLayout() {
         </main>
       </div>
 
-      <footer className="app-footer">
-        <div>
-          Feito por{' '}
-          <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
-            Charles Fonseca
-          </a>{' '}
-          &mdash;{' '}
-          <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
-            código aberto
-          </a>
-        </div>
-        <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
-          ₿ Doar
-        </button>
-      </footer>
+      {isDesktop && (
+        <footer className="app-footer">
+          <div>
+            Feito por{' '}
+            <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
+              Charles Fonseca
+            </a>{' '}
+            &mdash;{' '}
+            <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
+              código aberto
+            </a>
+          </div>
+          <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
+            ₿ Doar
+          </button>
+        </footer>
+      )}
 
       {!isDesktop && (
         <nav className="bottom-nav">

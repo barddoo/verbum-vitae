@@ -1,6 +1,6 @@
 # Verbum Vitae — AGENTS.md
 
-Bun monorepo. Workspaces: `app`, `worker`, `packages/*`. **PT-BR only. PWA.**
+Bun monorepo. Workspaces: `app`, `worker`, `packages/*`. **PT-BR only. PWA + Capacitor.**
 
 ## Commands (run from root)
 
@@ -15,6 +15,11 @@ Bun monorepo. Workspaces: `app`, `worker`, `packages/*`. **PT-BR only. PWA.**
 | DB migrate | `bun run db:migrate` |
 | DB gen | `bun run db:generate` (drizzle-kit) |
 | Add dep | `bun add <pkg> --cwd app` (or `worker`, `packages/shared`) |
+| Cap sync | `cd app && bun run cap:sync` (builds + syncs to native) |
+| Cap sync ios | `cd app && bun run cap:sync:ios` (single platform) |
+| Cap open ios | `cd app && bun run cap:open:ios` (Xcode) |
+| Cap open android | `cd app && bun run cap:open:android` (Android Studio) |
+| Cap assets | `cd app && bun run cap:assets` (generate icons/splash) |
 
 ## Biome formatting (repo-wide)
 
@@ -22,7 +27,7 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 
 ## Architecture
 
-- **app/** — React 19 + Vite 8 + TanStack Router 1 SPA. Offline-first via Dexie.js (IndexedDB). ts-fsrs for SRS. PWA via vite-plugin-pwa.
+- **app/** — React 19 + Vite 8 + TanStack Router 1 SPA. Offline-first via Dexie.js (IndexedDB). ts-fsrs for SRS. PWA via vite-plugin-pwa. Capacitor v8 for native iOS/Android.
 - **worker/** — Cloudflare Worker (Hono 4, Drizzle, D1 SQLite). Auth: JWT HS256 (30d). Sync: push/pull endpoints.
 - **packages/shared/** — Zod schemas, bible constants, translation keys. Imported as `shared` workspace dep.
 - Frontend auth: React Context + localStorage JWT. No dedicated auth routes — modal overlay.
@@ -38,6 +43,9 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 - `app/.env`: `VITE_API_URL=http://localhost:8787` for local worker dev.
 - `worker/.dev.vars`: `JWT_SECRET` for local auth.
 - Deploy: Cloudflare Workers + Assets (no separate static host).
+- Capacitor: `app/capacitor.config.ts` (appId: `com.verbumvitae.app`, webDir: `dist`). Native projects at `app/android/` and `app/ios/` (gitignored). StatusBar (dark, #0f1117) + SplashScreen plugins configured.
+- Capacitor build: set `VITE_API_URL` to full production URL (e.g. `https://verbum-vitae.pages.dev`) in `app/.env` when building for native, since there's no local server.
+- PWA components (install button, update banner) auto-disable on native via `Capacitor.isNativePlatform()`.
 - CI/CD: configured on Cloudflare dashboard (no in-repo config).
 
 ## React performance rules (Vercel best practices)

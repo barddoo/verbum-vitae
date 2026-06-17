@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -37,7 +38,7 @@ export function PwaInstallButton() {
     if (outcome === 'accepted') setDeferredPrompt(null)
   }
 
-  if (!deferredPrompt || installed) return null
+  if (Capacitor.isNativePlatform() || !deferredPrompt || installed) return null
 
   return (
     <button type="button" className="btn btn-sm pwa-install-btn" onClick={handleInstall}>

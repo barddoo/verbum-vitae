@@ -7,3 +7,10 @@ dist/
 .env.local
 *.tsbuildinfo
 test-results
+
+# Capacitor (native platforms generated at app/ level)
+app/android/
+app/ios/
+*.apk
+*.aab
+*.ipa

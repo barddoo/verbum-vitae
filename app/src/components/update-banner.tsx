@@ -1,4 +1,5 @@
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { Capacitor } from '@capacitor/core'
 import { Download } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
@@ -81,6 +82,7 @@ export function UpdateBanner() {
     }
   }, [])
 
+  if (Capacitor.isNativePlatform()) return null
   if (offlineReady && !needRefresh) return null
   if (!needRefresh) return null
 
