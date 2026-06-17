@@ -50,7 +50,10 @@ export function ReviewPage() {
     }
     return null
   })
-  const [filterCollectionId, setFilterCollectionId] = useState<number | null>(null)
+  const [filterCollectionId, setFilterCollectionId] = useState<number | null>(() => {
+    const saved = localStorage.getItem('review_collection_id')
+    return saved ? Number(saved) : null
+  })
   const [filterCardState, setFilterCardState] = useState<CardStateFilter>('all')
   const [sessionLimit, setSessionLimit] = useState<number | null>(() => {
     const saved = localStorage.getItem('review_session_limit')
@@ -68,10 +71,35 @@ export function ReviewPage() {
 
   const allProgress = useLiveQuery(() => db.progress.toArray(), [])
   const collections = useLiveQuery(() => db.collections.toArray(), [])
+  const allCollectionVerses = useLiveQuery(() => db.collectionVerses.toArray(), [])
   const collectionVerseIds = useLiveQuery<CollectionVerse[] | null>(
     () => (filterCollectionId != null ? db.collectionVerses.where({ collectionId: filterCollectionId }).toArray() : Promise.resolve(null)),
     [filterCollectionId],
   )
+
+  const progressVerseIds = useMemo(() => {
+    if (!allProgress) return new Set<string>()
+    return new Set(allProgress.map((p) => p.verseId))
+  }, [allProgress])
+
+  const dueVerseIds = useMemo(() => {
+    if (!allProgress) return new Set<string>()
+    return new Set(getDueCards(allProgress).map((d) => d.verseId))
+  }, [allProgress])
+
+  const collectionProgress = useMemo(() => {
+    if (!allCollectionVerses) return new Map<number, { total: number; due: number }>()
+    const map = new Map<number, { total: number; due: number }>()
+    for (const cv of allCollectionVerses) {
+      if (progressVerseIds.has(cv.verseId)) {
+        const entry = map.get(cv.collectionId) || { total: 0, due: 0 }
+        entry.total++
+        if (dueVerseIds.has(cv.verseId)) entry.due++
+        map.set(cv.collectionId, entry)
+      }
+    }
+    return map
+  }, [allCollectionVerses, progressVerseIds, dueVerseIds])
 
   const totalAll = allProgress?.length ?? 0
   const totalDue = allProgress ? getDueCards(allProgress).length : 0
@@ -135,6 +163,22 @@ export function ReviewPage() {
       localStorage.removeItem('review_session_limit')
     }
   }
+
+  function setAndPersistCollectionId(id: number | null) {
+    setFilterCollectionId(id)
+    if (id !== null) {
+      localStorage.setItem('review_collection_id', String(id))
+    } else {
+      localStorage.removeItem('review_collection_id')
+    }
+  }
+
+  useEffect(() => {
+    if (filterCollectionId !== null && collections && !collections.some((c) => c.id === filterCollectionId)) {
+      setFilterCollectionId(null)
+      localStorage.removeItem('review_collection_id')
+    }
+  }, [collections, filterCollectionId])
 
   const startReview = useCallback(async () => {
     if (!allProgress || filteredProgress.length === 0) return
@@ -287,20 +331,26 @@ export function ReviewPage() {
                   <button
                     type="button"
                     className={`source-chip ${filterCollectionId === null ? 'active' : ''}`}
-                    onClick={() => setFilterCollectionId(null)}
+                    onClick={() => setAndPersistCollectionId(null)}
                   >
                     Todas
                   </button>
-                  {collections.map((c) => (
-                    <button
-                      type="button"
-                      key={c.id}
-                      className={`source-chip ${filterCollectionId === c.id ? 'active' : ''}`}
-                      onClick={() => setFilterCollectionId(filterCollectionId === c.id ? null : c.id!)}
-                    >
-                      {c.icon ? `${c.icon} ${c.name}` : c.name}
-                    </button>
-                  ))}
+                  {collections
+                    .filter((c) => c.isBuiltin === 0 || (collectionProgress.get(c.id!)?.total ?? 0) > 0)
+                    .map((c) => {
+                      const due = collectionProgress.get(c.id!)?.due ?? 0
+                      return (
+                        <button
+                          type="button"
+                          key={c.id}
+                          className={`source-chip ${filterCollectionId === c.id ? 'active' : ''}`}
+                          onClick={() => setAndPersistCollectionId(filterCollectionId === c.id ? null : c.id!)}
+                        >
+                          {c.icon ? `${c.icon} ${c.name}` : c.name}
+                          {due > 0 && <span className="source-chip-count">{due}</span>}
+                        </button>
+                      )
+                    })}
                 </div>
               </div>
             )}

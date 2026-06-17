@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getNextCard, Rating } from './scheduler'
+import type { Grade } from './srs'
 import { createEmptyCard } from './srs'
 
 describe('getNextCard', () => {
@@ -7,7 +8,7 @@ describe('getNextCard', () => {
     const card = createEmptyCard()
 
     for (const rating of [Rating.Again, Rating.Hard, Rating.Good, Rating.Easy]) {
-      const result = getNextCard(card, rating)
+      const result = getNextCard(card, rating as Grade)
       expect(result.card).toBeDefined()
       expect(result.log).toBeDefined()
       expect(typeof result.dueDate).toBe('number')

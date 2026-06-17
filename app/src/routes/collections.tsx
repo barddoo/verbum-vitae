@@ -2,10 +2,12 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useCallback, useEffect, useState } from 'react'
 import { DEFAULT_TRANSLATION } from 'shared/bible'
 import { type CollectionFormData, CollectionFormModal } from '../components/collection-form-modal'
+import { MemorizedVersePickerModal } from '../components/memorized-verse-picker-modal'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { useSwipeToDelete } from '../hooks/use-swipe'
 import {
   addCollectionToMemory,
+  addVersesToCollection,
   createUserCollection,
   db,
   deleteUserCollection,
@@ -270,6 +272,7 @@ export function CollectionDetailPage() {
   const [showEdit, setShowEdit] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [showMemorized, setShowMemorized] = useState(false)
 
   const load = useCallback(async () => {
     const c = await db.collections.where({ slug }).first()
@@ -357,6 +360,13 @@ export function CollectionDetailPage() {
       const newMemoized = wasMemoized ? prev.memorized - 1 : prev.memorized
       return { ...prev, total: newTotal, memorized: newMemoized, percent: newTotal > 0 ? Math.round((newMemoized / newTotal) * 100) : 0 }
     })
+  }
+
+  async function handleMemorizedSave(versesToAdd: { verseId: string; translation: string }[]) {
+    if (!col) return
+    await addVersesToCollection(col.dbId, versesToAdd)
+    setShowMemorized(false)
+    await load()
   }
 
   const isUserCollection = col && !col.isBuiltin
@@ -466,9 +476,14 @@ export function CollectionDetailPage() {
                   ? 'Sem versículos'
                   : `Adicionar à memória (${col.total - col.memorized})`}
           </button>
-          <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
-            + Versículos
-          </Link>
+          <div className="collection-detail-actions-row">
+            <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
+              + Versículos
+            </Link>
+            <button type="button" className="btn btn-secondary" onClick={() => setShowMemorized(true)}>
+              Meus versículos
+            </button>
+          </div>
         </div>
       )}
 
@@ -489,6 +504,15 @@ export function CollectionDetailPage() {
                   : `Adicionar todos (${col.total - col.memorized})`}
           </button>
         </div>
+      )}
+
+      {isUserCollection && col && (
+        <MemorizedVersePickerModal
+          isOpen={showMemorized}
+          onClose={() => setShowMemorized(false)}
+          onSave={handleMemorizedSave}
+          collectionId={col.dbId}
+        />
       )}
 
       {isUserCollection && col && (
