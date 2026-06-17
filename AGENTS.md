@@ -33,7 +33,7 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 
 - **Mobile-first design**. All UI built for mobile first, desktop as enhancement.
 - **No `any` type**. Use `unknown` + narrowing, or proper types. Only use `unknown` when truly needed.
-- **No tests exist**. No test infra.
+- **No tests exist**. No test infra. After UI/layout changes, test on an actual iPhone in PWA standalone mode — `100dvh` and `safe-area-inset-*` behave differently from browser tabs.
 - `app/.env`: `VITE_API_URL=http://localhost:8787` for local worker dev.
 - `worker/.dev.vars`: `JWT_SECRET` for local auth.
 - Deploy: Cloudflare Workers + Assets (no separate static host).

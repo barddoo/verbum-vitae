@@ -50,6 +50,10 @@
     max-width: 62rem;
   }
 
+  .main-content {
+    padding-bottom: 0;
+  }
+
   .app-footer {
     padding-bottom: 1.5rem;
   }

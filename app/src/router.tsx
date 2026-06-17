@@ -116,23 +116,24 @@ function RootLayout() {
           <Suspense fallback={loadingSpinner}>
             <Outlet />
           </Suspense>
-          <footer className="app-footer">
-            <div>
-              Feito por{' '}
-              <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
-                Charles Fonseca
-              </a>{' '}
-              &mdash;{' '}
-              <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
-                código aberto
-              </a>
-            </div>
-            <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
-              ₿ Doar
-            </button>
-          </footer>
         </main>
       </div>
+
+      <footer className="app-footer">
+        <div>
+          Feito por{' '}
+          <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
+            Charles Fonseca
+          </a>{' '}
+          &mdash;{' '}
+          <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
+            código aberto
+          </a>
+        </div>
+        <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
+          ₿ Doar
+        </button>
+      </footer>
 
       {!isDesktop && (
         <nav className="bottom-nav">
@@ -156,6 +157,10 @@ function RootLayout() {
             <BarChart2 size={20} strokeWidth={1.5} />
             <span>Stats</span>
           </Link>
+          <button type="button" className="nav-item nav-donate" onClick={() => setShowDonate(true)}>
+            <span className="nav-donate-icon">₿</span>
+            <span>Doar</span>
+          </button>
         </nav>
       )}
 
