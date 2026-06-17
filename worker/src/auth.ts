@@ -19,7 +19,7 @@ const loginSchema = z.object({
   password: z.string(),
 })
 
-async function hashPassword(password: string): Promise<string> {
+export async function hashPassword(password: string): Promise<string> {
   const salt = crypto.getRandomValues(new Uint8Array(16))
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits'])
   const hash = await crypto.subtle.deriveBits(
@@ -36,7 +36,7 @@ async function hashPassword(password: string): Promise<string> {
   return `${saltHex}:${hashHex}`
 }
 
-async function verifyPassword(password: string, stored: string): Promise<boolean> {
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
   const [saltHex, hashHex] = stored.split(':')
   if (!saltHex || !hashHex) return false
   const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)))
@@ -47,7 +47,12 @@ async function verifyPassword(password: string, stored: string): Promise<boolean
     PBKDF2_KEY_LENGTH * 8,
   )
   const storedBytes = new Uint8Array(hashHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)))
-  return crypto.subtle.timingSafeEqual(new Uint8Array(hash), storedBytes)
+  const hashBytes = new Uint8Array(hash)
+  if (hashBytes.byteLength !== storedBytes.byteLength) return false
+  for (let i = 0; i < hashBytes.byteLength; i++) {
+    if (hashBytes[i] !== storedBytes[i]) return false
+  }
+  return true
 }
 
 async function generateToken(userId: string, email: string, secret: string): Promise<string> {

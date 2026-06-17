@@ -16,10 +16,16 @@
     "db:generate": "cd worker && bun run db:generate",
     "check": "bun run check:ts && bun run check:biome",
     "check:biome": "biome check app/src app/index.html worker/src packages --write",
+    "check:layout": "cd app && bunx playwright test",
     "check:ts": "cd packages/shared && bunx tsc && cd ../../worker && bunx tsc && cd ../app && bunx tsc -b",
-    "fix": "biome check --write --unsafe ."
+    "fix": "biome check --write --unsafe .",
+    "test": "vitest run && bun run check:layout",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.15"
+    "@biomejs/biome": "^2.4.15",
+    "jsdom": "^29.1.1",
+    "vitest": "^4.1.9"
   }
 }

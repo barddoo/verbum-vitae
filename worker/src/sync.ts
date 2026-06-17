@@ -29,7 +29,7 @@ async function getUser(c: Context<SyncEnv>) {
   }
 }
 
-function extractCardFields(cardJson: unknown): {
+export function extractCardFields(cardJson: unknown): {
   ease: number
   intervalDays: number
   repetitions: number
