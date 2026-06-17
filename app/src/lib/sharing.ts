@@ -1,15 +1,41 @@
-interface WhatsAppInviteParams {
+interface ShareVerseParams {
   verseRef?: string
   verseText?: string
 }
 
-export function buildWhatsAppInvite({ verseRef, verseText }: WhatsAppInviteParams = {}): string {
+function buildMessage({ verseRef, verseText }: ShareVerseParams = {}): { title: string; text: string; url: string } {
   const appUrl = window.location.origin
+  const browseUrl = `${appUrl}/browse`
 
-  const lines =
-    verseRef && verseText
-      ? [`Estou memorizando *${verseRef}*:`, `_"${verseText}"_`, '', `Vem memorizar também → ${appUrl}`]
-      : [`Estou memorizando!`, '', `Vem memorizar também → ${appUrl}`]
+  if (verseRef && verseText) {
+    return {
+      title: verseRef,
+      text: `"${verseText}" — ${verseRef}`,
+      url: browseUrl,
+    }
+  }
 
-  return `https://wa.me/?text=${encodeURIComponent(lines.join('\n'))}`
+  return {
+    title: 'Verbum Vitae',
+    text: 'Estou memorizando a Bíblia!',
+    url: browseUrl,
+  }
+}
+
+export async function shareVerse(params: ShareVerseParams = {}): Promise<void> {
+  const shareData = buildMessage(params)
+
+  try {
+    await navigator.share(shareData)
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') return
+    fallbackCopy(shareData)
+  }
+}
+
+function fallbackCopy({ title, text, url }: { title: string; text: string; url: string }) {
+  const full = `${title}\n${text}\n${url}`
+  navigator.clipboard.writeText(full).catch(() => {
+    alert(full)
+  })
 }

@@ -9,6 +9,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
+    iosScheme: 'vvitae',
   },
   plugins: {
     StatusBar: {

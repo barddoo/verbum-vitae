@@ -196,6 +196,10 @@ const homeRoute = createRoute({
 const browseRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/browse',
+  validateSearch: (search: Record<string, unknown>): { book?: string; chapter?: string } => ({
+    book: typeof search.book === 'string' ? search.book : undefined,
+    chapter: typeof search.chapter === 'string' ? search.chapter : undefined,
+  }),
   component: BrowsePage,
 })
 

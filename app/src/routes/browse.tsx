@@ -1,3 +1,4 @@
+import { useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { useLongPress } from '../hooks/use-long-press'
@@ -39,10 +40,17 @@ function SourcePicker({ current, onChange }: { current: SourceOption; onChange: 
 }
 
 export function BrowsePage() {
+  const search = useSearch({ from: '/browse' })
   const [source, setSource] = useState<SourceOption>(() => AVAILABLE_SOURCES[0])
   const [translation, setTranslation] = useState<Translation>(() => (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION)
-  const [bookIndex, setBookIndex] = useState<number | null>(null)
-  const [chapter, setChapter] = useState<number | null>(null)
+  const [bookIndex, setBookIndex] = useState<number | null>(() => {
+    const b = search.book ? Number(search.book) : null
+    return b !== null && !Number.isNaN(b) && b >= 0 && b < BOOKS.length ? b : null
+  })
+  const [chapter, setChapter] = useState<number | null>(() => {
+    const c = search.chapter ? Number(search.chapter) : null
+    return c !== null && !Number.isNaN(c) && c > 0 ? c : null
+  })
   const [verses, setVerses] = useState<string[]>([])
   const [loadingVerses, setLoadingVerses] = useState(false)
   const [memorizedVerses, setMemorizedVerses] = useState<Set<string>>(new Set())

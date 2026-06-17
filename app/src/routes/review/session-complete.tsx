@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { buildWhatsAppInvite } from '../../lib/sharing'
+import { shareVerse } from '../../lib/sharing'
 import type { Grade } from '../../lib/srs'
 
 interface DueItem {
@@ -33,10 +33,13 @@ export function SessionComplete({
   const gradeCounts = useMemo(() => [1, 2, 3, 4].map((r) => gradeHistory.filter((g) => g === r).length), [gradeHistory])
 
   const lastItem = reviewedItems.length > 0 ? reviewedItems[reviewedItems.length - 1] : null
-  const inviteUrl = buildWhatsAppInvite({
-    verseRef: lastItem?.reference,
-    verseText: lastItem?.verseText,
-  })
+
+  function handleShare() {
+    shareVerse({
+      verseRef: lastItem?.reference,
+      verseText: lastItem?.verseText,
+    })
+  }
 
   return (
     <div className="page review-page">
@@ -74,11 +77,9 @@ export function SessionComplete({
           <button type="button" className="btn btn-secondary" onClick={onGoBack}>
             Voltar
           </button>
-          {inviteUrl && (
-            <a href={inviteUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-              Compartilhar
-            </a>
-          )}
+          <button type="button" className="btn btn-secondary" onClick={handleShare}>
+            Compartilhar
+          </button>
         </div>
       </div>
     </div>
