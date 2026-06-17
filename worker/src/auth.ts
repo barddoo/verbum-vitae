@@ -10,12 +10,12 @@ const PBKDF2_KEY_LENGTH = 32
 const authApp = new Hono<{ Bindings: { DB: D1Database; JWT_SECRET: string } }>()
 
 const registerSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
 })
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string(),
 })
 

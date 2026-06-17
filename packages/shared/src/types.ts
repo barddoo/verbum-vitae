@@ -24,7 +24,7 @@ export const SyncLogEntry = z.object({
   rowId: z.string(),
   operation: z.enum(['create', 'update', 'delete']),
   data: z.string(),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
 })
 
 export const RegisterRequest = z.object({
@@ -52,6 +52,25 @@ export const SyncPullRequest = z.object({
   cursor: z.string().optional(),
 })
 
+export const CollectionSchema = z.object({
+  slug: z.string().min(1).max(80),
+  name: z.string().min(1).max(200),
+  description: z.string().default(''),
+  icon: z.string().default('📖'),
+  color: z.string().nullable().default(null),
+  isBuiltin: z.number().int().min(0).max(1).default(0),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+})
+
+export const CollectionVerseSchema = z.object({
+  verseId: z.string(),
+  translation: z.string(),
+  sortOrder: z.number().int().default(0),
+})
+
 export type VerseRow = z.infer<typeof VerseSchema>
 export type ProgressRow = z.infer<typeof ProgressSchema>
 export type SyncLogRow = z.infer<typeof SyncLogEntry>
+export type CollectionRow = z.infer<typeof CollectionSchema>
+export type CollectionVerseRow = z.infer<typeof CollectionVerseSchema>

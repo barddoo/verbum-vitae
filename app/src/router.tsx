@@ -23,6 +23,9 @@ const ReviewPage = lazy(() => import('./routes/review').then((m) => ({ default: 
 const StatsPage = lazy(() => import('./routes/stats').then((m) => ({ default: m.StatsPage })))
 const CollectionsListPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionsListPage })))
 const CollectionDetailPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionDetailPage })))
+const AddVersesToCollectionPage = lazy(() =>
+  import('./routes/collections.$slug.add').then((m) => ({ default: m.AddVersesToCollectionPage })),
+)
 
 type Modal = 'auth' | 'donate' | 'help' | 'welcome'
 
@@ -221,7 +224,21 @@ const collectionDetailRoute = createRoute({
   component: CollectionDetailPage,
 })
 
-const routeTree = rootRoute.addChildren([homeRoute, browseRoute, reviewRoute, collectionsListRoute, collectionDetailRoute, statsRoute])
+const addVersesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/collections/$slug/add',
+  component: AddVersesToCollectionPage,
+})
+
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  browseRoute,
+  reviewRoute,
+  collectionsListRoute,
+  collectionDetailRoute,
+  addVersesRoute,
+  statsRoute,
+])
 
 export const router = createRouter({ routeTree })
 

@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 import type { BatchItem } from 'drizzle-orm/batch'
 import { drizzle } from 'drizzle-orm/d1'
 import { type Context, Hono } from 'hono'
@@ -69,6 +69,27 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
   const now = new Date().toISOString()
   const db = drizzle(c.env.DB, { schema })
 
+  const collectionSlugToId = new Map<string, string>()
+
+  const collectionSlugs = entries
+    .filter((e) => e.tableName === 'collectionVerse')
+    .map((e) => {
+      const parts = e.rowId.split('|')
+      return parts[0] || ''
+    })
+    .filter(Boolean)
+
+  if (collectionSlugs.length > 0) {
+    const cols = await db
+      .select({ id: schema.collections.id, slug: schema.collections.slug })
+      .from(schema.collections)
+      .where(and(eq(schema.collections.userId, user.sub), inArray(schema.collections.slug, [...new Set(collectionSlugs)])))
+
+    for (const col of cols) {
+      collectionSlugToId.set(col.slug, col.id)
+    }
+  }
+
   const queries: BatchItem<'sqlite'>[] = []
 
   for (const entry of entries) {
@@ -98,7 +119,6 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
       const { ease, intervalDays, repetitions } = extractCardFields(parsed.cardJson)
       const nextReview = (parsed.nextReview as string) || now
       const lastReview = (parsed.lastReview as string) || now
-      const progressId = uuidv7()
 
       if (entry.operation === 'delete') {
         queries.push(
@@ -113,7 +133,7 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
           db
             .insert(schema.progress)
             .values({
-              id: progressId,
+              id: uuidv7(),
               userId: user.sub,
               verseId,
               translation,
@@ -128,15 +148,95 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
             })
             .onConflictDoUpdate({
               target: [schema.progress.userId, schema.progress.verseId, schema.progress.translation],
-              set: {
-                cardJson,
-                ease,
-                intervalDays,
-                repetitions,
-                nextReview,
-                lastReview,
-                updatedAt: now,
-              },
+              set: { cardJson, ease, intervalDays, repetitions, nextReview, lastReview, updatedAt: now },
+            }),
+        )
+      }
+    } else if (entry.tableName === 'collection') {
+      let parsed: Record<string, unknown>
+      try {
+        parsed = JSON.parse(entry.data)
+      } catch {
+        return c.json({ error: 'Invalid collection data' }, 400)
+      }
+
+      const slug = (parsed.slug as string) || entry.rowId
+      const name = (parsed.name as string) || ''
+      const description = (parsed.description as string) || ''
+      const icon = (parsed.icon as string) || '📖'
+      const color = (parsed.color as string) || null
+      const isBuiltin = (parsed.isBuiltin as number) ?? 0
+
+      if (entry.operation === 'delete') {
+        queries.push(db.delete(schema.collections).where(and(eq(schema.collections.userId, user.sub), eq(schema.collections.slug, slug))))
+      } else {
+        queries.push(
+          db
+            .insert(schema.collections)
+            .values({
+              id: uuidv7(),
+              userId: user.sub,
+              slug,
+              name,
+              description,
+              icon,
+              color,
+              isBuiltin,
+              createdAt: now,
+              updatedAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [schema.collections.userId, schema.collections.slug],
+              set: { name, description, icon, color, isBuiltin, updatedAt: now },
+            }),
+        )
+      }
+    } else if (entry.tableName === 'collectionVerse') {
+      let parsed: Record<string, unknown>
+      try {
+        parsed = JSON.parse(entry.data)
+      } catch {
+        return c.json({ error: 'Invalid collectionVerse data' }, 400)
+      }
+
+      const rowIdParts = entry.rowId.split('|')
+      const collectionSlug = rowIdParts[0] || (parsed.collectionSlug as string) || ''
+      const verseId = rowIdParts[1] || (parsed.verseId as string) || ''
+      const translation = rowIdParts[2] || (parsed.translation as string) || ''
+      const sortOrder = (parsed.sortOrder as number) ?? 0
+
+      if (!collectionSlug || !verseId || !translation) continue
+
+      const collectionId = collectionSlugToId.get(collectionSlug)
+      if (!collectionId) continue
+
+      if (entry.operation === 'delete') {
+        queries.push(
+          db
+            .delete(schema.collectionVerses)
+            .where(
+              and(
+                eq(schema.collectionVerses.collectionId, collectionId),
+                eq(schema.collectionVerses.verseId, verseId),
+                eq(schema.collectionVerses.translation, translation),
+              ),
+            ),
+        )
+      } else {
+        queries.push(
+          db
+            .insert(schema.collectionVerses)
+            .values({
+              id: uuidv7(),
+              collectionId,
+              verseId,
+              translation,
+              sortOrder,
+              createdAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [schema.collectionVerses.collectionId, schema.collectionVerses.verseId, schema.collectionVerses.translation],
+              set: { sortOrder },
             }),
         )
       }
@@ -192,6 +292,50 @@ syncApp.get('/pull', async (c) => {
     nextCursor,
     hasMore: rows.length === PULL_LIMIT,
   })
+})
+
+syncApp.get('/pull/collections', async (c) => {
+  const user = await getUser(c)
+  if (!user) return c.json({ error: 'Não autenticado' }, 401)
+
+  const db = drizzle(c.env.DB, { schema })
+
+  const cols = await db
+    .select()
+    .from(schema.collections)
+    .where(eq(schema.collections.userId, user.sub))
+    .orderBy(schema.collections.createdAt)
+
+  if (cols.length === 0) {
+    return c.json({ collections: [] })
+  }
+
+  const colIds = cols.map((c) => c.id)
+  const verses = await db
+    .select()
+    .from(schema.collectionVerses)
+    .where(inArray(schema.collectionVerses.collectionId, colIds))
+    .orderBy(schema.collectionVerses.sortOrder)
+
+  const versesByColId = new Map<string, { verseId: string; translation: string; sortOrder: number }[]>()
+  for (const v of verses) {
+    if (!versesByColId.has(v.collectionId)) versesByColId.set(v.collectionId, [])
+    versesByColId.get(v.collectionId)!.push({ verseId: v.verseId, translation: v.translation, sortOrder: v.sortOrder ?? 0 })
+  }
+
+  const result = cols.map((col) => ({
+    slug: col.slug,
+    name: col.name,
+    description: col.description,
+    icon: col.icon,
+    color: col.color,
+    isBuiltin: col.isBuiltin,
+    createdAt: col.createdAt,
+    updatedAt: col.updatedAt,
+    verses: versesByColId.get(col.id) || [],
+  }))
+
+  return c.json({ collections: result })
 })
 
 export { syncApp as syncRoutes }

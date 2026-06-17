@@ -122,7 +122,7 @@ export async function syncNow(cb?: SyncStateCallback) {
   try {
     const pendingCount = await db.syncLog.where({ synced: 0 }).count()
     if (pendingCount > 0) await pushPending()
-    await pullRemote()
+    await Promise.all([pullRemote(), pullCollections()])
     const remaining = await db.syncLog.where({ synced: 0 }).count()
     retryCount = 0
     update?.({ isSyncing: false, lastSynced: Date.now(), pendingCount: remaining })
@@ -214,6 +214,74 @@ async function pullRemote() {
     }
 
     if (!result.hasMore) break
+  }
+}
+
+async function pullCollections() {
+  const result = await api.sync.pullCollections()
+  if (!result.collections?.length) return
+
+  for (const serverCol of result.collections) {
+    const slug = serverCol.slug as string
+    if (!slug) continue
+
+    const hasUnsynced = await db.syncLog
+      .where({ synced: 0 })
+      .filter((log) => log.tableName === 'collection' && log.rowId === slug)
+      .count()
+
+    if (hasUnsynced > 0) continue
+
+    const localCol = await db.collections.where({ slug }).first()
+    const now = Date.now()
+    const createdAt = serverCol.createdAt ? new Date(serverCol.createdAt as string).getTime() : now
+
+    let collectionId: number
+
+    if (localCol) {
+      collectionId = localCol.id!
+      await db.collections.update(collectionId, {
+        name: serverCol.name as string,
+        description: serverCol.description as string,
+        icon: serverCol.icon as string,
+        color: (serverCol.color as string) || undefined,
+        isBuiltin: (serverCol.isBuiltin as number) ?? 0,
+        createdAt,
+      })
+    } else {
+      const newId = await db.collections.put({
+        slug,
+        name: serverCol.name as string,
+        description: (serverCol.description as string) || '',
+        icon: (serverCol.icon as string) || '📖',
+        color: (serverCol.color as string) || undefined,
+        isBuiltin: (serverCol.isBuiltin as number) ?? 0,
+        createdAt,
+      })
+      if (!newId) continue
+      collectionId = newId
+    }
+
+    const serverVerses = serverCol.verses as { verseId: string; translation: string; sortOrder: number }[] | undefined
+    if (!serverVerses?.length) {
+      await db.collectionVerses.where({ collectionId }).delete()
+      continue
+    }
+
+    await db.transaction('rw', db.collectionVerses, async () => {
+      await db.collectionVerses.where({ collectionId }).delete()
+
+      const entries = serverVerses.map((v, i) => ({
+        collectionId,
+        verseId: v.verseId,
+        translation: v.translation,
+        sortOrder: v.sortOrder ?? i,
+      }))
+
+      if (entries.length > 0) {
+        await db.collectionVerses.bulkPut(entries)
+      }
+    })
   }
 }
 

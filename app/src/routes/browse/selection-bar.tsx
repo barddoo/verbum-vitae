@@ -3,11 +3,13 @@ export function SelectionBar({
   previewText,
   onClear,
   onMemorize,
+  actionLabel,
 }: {
   count: number
   previewText: string
   onClear: () => void
   onMemorize: () => void
+  actionLabel?: string
 }) {
   if (count === 0) return null
 
@@ -18,8 +20,8 @@ export function SelectionBar({
           {count} selecionado{count > 1 ? 's' : ''}
         </span>
         <span className="selection-bar-preview">
-          "{previewText.slice(0, 60)}
-          {previewText.length > 60 ? '…' : ''}"
+          &ldquo;{previewText.slice(0, 60)}
+          {previewText.length > 60 ? '…' : ''}&rdquo;
         </span>
       </div>
       <div className="selection-bar-actions">
@@ -27,7 +29,7 @@ export function SelectionBar({
           Limpar
         </button>
         <button type="button" className="btn btn-sm btn-primary" onClick={onMemorize}>
-          Memorizar
+          {actionLabel || 'Memorizar'}
         </button>
       </div>
     </div>

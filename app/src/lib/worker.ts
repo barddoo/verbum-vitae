@@ -31,6 +31,7 @@ export const api = {
     push: (entries: { tableName: string; rowId: string; operation: string; data: string }[]) =>
       request('/api/sync/push', { method: 'POST', body: JSON.stringify({ entries }) }),
     pull: (cursor?: string) => request(`/api/sync/pull${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`),
+    pullCollections: () => request('/api/sync/pull/collections'),
   },
 
   verses: {
