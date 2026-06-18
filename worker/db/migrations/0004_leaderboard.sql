@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN display_name TEXT;
+ALTER TABLE users ADD COLUMN current_streak INTEGER NOT NULL DEFAULT 0;

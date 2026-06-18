@@ -2,8 +2,9 @@ import { memo, useEffect, useMemo, useState } from 'react'
 import { MemorizedVersesTab } from '../components/memorized-verses-tab'
 import { db } from '../lib/db'
 import { computeStreak } from '../lib/stats'
+import { RankingTab } from './stats/ranking-tab'
 
-type Tab = 'resumo' | 'versiculos'
+type Tab = 'resumo' | 'versiculos' | 'ranking'
 
 export function StatsPage() {
   const [tab, setTab] = useState<Tab>('resumo')
@@ -75,6 +76,15 @@ export function StatsPage() {
         >
           Versículos
         </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'ranking'}
+          className={`stats-tab${tab === 'ranking' ? ' active' : ''}`}
+          onClick={() => setTab('ranking')}
+        >
+          Ranking
+        </button>
       </div>
 
       {tab === 'resumo' && (
@@ -142,6 +152,7 @@ export function StatsPage() {
       )}
 
       {tab === 'versiculos' && <MemorizedVersesTab />}
+      {tab === 'ranking' && <RankingTab />}
     </div>
   )
 }

@@ -69,8 +69,28 @@ export const CollectionVerseSchema = z.object({
   sortOrder: z.number().int().default(0),
 })
 
+export const LeaderboardEntrySchema = z.object({
+  rank: z.number().int(),
+  displayName: z.string(),
+  memorizedCount: z.number().int(),
+  totalRepetitions: z.number().int(),
+  currentStreak: z.number().int(),
+  isCurrentUser: z.boolean(),
+})
+
+export const LeaderboardResponseSchema = z.object({
+  entries: z.array(LeaderboardEntrySchema),
+  currentUserEntry: LeaderboardEntrySchema.nullable(),
+})
+
+export const UpdateDisplayNameRequestSchema = z.object({
+  displayName: z.string().min(1).max(40).trim(),
+})
+
 export type VerseRow = z.infer<typeof VerseSchema>
 export type ProgressRow = z.infer<typeof ProgressSchema>
 export type SyncLogRow = z.infer<typeof SyncLogEntry>
 export type CollectionRow = z.infer<typeof CollectionSchema>
 export type CollectionVerseRow = z.infer<typeof CollectionVerseSchema>
+export type LeaderboardEntry = z.infer<typeof LeaderboardEntrySchema>
+export type LeaderboardResponse = z.infer<typeof LeaderboardResponseSchema>

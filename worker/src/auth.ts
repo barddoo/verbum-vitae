@@ -82,7 +82,7 @@ authApp.post('/register', zValidator('json', registerSchema), async (c) => {
     .run()
 
   const token = await generateToken(id, email, secret)
-  return c.json({ token, user: { id, email } })
+  return c.json({ token, user: { id, email, displayName: null } })
 })
 
 authApp.post('/login', zValidator('json', loginSchema), async (c) => {
@@ -90,8 +90,8 @@ authApp.post('/login', zValidator('json', loginSchema), async (c) => {
   const secret = c.env.JWT_SECRET
   if (!secret) return c.json({ error: 'Serviço não configurado' }, 500)
 
-  const user = (await c.env.DB.prepare('SELECT id, email, password_hash FROM users WHERE email = ?').bind(email).first()) as
-    | { id: string; email: string; password_hash: string }
+  const user = (await c.env.DB.prepare('SELECT id, email, password_hash, display_name FROM users WHERE email = ?').bind(email).first()) as
+    | { id: string; email: string; password_hash: string; display_name: string | null }
     | undefined
   if (!user) return c.json({ error: 'Credenciais inválidas' }, 401)
 
@@ -99,7 +99,7 @@ authApp.post('/login', zValidator('json', loginSchema), async (c) => {
   if (!valid) return c.json({ error: 'Credenciais inválidas' }, 401)
 
   const token = await generateToken(user.id, user.email, secret)
-  return c.json({ token, user: { id: user.id, email: user.email } })
+  return c.json({ token, user: { id: user.id, email: user.email, displayName: user.display_name ?? null } })
 })
 
 export { authApp as authRoutes }

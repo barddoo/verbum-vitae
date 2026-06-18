@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { authRoutes } from './auth'
+import { leaderboardRoutes } from './leaderboard'
 import { PresenceDO } from './presence-do'
 import { syncRoutes } from './sync'
 import { versesRoutes } from './verses'
@@ -11,6 +12,7 @@ type Bindings = {
   AUTH_RATE_LIMITER: RateLimit
   SYNC_RATE_LIMITER: RateLimit
   VERSES_RATE_LIMITER: RateLimit
+  LEADERBOARD_RATE_LIMITER: RateLimit
   CF_VERSION_METADATA: WorkerVersionMetadata
   ASSETS: { fetch: (req: Request) => Promise<Response> }
   PRESENCE: DurableObjectNamespace
@@ -86,9 +88,19 @@ app.use('/api/verses/*', async (c, next) => {
   await next()
 })
 
+app.use('/api/leaderboard/*', securityHeaders)
+app.use('/api/leaderboard/*', async (c, next) => {
+  const auth = c.req.header('Authorization')
+  const key = (auth?.startsWith('Bearer ') ? jwtSub(auth.slice(7)) : null) ?? c.req.header('CF-Connecting-IP') ?? 'anon'
+  const { success } = await c.env.LEADERBOARD_RATE_LIMITER.limit({ key: `leaderboard:${key}` })
+  if (!success) return c.json({ error: 'Too many requests' }, 429)
+  await next()
+})
+
 app.route('/api/auth', authRoutes)
 app.route('/api/sync', syncRoutes)
 app.route('/api/verses', versesRoutes)
+app.route('/api/leaderboard', leaderboardRoutes)
 
 app.get('/api/health', (c) => {
   const { id: versionId, tag: versionTag } = c.env.CF_VERSION_METADATA

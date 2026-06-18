@@ -41,4 +41,9 @@ export const api = {
   presence: {
     count: () => request('/api/presence/count'),
   },
+
+  leaderboard: {
+    get: () => request('/api/leaderboard'),
+    updateProfile: (displayName: string) => request('/api/leaderboard/profile', { method: 'PATCH', body: JSON.stringify({ displayName }) }),
+  },
 }

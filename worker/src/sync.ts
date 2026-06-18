@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
-import { and, eq, inArray, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm'
 import type { BatchItem } from 'drizzle-orm/batch'
 import { drizzle } from 'drizzle-orm/d1'
 import { type Context, Hono } from 'hono'
@@ -7,6 +7,7 @@ import { verify } from 'hono/jwt'
 import { uuidv7 } from 'shared/uuid'
 import { z } from 'zod'
 import * as schema from '../db/schema'
+import { computeStreak } from './leaderboard'
 
 const PULL_LIMIT = 200
 
@@ -247,6 +248,18 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
   for (let i = 0; i < queries.length; i += CHUNK) {
     const chunk = queries.slice(i, i + CHUNK)
     await db.batch(chunk as [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]])
+  }
+
+  const hasProgressEntry = entries.some((e) => e.tableName === 'progress' && e.operation !== 'delete')
+  if (hasProgressEntry) {
+    const reviewDays = await db
+      .selectDistinct({ day: sql<string>`DATE(${schema.progress.lastReview})` })
+      .from(schema.progress)
+      .where(and(eq(schema.progress.userId, user.sub), isNotNull(schema.progress.lastReview)))
+      .orderBy(desc(sql`DATE(${schema.progress.lastReview})`))
+
+    const streak = computeStreak(reviewDays.map((r) => r.day))
+    await db.update(schema.users).set({ currentStreak: streak }).where(eq(schema.users.id, user.sub))
   }
 
   return c.json({ pushed: entries.length })
