@@ -7,6 +7,8 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './app'
+import { syncNow } from './lib/sync'
+import { router } from './router'
 import './styles/index.css'
 
 if (Capacitor.isNativePlatform()) {
@@ -14,9 +16,7 @@ if (Capacitor.isNativePlatform()) {
   StatusBar.setBackgroundColor({ color: '#0f1117' }).catch(() => {})
 
   CapApp.addListener('appStateChange', ({ isActive }) => {
-    if (isActive) {
-      import('./lib/sync').then(({ syncNow }) => syncNow())
-    }
+    if (isActive) syncNow()
   })
 
   CapApp.addListener('backButton', ({ canGoBack }) => {
@@ -30,9 +30,7 @@ if (Capacitor.isNativePlatform()) {
       const url = new URL(data.url)
       const match = url.pathname.match(/^\/browse\/(\d+)\/(\d+)$/)
       if (match) {
-        import('./router').then(({ router }) => {
-          router.navigate({ to: '/browse', search: { book: match[1], chapter: match[2] } })
-        })
+        router.navigate({ to: '/browse', search: { book: match[1], chapter: match[2] } })
       }
     } catch {
       /* invalid URL, ignore */
