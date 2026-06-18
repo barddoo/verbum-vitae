@@ -73,7 +73,7 @@ async function shareNative(blob: Blob, title: string): Promise<void> {
       }
     }
   ).Capacitor
-  if (!cap) return shareWeb(blob, title)
+  if (!cap?.plugins?.Share || !cap?.plugins?.Filesystem) return shareWeb(blob, title)
   const base64 = await blobToBase64(blob)
   const { uri } = await cap.plugins.Filesystem.writeFile({
     path: `versiculo-${Date.now()}.png`,

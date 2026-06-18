@@ -122,14 +122,14 @@ export function HomePage() {
                 </span>
                 <span className="community-presence-label">memorizando agora</span>
                 <span className="community-presence-encourage">Continue assim!</span>
-                <button type="button" className="community-invite-link" onClick={() => shareVerse()}>
+                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
                   Compartilhar
                 </button>
               </>
             ) : (
               <>
                 <span className="community-presence-encourage">Continue memorizando!</span>
-                <button type="button" className="community-invite-link" onClick={() => shareVerse()}>
+                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
                   Compartilhar
                 </button>
               </>

@@ -20,6 +20,7 @@ const PREVIEW_DIM = { square: 540, story: 303 } as const
 export function VerseImageModal({ open, onClose, verses, translation, bookName }: VerseImageModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const renderTokenRef = useRef(0)
+  const customUrlRef = useRef<string | null>(null)
   const [background, setBackground] = useState<Background>(BACKGROUNDS[0])
   const [customImage, setCustomImage] = useState<HTMLImageElement | undefined>(undefined)
   const [format, setFormat] = useState<'square' | 'story'>(DEFAULT_FORMAT)
@@ -86,6 +87,16 @@ export function VerseImageModal({ open, onClose, verses, translation, bookName }
     setBackground(bg)
     if (custom) {
       setCustomImage(custom)
+      if (
+        bg.kind === 'photo' &&
+        bg.id === 'custom' &&
+        bg.full.startsWith('blob:') &&
+        customUrlRef.current &&
+        customUrlRef.current !== bg.full
+      ) {
+        URL.revokeObjectURL(customUrlRef.current)
+      }
+      if (bg.kind === 'photo' && bg.id === 'custom') customUrlRef.current = bg.full
     } else if (bg.kind === 'photo') {
       const img = new Image()
       img.onload = () => setCustomImage(img)
