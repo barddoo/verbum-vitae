@@ -1,6 +1,6 @@
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { Capacitor } from '@capacitor/core'
-import { Download } from 'lucide-react'
+import { Download, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 const LS_KEY = 'pwa_version_id'
@@ -106,7 +106,7 @@ export function UpdateBanner() {
         }}
         aria-label="Fechar"
       >
-        ✕
+        <X size={12} aria-hidden />
       </button>
     </div>
   )

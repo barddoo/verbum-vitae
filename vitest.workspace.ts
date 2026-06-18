@@ -18,7 +18,6 @@ export default defineWorkspace([
     test: {
       name: 'app',
       include: ['app/src/**/*.test.ts', 'app/src/**/*.test.tsx'],
-      environment: 'jsdom',
     },
   },
 ])

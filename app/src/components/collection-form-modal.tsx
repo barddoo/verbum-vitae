@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 const EMOJI_OPTIONS = ['📖', '⭐', '🙏', '❤️', '🔥', '✝️', '📜', '🛡️', '🎵', '⚓', '🌟', '🍇', '⛰️', '🩸', '✦', '✠', '💡', '🕊️', '🌿', '💧']
@@ -59,7 +60,7 @@ export function CollectionFormModal({
         <div className="modal-header">
           <h2 className="modal-title">{isEdit ? 'Editar coleção' : 'Nova coleção'}</h2>
           <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
-            ✕
+            <X size={18} aria-hidden />
           </button>
         </div>
 
@@ -131,7 +132,7 @@ export function CollectionFormModal({
             ))}
             {color && (
               <button type="button" className="color-clear" onClick={() => setColor(null)} aria-label="Limpar cor" title="Limpar cor">
-                ✕
+                <X size={12} aria-hidden />
               </button>
             )}
           </div>

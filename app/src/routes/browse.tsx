@@ -1,5 +1,6 @@
 import { useSearch } from '@tanstack/react-router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Check, X } from 'lucide-react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
@@ -9,6 +10,8 @@ import { cachedGet, cachedSet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 import { AVAILABLE_SOURCES, type SourceOption } from '../lib/text-sources'
 import { SelectionBar } from './browse/selection-bar'
+
+const VerseImageModal = lazy(() => import('../components/verse-image/verse-image-modal').then((m) => ({ default: m.VerseImageModal })))
 
 interface SearchResult {
   bookNumber: number
@@ -62,6 +65,7 @@ export function BrowsePage() {
   const [bookQuery, setBookQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searching, setSearching] = useState(false)
+  const [showImageModal, setShowImageModal] = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const isBible = source.type === 'bible'
@@ -262,6 +266,15 @@ export function BrowsePage() {
 
   const sortedSelected = useMemo(() => [...selectedVerses].toSorted((a, b) => a - b), [selectedVerses])
   const chapterCount = isBible && bookIndex !== null ? CHAPTER_COUNTS[bookIndex] : verses.length
+  const imageVerses = useMemo(() => {
+    if (bookIndex === null || !isBible) return []
+    return sortedSelected.map((v) => ({
+      ref: `${BOOKS[bookIndex]} ${chapter ?? 0}:${v}`,
+      text: verses[v - 1] ?? '',
+    }))
+  }, [sortedSelected, bookIndex, chapter, verses, isBible])
+  const imageBookName = bookIndex !== null && isBible ? BOOKS[bookIndex] : source.name
+  const imageTranslation = isBible ? translation : source.id
 
   function handleBookClick(idx: number) {
     if (isBible) {
@@ -349,7 +362,7 @@ export function BrowsePage() {
             />
             {searchQuery && (
               <button type="button" className="search-clear" aria-label="Limpar busca" onClick={clearSearch}>
-                ✕
+                <X size={14} aria-hidden />
               </button>
             )}
           </div>
@@ -430,7 +443,7 @@ export function BrowsePage() {
                       : 'Toque para selecionar'}
                   </span>
                   <button type="button" className="select-mode-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
-                    ✕
+                    <X size={16} aria-hidden />
                   </button>
                 </>
               ) : (
@@ -458,16 +471,43 @@ export function BrowsePage() {
                       onPointerUp={() => longPress.handlePointerUp(v)}
                       onPointerCancel={longPress.handlePointerCancel}
                     >
-                      <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : label}</span>
+                      <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>
+                        {selectionMode ? sel ? <Check size={10} aria-hidden /> : '' : label}
+                      </span>
                       <span className="verse-text">{text}</span>
-                      {add ? <span className="added-check">✓</span> : mem ? <span className="memorized-badge">Memorizado</span> : null}
+                      {add ? (
+                        <span className="added-check">
+                          <Check size={14} aria-hidden />
+                        </span>
+                      ) : mem ? (
+                        <span className="memorized-badge">
+                          <Check size={10} aria-hidden /> Memorizado
+                        </span>
+                      ) : null}
                     </button>
                   )
                 })}
           </div>
         ) : null}
       </div>
-      <SelectionBar count={selectedVerses.size} previewText={previewText} onClear={exitSelectionMode} onMemorize={memorizeSelected} />
+      <SelectionBar
+        count={selectedVerses.size}
+        previewText={previewText}
+        onClear={exitSelectionMode}
+        onMemorize={memorizeSelected}
+        onShareImage={imageVerses.length > 0 ? () => setShowImageModal(true) : undefined}
+      />
+      {showImageModal && (
+        <Suspense fallback={null}>
+          <VerseImageModal
+            open={showImageModal}
+            onClose={() => setShowImageModal(false)}
+            verses={imageVerses}
+            translation={imageTranslation}
+            bookName={imageBookName}
+          />
+        </Suspense>
+      )}
     </>
   )
 }

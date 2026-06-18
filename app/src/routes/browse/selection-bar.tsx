@@ -3,12 +3,14 @@ export function SelectionBar({
   previewText,
   onClear,
   onMemorize,
+  onShareImage,
   actionLabel,
 }: {
   count: number
   previewText: string
   onClear: () => void
   onMemorize: () => void
+  onShareImage?: () => void
   actionLabel?: string
 }) {
   if (count === 0) return null
@@ -28,6 +30,11 @@ export function SelectionBar({
         <button type="button" className="btn btn-sm btn-secondary" onClick={onClear}>
           Limpar
         </button>
+        {onShareImage && (
+          <button type="button" className="btn btn-sm btn-secondary" onClick={onShareImage}>
+            Imagem
+          </button>
+        )}
         <button type="button" className="btn btn-sm btn-primary" onClick={onMemorize}>
           {actionLabel || 'Memorizar'}
         </button>

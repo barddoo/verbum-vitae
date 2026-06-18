@@ -1,5 +1,6 @@
 import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Check } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { type CollectionVerse, db, fetchVersesBatch, parseTextKey } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
@@ -40,6 +41,7 @@ export function ReviewPage() {
   const [practiceMode, setPracticeMode] = useState<PracticeMode>(
     () => (localStorage.getItem('review_mode') as PracticeMode) || 'fill-blank',
   )
+  const [progressiveBlanks, setProgressiveBlanks] = useState(() => localStorage.getItem('review_fill_blank_progressive') === '1')
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
   const [skipped, setSkipped] = useState(0)
   const [filterVerseIds, setFilterVerseIds] = useState<string[] | null>(() => {
@@ -421,6 +423,21 @@ export function ReviewPage() {
           ))}
         </div>
 
+        {practiceMode === 'fill-blank' && (
+          <label className="review-sub-toggle">
+            <input
+              type="checkbox"
+              checked={progressiveBlanks}
+              onChange={(e) => {
+                setProgressiveBlanks(e.target.checked)
+                localStorage.setItem('review_fill_blank_progressive', e.target.checked ? '1' : '0')
+              }}
+            />
+            <span>Palavra por palavra</span>
+            <span className="review-sub-toggle-hint">Toque em cada lacuna para revelar uma palavra por vez</span>
+          </label>
+        )}
+
         {totalAll === 0 ? (
           <>
             <button type="button" className="btn btn-primary btn-large btn-start" disabled>
@@ -471,7 +488,15 @@ export function ReviewPage() {
         completed={completed}
         skippedCount={skipped}
         gradeHistory={gradeHistory}
-        reviewedItems={items}
+        lastVerse={
+          items.length > 0
+            ? {
+                ref: items[items.length - 1].reference,
+                text: items[items.length - 1].verseText,
+                translation: items[items.length - 1].translation,
+              }
+            : undefined
+        }
         remainingCount={Math.max(0, filteredProgress.length - sessionOffsetRef.current - items.length)}
         onGoBack={goBack}
         onNewSession={() => {
@@ -517,7 +542,7 @@ export function ReviewPage() {
           </div>
         </div>
         <span className="review-completed" title="Concluídos">
-          {completed} ✓
+          {completed} <Check size={12} aria-hidden />
         </span>
       </div>
       <div className="review-progress-bar">
@@ -549,6 +574,7 @@ export function ReviewPage() {
           verseId={currentItem.verseId}
           onGrade={handleGrade}
           question={currentItem.question}
+          progressive={progressiveBlanks}
         />
       )}
       {practiceMode === 'typing' && (

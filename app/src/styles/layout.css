@@ -127,10 +127,6 @@
   .top-bar-right {
     gap: 0.25rem;
   }
-
-  .user-badge {
-    max-width: 5rem;
-  }
 }
 
 .theme-toggle {
@@ -188,16 +184,6 @@
   text-transform: uppercase;
   letter-spacing: 0.0938rem;
   border: 1px solid rgba(212, 168, 83, 0.15);
-}
-
-.user-badge {
-  font-size: 0.7rem;
-  color: var(--aged);
-  max-width: 8.75rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-style: italic;
 }
 
 /* SYNC INDICATOR */

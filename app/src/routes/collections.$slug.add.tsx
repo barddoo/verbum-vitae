@@ -1,4 +1,5 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { Check, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { useLongPress } from '../hooks/use-long-press'
@@ -275,7 +276,7 @@ export function AddVersesToCollectionPage() {
                       : 'Toque para selecionar'}
                   </span>
                   <button type="button" className="select-mode-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
-                    ✕
+                    <X size={16} aria-hidden />
                   </button>
                 </>
               ) : (
@@ -303,9 +304,15 @@ export function AddVersesToCollectionPage() {
                       onPointerCancel={longPress.handlePointerCancel}
                       disabled={exist}
                     >
-                      <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>{selectionMode ? (sel ? '✓' : '') : label}</span>
+                      <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>
+                        {selectionMode ? sel ? <Check size={10} aria-hidden /> : '' : label}
+                      </span>
                       <span className="verse-text">{text}</span>
-                      {exist && <span className="memorized-badge">Na coleção</span>}
+                      {exist && (
+                        <span className="memorized-badge">
+                          <Check size={10} aria-hidden /> Na coleção
+                        </span>
+                      )}
                     </button>
                   )
                 })}
@@ -323,7 +330,9 @@ export function AddVersesToCollectionPage() {
       )}
       {done && (
         <div className="selection-bar selection-bar-done">
-          <span>✓ Adicionado à coleção!</span>
+          <span>
+            <Check size={14} aria-hidden /> Adicionado à coleção!
+          </span>
         </div>
       )}
     </>

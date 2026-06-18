@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Share2, Smartphone, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { db } from '../lib/db'
 import { usePresence } from '../lib/presence-context'
@@ -121,14 +122,14 @@ export function HomePage() {
                 </span>
                 <span className="community-presence-label">memorizando agora</span>
                 <span className="community-presence-encourage">Continue assim!</span>
-                <button type="button" className="community-invite-link" onClick={() => shareVerse()}>
+                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
                   Compartilhar
                 </button>
               </>
             ) : (
               <>
                 <span className="community-presence-encourage">Continue memorizando!</span>
-                <button type="button" className="community-invite-link" onClick={() => shareVerse()}>
+                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
                   Compartilhar
                 </button>
               </>
@@ -138,10 +139,10 @@ export function HomePage() {
           {show && (
             <div className="install-guide-card">
               <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
-                ✕
+                <X size={16} aria-hidden />
               </button>
               <span className="install-guide-icon" aria-hidden="true">
-                📲
+                <Smartphone size={24} />
               </span>
               <div className="install-guide-body">
                 <strong className="install-guide-title">Instalar como aplicativo</strong>
@@ -158,7 +159,7 @@ export function HomePage() {
                     <li>
                       Toque no ícone <strong>Compartilhar</strong>{' '}
                       <span className="install-guide-share-icon" aria-hidden="true">
-                        📤
+                        <Share2 size={14} />
                       </span>{' '}
                       na barra inferior
                     </li>

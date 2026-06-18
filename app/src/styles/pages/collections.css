@@ -685,10 +685,9 @@
   border: 1px solid rgba(74, 158, 122, 0.2);
   border-radius: 2rem;
   padding: 0.125rem 0.5rem;
-}
-
-.memorized-badge::before {
-  content: "✓ ";
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 /* ──────────────────────────────────────────────
