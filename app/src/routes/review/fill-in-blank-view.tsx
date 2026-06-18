@@ -20,6 +20,7 @@ export function FillInBlankView({
   verseId,
   onGrade,
   question,
+  progressive = false,
 }: {
   reference: string
   verseText: string
@@ -27,8 +28,11 @@ export function FillInBlankView({
   verseId: string
   onGrade: (r: Grade) => void
   question?: string
+  progressive?: boolean
 }) {
   const [revealed, setRevealed] = useState(false)
+  const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set())
+  const [revealedAll, setRevealedAll] = useState(false)
   const [heat, setHeat] = useState<Map<number, number>>(new Map())
 
   const words = useMemo(() => verseText.trim().split(WORD_SPLIT), [verseText])
@@ -58,7 +62,25 @@ export function FillInBlankView({
       setHeat(map)
     })
     setRevealed(false)
+    setRevealedIndices(new Set())
+    setRevealedAll(false)
   }, [verseId, translation, words.length])
+
+  const allRevealed = progressive
+    ? revealedAll || blankIndices.size === 0 || (blankIndices.size > 0 && revealedIndices.size === blankIndices.size)
+    : revealed
+
+  function revealWord(i: number) {
+    setRevealedIndices((prev) => {
+      const next = new Set(prev)
+      next.add(i)
+      return next
+    })
+  }
+
+  function revealAll() {
+    setRevealedAll(true)
+  }
 
   return (
     <div className="fill-blank">
@@ -67,22 +89,46 @@ export function FillInBlankView({
       <div className="fill-blank-text">
         {words.map((word, i) => {
           const blank = blankIndices.has(i)
-          const hcls = revealed && !blank ? heatClass(heat.get(i) ?? -1) : ''
+          const isRevealed = progressive ? revealedAll || revealedIndices.has(i) : revealed
+          const hcls = isRevealed && !blank ? heatClass(heat.get(i) ?? -1) : ''
+          if (blank && !isRevealed && progressive) {
+            return (
+              <Fragment key={i}>
+                <button
+                  type="button"
+                  className="fill-blank-word blank-word blank-interactive"
+                  onClick={() => revealWord(i)}
+                  aria-label="Revelar palavra"
+                >
+                  {'_'.repeat(word.length)}
+                </button>{' '}
+              </Fragment>
+            )
+          }
           return (
             <Fragment key={i}>
-              <span className={`fill-blank-word ${blank ? 'blank-word' : ''} ${hcls}`}>
-                {revealed || !blank ? word : '_'.repeat(word.length)}
+              <span className={`fill-blank-word ${blank ? 'blank-word' : ''} ${blank && isRevealed ? 'blank-revealed' : ''} ${hcls}`}>
+                {isRevealed || !blank ? word : '_'.repeat(word.length)}
               </span>{' '}
             </Fragment>
           )
         })}
       </div>
       <div className="fill-blank-actions">
-        <button type="button" className="btn btn-secondary" onClick={() => setRevealed(!revealed)}>
-          {revealed ? 'Ocultar' : 'Revelar'}
-        </button>
+        {progressive ? (
+          blankIndices.size > 0 &&
+          !revealedAll && (
+            <button type="button" className="btn btn-secondary" onClick={revealAll}>
+              Revelar todos
+            </button>
+          )
+        ) : (
+          <button type="button" className="btn btn-secondary" onClick={() => setRevealed(!revealed)}>
+            {revealed ? 'Ocultar' : 'Revelar'}
+          </button>
+        )}
       </div>
-      {revealed && <GradingButtons onGrade={onGrade} />}
+      {allRevealed && <GradingButtons onGrade={onGrade} />}
     </div>
   )
 }

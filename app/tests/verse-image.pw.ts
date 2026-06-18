@@ -3,22 +3,21 @@ import { expect, test, type Page } from '@playwright/test'
 test.describe('verse image modal', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
-  async function navigateToChapter(page: Page, bookName = 'Gênesis', chapterNum = '1') {
+  async function navigateToChapter(page: Page) {
     await page.goto('/browse')
-    // if welcome modal appears, dismiss it
     await page.locator('.welcome-cta').click({ force: true }).catch(() => {})
-    await page.waitForTimeout(500)
+    await expect(page.locator('.book-list')).toBeVisible({ timeout: 5000 })
 
-    // click the book
-    await page.locator('.book-item', { hasText: bookName }).click()
-    await page.waitForTimeout(500)
+    await page.locator('.book-item', { hasText: /^Gênesis$/ }).click()
+    await expect(page.locator('.chapter-grid')).toBeVisible({ timeout: 5000 })
 
-    // click the chapter
-    await page.locator('.chapter-item', { hasText: chapterNum }).click()
+    await page.locator('.chapter-item', { hasText: /^1$/ }).click()
 
-    // wait for verses to load
-    await page.waitForSelector('.verse-row', { timeout: 15000 })
-    await page.waitForTimeout(300)
+    // wait for loading spinner to disappear (IndexedDB seeding can be slow)
+    await page.locator('.loading').waitFor({ state: 'hidden', timeout: 30000 }).catch(() => {})
+
+    // wait for verse rows to appear
+    await expect(page.locator('.verse-row').first()).toBeVisible({ timeout: 30000 })
   }
 
   test('shows "Imagem" button when verses are selected', async ({ page }) => {
@@ -29,7 +28,7 @@ test.describe('verse image modal', () => {
     await expect(page.locator('.selection-bar button', { hasText: 'Imagem' })).toBeVisible()
   })
 
-  test('opens verse image modal when "Imagem" is clicked', async ({ page }) => {
+  test('opens verse image modal', async ({ page }) => {
     await navigateToChapter(page)
     await page.locator('.verse-row').first().click()
     await page.waitForTimeout(500)

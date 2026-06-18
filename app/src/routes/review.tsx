@@ -41,6 +41,7 @@ export function ReviewPage() {
   const [practiceMode, setPracticeMode] = useState<PracticeMode>(
     () => (localStorage.getItem('review_mode') as PracticeMode) || 'fill-blank',
   )
+  const [progressiveBlanks, setProgressiveBlanks] = useState(() => localStorage.getItem('review_fill_blank_progressive') === '1')
   const [gradeHistory, setGradeHistory] = useState<Grade[]>([])
   const [skipped, setSkipped] = useState(0)
   const [filterVerseIds, setFilterVerseIds] = useState<string[] | null>(() => {
@@ -422,6 +423,21 @@ export function ReviewPage() {
           ))}
         </div>
 
+        {practiceMode === 'fill-blank' && (
+          <label className="review-sub-toggle">
+            <input
+              type="checkbox"
+              checked={progressiveBlanks}
+              onChange={(e) => {
+                setProgressiveBlanks(e.target.checked)
+                localStorage.setItem('review_fill_blank_progressive', e.target.checked ? '1' : '0')
+              }}
+            />
+            <span>Palavra por palavra</span>
+            {progressiveBlanks && <span className="review-sub-toggle-hint">Toque em cada lacuna para revelar uma palavra por vez</span>}
+          </label>
+        )}
+
         {totalAll === 0 ? (
           <>
             <button type="button" className="btn btn-primary btn-large btn-start" disabled>
@@ -550,6 +566,7 @@ export function ReviewPage() {
           verseId={currentItem.verseId}
           onGrade={handleGrade}
           question={currentItem.question}
+          progressive={progressiveBlanks}
         />
       )}
       {practiceMode === 'typing' && (
