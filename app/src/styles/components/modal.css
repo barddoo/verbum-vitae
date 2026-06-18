@@ -470,6 +470,8 @@
   justify-content: center;
   z-index: 100;
   padding: 1.5rem;
+  padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
   backdrop-filter: blur(2px);
   overscroll-behavior: contain;
   animation: fadeIn 0.2s ease;
