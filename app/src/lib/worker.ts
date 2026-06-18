@@ -45,5 +45,7 @@ export const api = {
   leaderboard: {
     get: () => request('/api/leaderboard'),
     updateProfile: (displayName: string) => request('/api/leaderboard/profile', { method: 'PATCH', body: JSON.stringify({ displayName }) }),
+    updateVisibility: (hideFromLeaderboard: boolean) =>
+      request('/api/leaderboard/visibility', { method: 'PATCH', body: JSON.stringify({ hideFromLeaderboard }) }),
   },
 }

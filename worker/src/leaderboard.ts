@@ -1,7 +1,7 @@
 import { zValidator } from '@hono/zod-validator'
 import { type Context, Hono } from 'hono'
 import { verify } from 'hono/jwt'
-import { UpdateDisplayNameRequestSchema } from 'shared/types'
+import { UpdateDisplayNameRequestSchema, UpdateLeaderboardVisibilitySchema } from 'shared/types'
 
 type LeaderboardEnv = {
   Bindings: { DB: D1Database; JWT_SECRET: string }
@@ -72,12 +72,19 @@ leaderboardApp.get('/', async (c) => {
       u.current_streak
     FROM progress p
     JOIN users u ON u.id = p.user_id
+    WHERE u.hide_from_leaderboard = 0
     GROUP BY p.user_id
+    HAVING memorized_count >= 1
     ORDER BY memorized_count DESC, total_repetitions DESC
     LIMIT 50
   `
 
-  const { results } = await c.env.DB.prepare(top50Query).all<LeaderboardRow>()
+  const [{ results }, userMeta] = await Promise.all([
+    c.env.DB.prepare(top50Query).all<LeaderboardRow>(),
+    c.env.DB.prepare('SELECT hide_from_leaderboard FROM users WHERE id = ?').bind(user.sub).first<{ hide_from_leaderboard: number }>(),
+  ])
+
+  const currentUserHidden = (userMeta?.hide_from_leaderboard ?? 0) === 1
 
   const entries = results.map((row, i) => ({
     rank: i + 1,
@@ -101,6 +108,7 @@ leaderboardApp.get('/', async (c) => {
       JOIN users u ON u.id = p.user_id
       WHERE p.user_id = ?
       GROUP BY p.user_id
+      HAVING memorized_count >= 1
     `
     const userRow = await c.env.DB.prepare(userStatsQuery).bind(user.sub).first<LeaderboardRow>()
 
@@ -129,7 +137,7 @@ leaderboardApp.get('/', async (c) => {
   }
 
   c.header('Cache-Control', 'public, max-age=60, s-maxage=60')
-  return c.json({ entries, currentUserEntry })
+  return c.json({ entries, currentUserEntry, currentUserHidden })
 })
 
 leaderboardApp.patch('/profile', zValidator('json', UpdateDisplayNameRequestSchema), async (c) => {
@@ -138,6 +146,16 @@ leaderboardApp.patch('/profile', zValidator('json', UpdateDisplayNameRequestSche
   const { displayName } = c.req.valid('json')
   await c.env.DB.prepare('UPDATE users SET display_name = ? WHERE id = ?').bind(displayName, user.sub).run()
   return c.json({ ok: true, displayName })
+})
+
+leaderboardApp.patch('/visibility', zValidator('json', UpdateLeaderboardVisibilitySchema), async (c) => {
+  const user = await getUser(c)
+  if (!user) return c.json({ error: 'Não autenticado' }, 401)
+  const { hideFromLeaderboard } = c.req.valid('json')
+  await c.env.DB.prepare('UPDATE users SET hide_from_leaderboard = ? WHERE id = ?')
+    .bind(hideFromLeaderboard ? 1 : 0, user.sub)
+    .run()
+  return c.json({ ok: true, hideFromLeaderboard })
 })
 
 export { leaderboardApp as leaderboardRoutes }

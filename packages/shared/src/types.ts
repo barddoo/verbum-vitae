@@ -81,10 +81,15 @@ export const LeaderboardEntrySchema = z.object({
 export const LeaderboardResponseSchema = z.object({
   entries: z.array(LeaderboardEntrySchema),
   currentUserEntry: LeaderboardEntrySchema.nullable(),
+  currentUserHidden: z.boolean(),
 })
 
 export const UpdateDisplayNameRequestSchema = z.object({
   displayName: z.string().min(1).max(40).trim(),
+})
+
+export const UpdateLeaderboardVisibilitySchema = z.object({
+  hideFromLeaderboard: z.boolean(),
 })
 
 export type VerseRow = z.infer<typeof VerseSchema>

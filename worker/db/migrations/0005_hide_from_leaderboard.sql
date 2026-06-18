@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN hide_from_leaderboard INTEGER NOT NULL DEFAULT 0;

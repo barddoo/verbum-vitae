@@ -362,6 +362,40 @@
   line-height: 1.4;
 }
 
+.ranking-visibility-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.ranking-visibility-toggle input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--gold);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ranking-visibility-toggle span {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--aged);
+  line-height: 1.4;
+}
+
+.ranking-hidden-notice {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: var(--aged);
+  margin: 0.375rem 0 0;
+  line-height: 1.4;
+  font-style: italic;
+}
+
 .ranking-name-edit {
   display: flex;
   align-items: center;

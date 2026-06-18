@@ -6,6 +6,7 @@ export const users = sqliteTable('users', {
   passwordHash: text('password_hash').notNull(),
   displayName: text('display_name'),
   currentStreak: integer('current_streak').notNull().default(0),
+  hideFromLeaderboard: integer('hide_from_leaderboard', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull(),
 })
 

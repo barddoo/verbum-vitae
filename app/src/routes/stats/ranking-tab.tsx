@@ -35,13 +35,18 @@ export function RankingTab() {
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState('')
   const [saving, setSaving] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setLoading(true)
     api.leaderboard
       .get()
-      .then((d) => setData(d as LeaderboardResponse))
+      .then((d) => {
+        const resp = d as LeaderboardResponse
+        setData(resp)
+        setHidden(resp.currentUserHidden)
+      })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false))
   }, [])
@@ -68,15 +73,31 @@ export function RankingTab() {
     if (!nameInput.trim()) return
     setSaving(true)
     try {
-      await updateDisplayName(nameInput.trim())
+      const newName = nameInput.trim()
+      await updateDisplayName(newName)
       setEditing(false)
-      // refresh leaderboard
-      const d = await api.leaderboard.get()
-      setData(d as LeaderboardResponse)
+      setData((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          entries: prev.entries.map((e) => (e.isCurrentUser ? { ...e, displayName: newName } : e)),
+          currentUserEntry: prev.currentUserEntry ? { ...prev.currentUserEntry, displayName: newName } : null,
+        }
+      })
     } catch {
       // leave editing open on error
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleToggleVisibility() {
+    const newHidden = !hidden
+    setHidden(newHidden)
+    try {
+      await api.leaderboard.updateVisibility(newHidden)
+    } catch {
+      setHidden(!newHidden)
     }
   }
 
@@ -120,6 +141,11 @@ export function RankingTab() {
           </div>
         )}
         {!user.displayName && !editing && <p className="ranking-name-hint">Defina seu nome público para aparecer no ranking.</p>}
+        <label className="ranking-visibility-toggle">
+          <input type="checkbox" checked={hidden} onChange={handleToggleVisibility} />
+          <span>Ocultar meu nome do ranking</span>
+        </label>
+        {hidden && <p className="ranking-hidden-notice">Você está oculto do ranking.</p>}
       </div>
 
       {data && data.entries.length === 0 ? (
