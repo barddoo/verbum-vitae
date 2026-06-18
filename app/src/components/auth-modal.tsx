@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../lib/auth'
 
@@ -53,7 +54,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
-          ✕
+          <X size={18} aria-hidden />
         </button>
 
         <div className="modal-tabs">

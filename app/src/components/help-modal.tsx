@@ -1,30 +1,33 @@
+import { BookOpen, Cloud, Plus, RotateCcw, Smartphone, X } from 'lucide-react'
+import type { ReactNode } from 'react'
+
 interface HelpModalProps {
   onClose: () => void
 }
 
-const steps = [
+const steps: { icon: ReactNode; title: string; text: string }[] = [
   {
-    icon: '📖',
+    icon: <BookOpen size={20} aria-hidden />,
     title: 'Encontre um versículo',
     text: 'Vá em Bíblia, escolha um livro, capítulo e segure o dedo sobre o versículo que deseja memorizar.',
   },
   {
-    icon: '➕',
+    icon: <Plus size={20} aria-hidden />,
     title: 'Adicione à memória',
     text: 'Selecione um ou mais versículos e toque em Memorizar. Eles entram na sua fila de revisão.',
   },
   {
-    icon: '🔄',
+    icon: <RotateCcw size={20} aria-hidden />,
     title: 'Revise todo dia',
     text: 'Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa.',
   },
   {
-    icon: '🌐',
+    icon: <Cloud size={20} aria-hidden />,
     title: 'Sincronize entre dispositivos',
     text: 'Crie uma conta (opcional) para salvar seu progresso na nuvem e acessar em qualquer aparelho.',
   },
   {
-    icon: '📲',
+    icon: <Smartphone size={20} aria-hidden />,
     title: 'Instale como aplicativo',
     text: 'No Android/Chrome, toque em "Instalar App" no topo da tela. No iPhone, clique em Compartilhar e "Adicionar à Tela de Início". Instalado, o app funciona offline, sem distrações e com acesso rápido na tela inicial.',
   },
@@ -41,7 +44,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
-          ✕
+          <X size={18} aria-hidden />
         </button>
 
         <div className="help-header">

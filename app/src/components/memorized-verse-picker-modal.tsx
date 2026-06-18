@@ -1,3 +1,4 @@
+import { Check, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { db, fetchVersesBatch } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
@@ -90,7 +91,7 @@ export function MemorizedVersePickerModal({
         <div className="modal-header">
           <h2 className="modal-title">Meus versículos</h2>
           <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
-            ✕
+            <X size={18} aria-hidden />
           </button>
         </div>
 
@@ -122,7 +123,7 @@ export function MemorizedVersePickerModal({
                   className={`memorized-picker-row ${sel ? 'selected' : ''}`}
                   onClick={() => toggle(item.verseId)}
                 >
-                  <span className={`memorized-picker-check${sel ? ' checked' : ''}`}>{sel ? '✓' : ''}</span>
+                  <span className={`memorized-picker-check${sel ? ' checked' : ''}`}>{sel ? <Check size={10} aria-hidden /> : ''}</span>
                   <div className="memorized-picker-body">
                     <span className="memorized-picker-ref">{item.reference}</span>
                     <span className="memorized-picker-text">{item.text.slice(0, 120)}</span>

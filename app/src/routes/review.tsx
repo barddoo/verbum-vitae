@@ -1,5 +1,6 @@
 import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Check } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { type CollectionVerse, db, fetchVersesBatch, parseTextKey } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
@@ -517,7 +518,7 @@ export function ReviewPage() {
           </div>
         </div>
         <span className="review-completed" title="Concluídos">
-          {completed} ✓
+          {completed} <Check size={12} aria-hidden />
         </span>
       </div>
       <div className="review-progress-bar">

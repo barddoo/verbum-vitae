@@ -302,6 +302,9 @@
   text-transform: uppercase;
   letter-spacing: 0.05rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .added-check {

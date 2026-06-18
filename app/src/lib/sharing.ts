@@ -39,3 +39,72 @@ function fallbackCopy({ title, text, url }: { title: string; text: string; url: 
     alert(full)
   })
 }
+
+export async function shareImageBlob(blob: Blob, title: string): Promise<void> {
+  if (isNative()) return shareNative(blob, title)
+  return shareWeb(blob, title)
+}
+
+function isNative(): boolean {
+  try {
+    const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor
+    return cap?.isNativePlatform?.() === true
+  } catch {
+    return false
+  }
+}
+
+async function blobToBase64(blob: Blob): Promise<string> {
+  const buffer = await blob.arrayBuffer()
+  let binary = ''
+  const bytes = new Uint8Array(buffer)
+  const chunk = 0x8000
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk))
+  }
+  return btoa(binary)
+}
+
+async function shareNative(blob: Blob, title: string): Promise<void> {
+  const cap = (
+    window as unknown as {
+      Capacitor?: {
+        plugins: { Share: { share: (o: { title?: string; files: string[] }) => Promise<void> }; Filesystem: typeof FilesystemNS }
+      }
+    }
+  ).Capacitor
+  if (!cap) return shareWeb(blob, title)
+  const base64 = await blobToBase64(blob)
+  const { uri } = await cap.plugins.Filesystem.writeFile({
+    path: `versiculo-${Date.now()}.png`,
+    data: base64,
+    directory: 'CACHE',
+  })
+  try {
+    await cap.plugins.Share.share({ title, files: [uri] })
+  } catch {
+    // user dismissed the sheet — no-op
+  }
+}
+
+async function shareWeb(blob: Blob, title: string): Promise<void> {
+  const file = new File([blob], 'versiculo.png', { type: 'image/png' })
+  if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ title, files: [file] })
+      return
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return
+    }
+  }
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'versiculo.png'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+declare const FilesystemNS: {
+  writeFile: (o: { path: string; data: string; directory: string }) => Promise<{ uri: string }>
+}

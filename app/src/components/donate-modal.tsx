@@ -1,3 +1,4 @@
+import { Check, X } from 'lucide-react'
 import { useState } from 'react'
 
 const BTC_ADDRESS = 'bc1qs4n8h0z5perjqefgwjm8wfmzxm92sujum5uy3a'
@@ -29,7 +30,7 @@ export function DonateModal({ onClose }: DonateModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
-          ✕
+          <X size={18} aria-hidden />
         </button>
 
         <div className="donate-header">
@@ -43,7 +44,7 @@ export function DonateModal({ onClose }: DonateModalProps) {
           <div className="donate-btc-row">
             <code className="donate-btc-addr">{BTC_ADDRESS}</code>
             <button type="button" className="donate-copy-btn" onClick={() => handleCopy('btc', BTC_ADDRESS)} aria-live="polite">
-              {copied === 'btc' ? '✓' : 'Copiar'}
+              {copied === 'btc' ? <Check size={14} aria-hidden /> : 'Copiar'}
             </button>
           </div>
         </div>
@@ -56,7 +57,7 @@ export function DonateModal({ onClose }: DonateModalProps) {
           <div className="donate-btc-row">
             <code className="donate-btc-addr">{CHURCH_PIX_KEY}</code>
             <button type="button" className="donate-copy-btn" onClick={() => handleCopy('church', CHURCH_PIX_KEY)} aria-live="polite">
-              {copied === 'church' ? '✓' : 'Copiar'}
+              {copied === 'church' ? <Check size={14} aria-hidden /> : 'Copiar'}
             </button>
           </div>
         </div>

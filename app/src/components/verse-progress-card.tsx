@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react'
 import { memo, useState } from 'react'
 import { formatRelativeDueDate, verseIdToReference } from '../lib/format'
 
@@ -49,7 +50,7 @@ export const VerseProgressCard = memo(function VerseProgressCard({
         <span className="verse-card-ref">{reference}</span>
         {selectionMode ? (
           <span className={`verse-card-check${selected ? ' checked' : ''}`} aria-hidden="true">
-            {selected ? '✓' : ''}
+            {selected ? <Check size={12} /> : ''}
           </span>
         ) : !confirming ? (
           <button

@@ -1,4 +1,5 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { Check, Pencil, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { DEFAULT_TRANSLATION } from 'shared/bible'
 import { type CollectionFormData, CollectionFormModal } from '../components/collection-form-modal'
@@ -122,7 +123,11 @@ function SwipeableVerseRow({
       >
         <span className="collection-verse-ref">{reference}</span>
         <span className="collection-verse-text">{text}</span>
-        {memorized && <span className="memorized-badge">Memorizado</span>}
+        {memorized && (
+          <span className="memorized-badge">
+            <Check size={10} aria-hidden /> Memorizado
+          </span>
+        )}
       </div>
     </div>
   )
@@ -400,7 +405,7 @@ export function CollectionDetailPage() {
               aria-label="Editar coleção"
               title="Editar"
             >
-              ✎
+              <Pencil size={14} aria-hidden />
             </button>
             <button
               type="button"
@@ -409,7 +414,7 @@ export function CollectionDetailPage() {
               aria-label="Excluir coleção"
               title="Excluir"
             >
-              ✕
+              <X size={14} aria-hidden />
             </button>
           </div>
         )}
@@ -454,7 +459,11 @@ export function CollectionDetailPage() {
             <div key={`${v.verseId}-${v.translation}`} className={`collection-verse-row ${v.memorized ? 'memorized' : ''}`}>
               <span className="collection-verse-ref">{v.reference}</span>
               <span className="collection-verse-text">{v.text}</span>
-              {v.memorized && <span className="memorized-badge">Memorizado</span>}
+              {v.memorized && (
+                <span className="memorized-badge">
+                  <Check size={10} aria-hidden /> Memorizado
+                </span>
+              )}
             </div>
           ),
         )}
@@ -468,13 +477,17 @@ export function CollectionDetailPage() {
             onClick={handleAddAll}
             disabled={adding || added || col.memorized === col.total}
           >
-            {adding
-              ? 'Adicionando…'
-              : added
-                ? '✓ Adicionado'
-                : col.total === 0
-                  ? 'Sem versículos'
-                  : `Adicionar à memória (${col.total - col.memorized})`}
+            {adding ? (
+              'Adicionando…'
+            ) : added ? (
+              <>
+                <Check size={16} aria-hidden /> Adicionado
+              </>
+            ) : col.total === 0 ? (
+              'Sem versículos'
+            ) : (
+              `Adicionar à memória (${col.total - col.memorized})`
+            )}
           </button>
           <div className="collection-detail-actions-row">
             <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
@@ -495,13 +508,17 @@ export function CollectionDetailPage() {
             onClick={handleAddAll}
             disabled={adding || added || col.memorized === col.total}
           >
-            {adding
-              ? 'Adicionando…'
-              : added
-                ? '✓ Adicionado'
-                : col.total === 0
-                  ? 'Sem versículos'
-                  : `Adicionar todos (${col.total - col.memorized})`}
+            {adding ? (
+              'Adicionando…'
+            ) : added ? (
+              <>
+                <Check size={16} aria-hidden /> Adicionado
+              </>
+            ) : col.total === 0 ? (
+              'Sem versículos'
+            ) : (
+              `Adicionar todos (${col.total - col.memorized})`
+            )}
           </button>
         </div>
       )}
