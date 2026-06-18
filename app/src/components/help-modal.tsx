@@ -1,11 +1,11 @@
-import { BookOpen, Cloud, Plus, RotateCcw, Smartphone, X } from 'lucide-react'
+import { BookOpen, Brain, Cloud, Plus, RotateCcw, Smartphone, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 interface HelpModalProps {
   onClose: () => void
 }
 
-const steps: { icon: ReactNode; title: string; text: string }[] = [
+const steps: { icon: ReactNode; title: string; text: ReactNode }[] = [
   {
     icon: <BookOpen size={20} aria-hidden />,
     title: 'Encontre um versículo',
@@ -20,6 +20,17 @@ const steps: { icon: ReactNode; title: string; text: string }[] = [
     icon: <RotateCcw size={20} aria-hidden />,
     title: 'Revise todo dia',
     text: 'Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa.',
+  },
+  {
+    icon: <Brain size={20} aria-hidden />,
+    title: 'Três modos de revisão',
+    text: (
+      <>
+        <strong>Flashcard</strong> — recite mentalmente e revele. <strong>Lacunas</strong> — complete palavras ocultas (ative &ldquo;Palavra
+        por palavra&rdquo; para mais desafio). <strong>Digitação</strong> — escreva de memória, o mais eficaz para versículos novos. Avalie
+        com <strong>honestidade</strong>: 1&nbsp;=&nbsp;vê em breve · 4&nbsp;=&nbsp;vê em semanas.
+      </>
+    ),
   },
   {
     icon: <Cloud size={20} aria-hidden />,

@@ -22,6 +22,21 @@ function buildMessage({ verseRef, verseText }: ShareVerseParams = {}): { title: 
   }
 }
 
+export async function shareSession(reviewed: number): Promise<void> {
+  const appUrl = window.location.origin
+  const text =
+    reviewed === 1
+      ? `Revisei 1 versículo agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada.`
+      : `Revisei ${reviewed} versículos agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada.`
+  const shareData = { title: 'Verbum Vitae', text, url: appUrl }
+  try {
+    await navigator.share(shareData)
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') return
+    fallbackCopy(shareData)
+  }
+}
+
 export async function shareVerse(params: ShareVerseParams = {}): Promise<void> {
   const shareData = buildMessage(params)
 

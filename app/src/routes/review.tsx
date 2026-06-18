@@ -488,7 +488,6 @@ export function ReviewPage() {
         completed={completed}
         skippedCount={skipped}
         gradeHistory={gradeHistory}
-        reviewedItems={items}
         remainingCount={Math.max(0, filteredProgress.length - sessionOffsetRef.current - items.length)}
         onGoBack={goBack}
         onNewSession={() => {

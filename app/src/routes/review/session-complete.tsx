@@ -1,21 +1,24 @@
-import { useMemo } from 'react'
-import { shareVerse } from '../../lib/sharing'
+import { useMemo, useState } from 'react'
+import { shareSession } from '../../lib/sharing'
 import type { Grade } from '../../lib/srs'
 
-interface DueItem {
-  progressId: number
-  verseId: string
-  reference: string
-  verseText: string
-  card: unknown
-  translation: string
-}
+const TIPS = [
+  'Leia o contexto antes de memorizar — o parágrafo ao redor ancora o significado das palavras.',
+  'Leia o versículo em voz alta. Vocalizar ativa a memória auditiva e aumenta a retenção em ~50%.',
+  'Escreva o versículo à mão uma vez quando começar a memorizá-lo. O ato de escrever cria outro caminho de memória.',
+  'Avalie com honestidade. Dizer "Fácil" quando não está fluente engana o algoritmo e você esquece mais rápido.',
+  'Associe o versículo a uma situação concreta da sua vida. Memória emocional é muito mais durável.',
+  'Consistência supera intensidade — 5 versículos por dia superam 35 numa sessão semanal. Não pule dias.',
+  'Recite o versículo em voz alta, como se estivesse ensinando alguém. O feedback auditivo fixa mais.',
+  'Adicione 1–2 versículos novos por vez, nunca muitos de uma vez. O acúmulo rápido leva ao abandono.',
+  'Medite no significado do versículo. Entender o que ele diz torna a memorização mais rápida e a retenção mais longa.',
+  'Manhã é o melhor momento para revisar — aproveite a consolidação da memória que ocorre durante o sono.',
+]
 
 export function SessionComplete({
   completed,
   skippedCount,
   gradeHistory,
-  reviewedItems,
   remainingCount,
   onGoBack,
   onNewSession,
@@ -24,7 +27,6 @@ export function SessionComplete({
   completed: number
   skippedCount: number
   gradeHistory: Grade[]
-  reviewedItems: DueItem[]
   remainingCount: number
   onGoBack: () => void
   onNewSession: () => void
@@ -32,13 +34,15 @@ export function SessionComplete({
 }) {
   const gradeCounts = useMemo(() => [1, 2, 3, 4].map((r) => gradeHistory.filter((g) => g === r).length), [gradeHistory])
 
-  const lastItem = reviewedItems.length > 0 ? reviewedItems[reviewedItems.length - 1] : null
+  const [tip] = useState(() => {
+    const stored = parseInt(localStorage.getItem('session_tip_index') ?? '0', 10)
+    const index = Number.isNaN(stored) ? 0 : stored % TIPS.length
+    localStorage.setItem('session_tip_index', String((index + 1) % TIPS.length))
+    return TIPS[index]
+  })
 
   function handleShare() {
-    shareVerse({
-      verseRef: lastItem?.reference,
-      verseText: lastItem?.verseText,
-    })
+    shareSession(completed)
   }
 
   return (
@@ -62,6 +66,12 @@ export function SessionComplete({
                 <span>{gradeCounts[i]}</span>
               </div>
             ))}
+          </div>
+        )}
+        {completed > 0 && (
+          <div className="session-tip">
+            <span className="session-tip-label">💡 Dica</span>
+            <p className="session-tip-text">{tip}</p>
           </div>
         )}
         <div className="session-complete-actions">
