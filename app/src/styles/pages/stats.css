@@ -299,6 +299,224 @@
   border-bottom-color: var(--gold);
 }
 
+/* RANKING TAB */
+
+.ranking-tab {
+  display: flex;
+  flex-direction: column;
+}
+
+.ranking-profile {
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.125rem;
+}
+
+.ranking-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ranking-profile-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--parchment);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ranking-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  transition: opacity 0.15s;
+}
+
+.ranking-edit-btn:hover {
+  opacity: 0.7;
+}
+
+.ranking-edit-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.ranking-name-hint {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--aged);
+  margin: 0.4375rem 0 0;
+  line-height: 1.4;
+}
+
+.ranking-name-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ranking-name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4375rem 0.75rem;
+  background: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ranking-name-input:focus {
+  border-color: var(--gold);
+}
+
+.ranking-name-input::placeholder {
+  color: var(--aged);
+}
+
+/* ROW LIST */
+
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.ranking-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto auto;
+  align-items: center;
+  column-gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--leather);
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s;
+}
+
+.ranking-row:last-child {
+  border-bottom: none;
+}
+
+.ranking-row--me {
+  background: var(--gold-dim);
+  border-left: 2px solid var(--gold);
+  padding-left: calc(1rem - 2px);
+}
+
+.ranking-medal {
+  font-size: 1.1875rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.ranking-rank {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--aged);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking-name {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--parchment);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ranking-row--me .ranking-name {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.ranking-stat {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.ranking-stat-label {
+  font-size: 0.6rem;
+  color: var(--aged);
+  text-transform: uppercase;
+  letter-spacing: 0.03rem;
+  margin-left: 0.1875rem;
+}
+
+.ranking-streak {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* SEPARATOR */
+
+.ranking-separator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.25rem 0 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  color: var(--aged);
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+}
+
+.ranking-separator::before,
+.ranking-separator::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* STATES */
+
+.ranking-loading,
+.ranking-error,
+.ranking-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--aged);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ranking-error {
+  color: var(--rubric);
+}
+
 /* FILTER CHIPS */
 
 .filter-chips {
