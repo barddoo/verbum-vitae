@@ -5,6 +5,15 @@ import { GradingButtons } from './grading-buttons'
 
 const WORD_SPLIT = /\s+/
 const STRIP_NON_ALPHA = /[^a-zA-ZÀ-ÿ]/g
+const PUNCT_PREFIX = /^[^a-zA-ZÀ-ÿ0-9]*/
+const PUNCT_SUFFIX = /[^a-zA-ZÀ-ÿ0-9]*$/
+
+function blankFor(word: string): string {
+  const pre = word.match(PUNCT_PREFIX)?.[0] ?? ''
+  const suf = word.match(PUNCT_SUFFIX)?.[0] ?? ''
+  const core = word.slice(pre.length, word.length - suf.length)
+  return pre + '_'.repeat(core.length) + suf
+}
 
 function heatClass(accuracy: number): string {
   if (accuracy < 0) return ''
@@ -100,7 +109,7 @@ export function FillInBlankView({
                   onClick={() => revealWord(i)}
                   aria-label="Revelar palavra"
                 >
-                  {'_'.repeat(word.length)}
+                  {blankFor(word)}
                 </button>{' '}
               </Fragment>
             )

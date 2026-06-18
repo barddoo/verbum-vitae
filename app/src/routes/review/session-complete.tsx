@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { VerseImageModal } from '../../components/verse-image/verse-image-modal'
 import { shareSession } from '../../lib/sharing'
 import type { Grade } from '../../lib/srs'
 
@@ -19,6 +20,7 @@ export function SessionComplete({
   completed,
   skippedCount,
   gradeHistory,
+  lastVerse,
   remainingCount,
   onGoBack,
   onNewSession,
@@ -27,6 +29,7 @@ export function SessionComplete({
   completed: number
   skippedCount: number
   gradeHistory: Grade[]
+  lastVerse?: { ref: string; text: string; translation: string }
   remainingCount: number
   onGoBack: () => void
   onNewSession: () => void
@@ -40,6 +43,8 @@ export function SessionComplete({
     localStorage.setItem('session_tip_index', String((index + 1) % TIPS.length))
     return TIPS[index]
   })
+
+  const [showImageModal, setShowImageModal] = useState(false)
 
   function handleShare() {
     shareSession(completed)
@@ -90,8 +95,22 @@ export function SessionComplete({
           <button type="button" className="btn btn-secondary" onClick={handleShare}>
             Compartilhar
           </button>
+          {lastVerse && (
+            <button type="button" className="btn btn-secondary" onClick={() => setShowImageModal(true)}>
+              Compartilhar imagem
+            </button>
+          )}
         </div>
       </div>
+      {lastVerse && (
+        <VerseImageModal
+          open={showImageModal}
+          onClose={() => setShowImageModal(false)}
+          verses={[{ ref: lastVerse.ref, text: lastVerse.text }]}
+          translation={lastVerse.translation}
+          bookName={lastVerse.ref}
+        />
+      )}
     </div>
   )
 }

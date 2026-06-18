@@ -434,7 +434,7 @@ export function ReviewPage() {
               }}
             />
             <span>Palavra por palavra</span>
-            {progressiveBlanks && <span className="review-sub-toggle-hint">Toque em cada lacuna para revelar uma palavra por vez</span>}
+            <span className="review-sub-toggle-hint">Toque em cada lacuna para revelar uma palavra por vez</span>
           </label>
         )}
 
@@ -488,6 +488,15 @@ export function ReviewPage() {
         completed={completed}
         skippedCount={skipped}
         gradeHistory={gradeHistory}
+        lastVerse={
+          items.length > 0
+            ? {
+                ref: items[items.length - 1].reference,
+                text: items[items.length - 1].verseText,
+                translation: items[items.length - 1].translation,
+              }
+            : undefined
+        }
         remainingCount={Math.max(0, filteredProgress.length - sessionOffsetRef.current - items.length)}
         onGoBack={goBack}
         onNewSession={() => {

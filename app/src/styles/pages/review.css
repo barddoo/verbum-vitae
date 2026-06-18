@@ -784,6 +784,37 @@
   font-size: 0.85rem;
 }
 
+.typing-diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.75rem 0 1rem;
+  font-family: var(--font-body);
+}
+
+.typing-diff-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.diff-typed {
+  color: var(--rubric);
+  text-decoration: line-through;
+  min-width: 4rem;
+}
+
+.diff-arrow {
+  color: var(--border);
+  flex-shrink: 0;
+}
+
+.diff-target {
+  color: var(--sage);
+  font-weight: 600;
+}
+
 /* SESSION COMPLETE */
 
 .session-complete {
