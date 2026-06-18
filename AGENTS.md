@@ -36,6 +36,7 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 
 ## Conventions
 
+- **Prefer native**. Use platform APIs over third-party libraries when possible. Avoid adding dependencies for functionality available in the runtime (Web APIs, Bun APIs, Cloudflare Workers runtime). In Capacitor, prefer built-in plugins (Camera, Filesystem, Haptics, etc.) over third-party wrappers or Cordova plugins.
 - **Mobile-first design**. All UI built for mobile first, desktop as enhancement.
 - **No `any` type**. Use `unknown` + narrowing, or proper types. Only use `unknown` when truly needed.
 - **Tests exist**: Vitest (unit) + Playwright (layout/smoke). 113 unit tests, 54 layout tests across mobile + desktop.

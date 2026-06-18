@@ -64,9 +64,9 @@ app/
 
 ## Phase 1 — Background assets
 
-> ✅ **Registry done** (`verse-backgrounds.ts`). Photo assets pending — user will provide source images.
+> ✅ **Registry + assets done** — 23 curated WebP from Unsplash CDN, downloaded via `scripts/fetch-backgrounds.ts`. Includes 3 explicitly Christian-themed photos (Adoração, Bíblia Aberta, Livro Flutuante).
 
-`app/public/bg/` — ~20 curated WebP images (~1200×1200 and/or 1080×1920), quality ~70 → 40–90KB each, ~1–2MB total. Themes: sky, nature, mountains, water, paper/texture, dark abstract. Lazy-loaded (never in the JS bundle) and added to the PWA precache list so they work fully offline after first install.
+`app/public/bg/` — 23 curated WebP images (1080×1080 + thumbs at 200×200), quality 55. **Total: 3.55MB** (3.4MB fulls + 0.2MB thumbs). Themes: sky, stars, mountains, water, forest, aurora, plus 3 Christian-themed (worship silhouette, open Bible, floating book in library). Lazy-loaded (never in the JS bundle) and added to the PWA precache list so they work fully offline after first install.
 
 `verse-backgrounds.ts` exports a typed registry:
 
@@ -251,7 +251,10 @@ No additions. App already loads Fraunces (`--font-display`, "Fraunces Variable")
 |--------|-------|
 | New code files | 6 |
 | Modified files | 4 |
-| New assets | ~20 WebP (~1–2MB, lazy + precached) |
+| New scripts | 2 (`scripts/background-photos.json`, `scripts/fetch-backgrounds.ts`) |
+| New assets | 23 WebP (3.55MB, lazy + precached) |
+| New test files | 5 (`verse-backgrounds.test.ts`, `verse-canvas.test.ts`, `sharing.test.ts`, `verse-image-controls.test.tsx`, `background-carousel.test.tsx`, plus `verse-image.pw.ts` Playwright) |
+| New unit tests | 30 (total 143, up from 113) |
 | JS dependencies added | **0** |
 | Capacitor plugins added | **2** (`@capacitor/share`, `@capacitor/filesystem` — core, no network; needs org approval) |
 | Network egress | **none** (fully offline) |

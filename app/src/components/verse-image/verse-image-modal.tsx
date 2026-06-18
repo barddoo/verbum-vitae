@@ -62,6 +62,19 @@ export function VerseImageModal({ open, onClose, verses, translation, bookName }
 
   useEffect(() => {
     if (!open) return
+    if (background.kind !== 'photo') return
+    const img = new Image()
+    img.onload = () => setCustomImage(img)
+    img.onerror = () => setCustomImage(undefined)
+    img.src = background.full
+    return () => {
+      img.onload = null
+      img.onerror = null
+    }
+  }, [open, background.id])
+
+  useEffect(() => {
+    if (!open) return
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
@@ -71,8 +84,16 @@ export function VerseImageModal({ open, onClose, verses, translation, bookName }
 
   const handleSelect = useCallback((bg: Background, custom?: HTMLImageElement) => {
     setBackground(bg)
-    if (custom) setCustomImage(custom)
-    else if (bg.id !== 'custom') setCustomImage(undefined)
+    if (custom) {
+      setCustomImage(custom)
+    } else if (bg.kind === 'photo') {
+      const img = new Image()
+      img.onload = () => setCustomImage(img)
+      img.onerror = () => setCustomImage(undefined)
+      img.src = bg.full
+    } else {
+      setCustomImage(undefined)
+    }
   }, [])
 
   async function handleShare() {

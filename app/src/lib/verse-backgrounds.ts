@@ -2,6 +2,170 @@ export type Background =
   | { kind: 'photo'; id: string; thumb: string; full: string; name: string }
   | { kind: 'gradient'; id: string; stops: [string, string]; name: string }
 
+export const PHOTOS: Extract<Background, { kind: 'photo' }>[] = [
+  {
+    kind: 'photo',
+    id: 'noite-estrelada',
+    thumb: '/bg/1419242902214-272b3f66ee7a-thumb.webp',
+    full: '/bg/1419242902214-272b3f66ee7a.webp',
+    name: 'Noite Estrelada',
+  },
+  {
+    kind: 'photo',
+    id: 'via-lactea',
+    thumb: '/bg/1502134249126-9f3755a50d78-thumb.webp',
+    full: '/bg/1502134249126-9f3755a50d78.webp',
+    name: 'Via Láctea',
+  },
+  {
+    kind: 'photo',
+    id: 'montanha-estrelada',
+    thumb: '/bg/1519681393784-d120267933ba-thumb.webp',
+    full: '/bg/1519681393784-d120267933ba.webp',
+    name: 'Montanha Estrelada',
+  },
+  {
+    kind: 'photo',
+    id: 'por-do-sol',
+    thumb: '/bg/1495567720989-cebdbdd97913-thumb.webp',
+    full: '/bg/1495567720989-cebdbdd97913.webp',
+    name: 'Pôr do Sol',
+  },
+  {
+    kind: 'photo',
+    id: 'floresta-aerea',
+    thumb: '/bg/1473773508845-188df298d2d1-thumb.webp',
+    full: '/bg/1473773508845-188df298d2d1.webp',
+    name: 'Floresta Aérea',
+  },
+  {
+    kind: 'photo',
+    id: 'cachoeira',
+    thumb: '/bg/1455218873509-8097305ee378-thumb.webp',
+    full: '/bg/1455218873509-8097305ee378.webp',
+    name: 'Cachoeira',
+  },
+  {
+    kind: 'photo',
+    id: 'floresta-nebulosa',
+    thumb: '/bg/1448375240586-882707db888b-thumb.webp',
+    full: '/bg/1448375240586-882707db888b.webp',
+    name: 'Floresta Nebulosa',
+  },
+  {
+    kind: 'photo',
+    id: 'campo-ao-amanhecer',
+    thumb: '/bg/1500382017468-9049fed747ef-thumb.webp',
+    full: '/bg/1500382017468-9049fed747ef.webp',
+    name: 'Campo ao Amanhecer',
+  },
+  {
+    kind: 'photo',
+    id: 'vale-alpino',
+    thumb: '/bg/1464822759023-fed622ff2c3b-thumb.webp',
+    full: '/bg/1464822759023-fed622ff2c3b.webp',
+    name: 'Vale Alpino',
+  },
+  {
+    kind: 'photo',
+    id: 'pico-nas-nuvens',
+    thumb: '/bg/1506905925346-21bda4d32df4-thumb.webp',
+    full: '/bg/1506905925346-21bda4d32df4.webp',
+    name: 'Pico nas Nuvens',
+  },
+  {
+    kind: 'photo',
+    id: 'pico-nevado',
+    thumb: '/bg/1485470733090-0aae1788d5af-thumb.webp',
+    full: '/bg/1485470733090-0aae1788d5af.webp',
+    name: 'Pico Nevado',
+  },
+  {
+    kind: 'photo',
+    id: 'praia-ao-entardecer',
+    thumb: '/bg/1507525428034-b723cf961d3e-thumb.webp',
+    full: '/bg/1507525428034-b723cf961d3e.webp',
+    name: 'Praia ao Entardecer',
+  },
+  {
+    kind: 'photo',
+    id: 'ondas',
+    thumb: '/bg/1518837695005-2083093ee35b-thumb.webp',
+    full: '/bg/1518837695005-2083093ee35b.webp',
+    name: 'Ondas',
+  },
+  {
+    kind: 'photo',
+    id: 'lago-alpino',
+    thumb: '/bg/1501785888041-af3ef285b470-thumb.webp',
+    full: '/bg/1501785888041-af3ef285b470.webp',
+    name: 'Lago Alpino',
+  },
+  {
+    kind: 'photo',
+    id: 'aurora',
+    thumb: '/bg/1507272931001-fc06c17e4f43-thumb.webp',
+    full: '/bg/1507272931001-fc06c17e4f43.webp',
+    name: 'Aurora',
+  },
+  {
+    kind: 'photo',
+    id: 'cordilheira',
+    thumb: '/bg/1465056836041-7f43ac27dcb5-thumb.webp',
+    full: '/bg/1465056836041-7f43ac27dcb5.webp',
+    name: 'Cordilheira',
+  },
+  {
+    kind: 'photo',
+    id: 'montanhas-azuis',
+    thumb: '/bg/1500964757637-c85e8a162699-thumb.webp',
+    full: '/bg/1500964757637-c85e8a162699.webp',
+    name: 'Montanhas Azuis',
+  },
+  {
+    kind: 'photo',
+    id: 'floresta-verde',
+    thumb: '/bg/1542273917363-3b1817f69a2d-thumb.webp',
+    full: '/bg/1542273917363-3b1817f69a2d.webp',
+    name: 'Floresta Verde',
+  },
+  {
+    kind: 'photo',
+    id: 'por-do-sol-dourado',
+    thumb: '/bg/1469474968028-56623f02e42e-thumb.webp',
+    full: '/bg/1469474968028-56623f02e42e.webp',
+    name: 'Pôr do Sol Dourado',
+  },
+  {
+    kind: 'photo',
+    id: 'camadas-de-montanha',
+    thumb: '/bg/1490604001847-b712b0c2f967-thumb.webp',
+    full: '/bg/1490604001847-b712b0c2f967.webp',
+    name: 'Camadas de Montanha',
+  },
+  {
+    kind: 'photo',
+    id: 'adoracao',
+    thumb: '/bg/1499209974431-9dddcece7f88-thumb.webp',
+    full: '/bg/1499209974431-9dddcece7f88.webp',
+    name: 'Adoração',
+  },
+  {
+    kind: 'photo',
+    id: 'biblia-aberta',
+    thumb: '/bg/1504052434569-70ad5836ab65-thumb.webp',
+    full: '/bg/1504052434569-70ad5836ab65.webp',
+    name: 'Bíblia Aberta',
+  },
+  {
+    kind: 'photo',
+    id: 'livro-flutuante',
+    thumb: '/bg/1532012197267-da84d127e765-thumb.webp',
+    full: '/bg/1532012197267-da84d127e765.webp',
+    name: 'Livro Flutuante',
+  },
+]
+
 export const GRADIENTS: Extract<Background, { kind: 'gradient' }>[] = [
   { kind: 'gradient', id: 'ink', stops: ['#0f1117', '#1a1f2e'], name: 'Tinta' },
   { kind: 'gradient', id: 'deep-purple', stops: ['#1a1f2e', '#2d1f3d'], name: 'Púrpura' },
@@ -14,7 +178,5 @@ export const GRADIENTS: Extract<Background, { kind: 'gradient' }>[] = [
   { kind: 'gradient', id: 'night-sky', stops: ['#2a1a3a', '#1a2a3a'], name: 'Céu Noturno' },
   { kind: 'gradient', id: 'teal', stops: ['#1a3a3a', '#0f1f2e'], name: 'Azul-petróleo' },
 ]
-
-export const PHOTOS: Extract<Background, { kind: 'photo' }>[] = []
 
 export const BACKGROUNDS: Background[] = [...PHOTOS, ...GRADIENTS]
