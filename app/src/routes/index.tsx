@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BookOpen, Brain, Share2, Smartphone, WifiOff, X } from 'lucide-react'
 import { useContext, useEffect, useMemo, useState } from 'react'
+import { PageMeta } from '../components/page-meta'
 import { db } from '../lib/db'
 import { usePresence } from '../lib/presence-context'
 import { shareVerse } from '../lib/sharing'
@@ -108,284 +109,290 @@ export function HomePage() {
   }, [allProgress, closeWelcome])
 
   return (
-    <div className="page home-page">
-      {!stats ? (
-        loadingSpinner
-      ) : totalMemorized === 0 ? (
-        <>
-          <div className="welcome-hero">
-            <h2 className="welcome-headline">
-              Memorize a Bíblia com <span className="welcome-headline-accent">repetição espaçada</span>
-            </h2>
-            <p className="welcome-subtitle">Aprenda versículos no seu ritmo, com revisões inteligentes que aparecem no momento certo.</p>
-            <div className="welcome-features">
-              <div className="welcome-feature-item">
-                <BookOpen size={20} className="welcome-feature-icon" />
-                <span className="welcome-feature-label">6 traduções</span>
+    <>
+      <PageMeta
+        title="Verbum Vitae — Memorização Bíblica"
+        description="Memorização bíblica com repetição espaçada. Aprenda e memorize versículos da Bíblia com flashcards inteligentes e acompanhamento de progresso."
+      />
+      <div className="page home-page">
+        {!stats ? (
+          loadingSpinner
+        ) : totalMemorized === 0 ? (
+          <>
+            <div className="welcome-hero">
+              <h2 className="welcome-headline">
+                Memorize a Bíblia com <span className="welcome-headline-accent">repetição espaçada</span>
+              </h2>
+              <p className="welcome-subtitle">Aprenda versículos no seu ritmo, com revisões inteligentes que aparecem no momento certo.</p>
+              <div className="welcome-features">
+                <div className="welcome-feature-item">
+                  <BookOpen size={20} className="welcome-feature-icon" />
+                  <span className="welcome-feature-label">6 traduções</span>
+                </div>
+                <div className="welcome-feature-item">
+                  <Brain size={20} className="welcome-feature-icon" />
+                  <span className="welcome-feature-label">FSRS</span>
+                </div>
+                <div className="welcome-feature-item">
+                  <WifiOff size={20} className="welcome-feature-icon" />
+                  <span className="welcome-feature-label">Offline</span>
+                </div>
               </div>
-              <div className="welcome-feature-item">
-                <Brain size={20} className="welcome-feature-icon" />
-                <span className="welcome-feature-label">FSRS</span>
+              <div className="welcome-cta">
+                <Link to="/browse" className="btn btn-primary btn-large">
+                  Explorar a Bíblia
+                </Link>
+                <Link to="/collections" className="btn btn-secondary btn-large">
+                  Ver Coleções Temáticas
+                </Link>
               </div>
-              <div className="welcome-feature-item">
-                <WifiOff size={20} className="welcome-feature-icon" />
-                <span className="welcome-feature-label">Offline</span>
-              </div>
+              <p className="welcome-reassurance">Grátis · Sem cadastro</p>
             </div>
-            <div className="welcome-cta">
-              <Link to="/browse" className="btn btn-primary btn-large">
-                Explorar a Bíblia
-              </Link>
-              <Link to="/collections" className="btn btn-secondary btn-large">
-                Ver Coleções Temáticas
-              </Link>
-            </div>
-            <p className="welcome-reassurance">Grátis · Sem cadastro</p>
-          </div>
 
-          <div className="community-presence-card" aria-live="polite">
-            {presenceCount > 0 ? (
-              <>
-                <span className="community-presence-main">
-                  <span className="community-presence-count">{nf.format(presenceCount)}</span>
-                  <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
-                </span>
-                <span className="community-presence-label">memorizando agora</span>
-                <span className="community-presence-encourage">Junte-se a eles!</span>
-                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                  Compartilhar
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="community-presence-encourage">Seja o primeiro a memorizar hoje!</span>
-                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                  Compartilhar
-                </button>
-              </>
-            )}
-          </div>
-
-          {show && (
-            <div className="install-guide-card">
-              <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
-                <X size={16} aria-hidden />
-              </button>
-              <span className="install-guide-icon" aria-hidden="true">
-                <Smartphone size={24} />
-              </span>
-              <div className="install-guide-body">
-                <strong className="install-guide-title">Instalar como aplicativo</strong>
-                <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
-                {deferredPrompt ? (
-                  <button type="button" className="btn btn-primary install-guide-btn" onClick={handleInstall}>
-                    Instalar App
+            <div className="community-presence-card" aria-live="polite">
+              {presenceCount > 0 ? (
+                <>
+                  <span className="community-presence-main">
+                    <span className="community-presence-count">{nf.format(presenceCount)}</span>
+                    <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
+                  </span>
+                  <span className="community-presence-label">memorizando agora</span>
+                  <span className="community-presence-encourage">Junte-se a eles!</span>
+                  <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
+                    Compartilhar
                   </button>
-                ) : isIOS ? (
-                  <ol className="install-guide-steps">
-                    <li>
-                      Abra este app no <strong>Safari</strong> (não funciona no Chrome)
-                    </li>
-                    <li>
-                      Toque no ícone <strong>Compartilhar</strong>{' '}
-                      <span className="install-guide-share-icon" aria-hidden="true">
-                        <Share2 size={14} />
-                      </span>{' '}
-                      na barra inferior
-                    </li>
-                    <li>
-                      Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
-                    </li>
-                    <li>
-                      Toque <strong>"Adicionar"</strong> no canto superior direito
-                    </li>
-                  </ol>
-                ) : isAndroid ? (
-                  <ol className="install-guide-steps">
-                    <li>
-                      Abra no <strong>Chrome</strong>
-                    </li>
-                    <li>
-                      Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
-                    </li>
-                    <li>
-                      Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
-                    </li>
-                    <li>
-                      Toque em <strong>"Instalar"</strong>
-                    </li>
-                  </ol>
-                ) : null}
-              </div>
-            </div>
-          )}
-
-          <div className="stats-grid">
-            <div className="stat-card">
-              <span className="stat-value">{nf.format(totalMemorized)}</span>
-              <span className="stat-label">Em aprendizado</span>
-            </div>
-            <div className="stat-card">
-              <span className="stat-value">{nf.format(streak)}</span>
-              <span className="stat-label">Dias de Streak</span>
-            </div>
-            <div className="stat-card">
-              <span className="stat-value">{nf.format(dueCount)}</span>
-              <span className="stat-label">Pendentes</span>
-            </div>
-          </div>
-
-          <div className="quick-actions">
-            <Link to="/browse" className="btn btn-secondary">
-              + Adicionar Versículo
-            </Link>
-            <Link to="/collections" className="btn btn-secondary">
-              Coleções
-            </Link>
-            <Link to="/stats" className="btn btn-secondary">
-              Ver Progresso
-            </Link>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="hero-card">
-            <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} para revisar` : 'Nada pendente!'}</h2>
-            {dueCount > 0 && (
-              <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
-                Revisar Agora ({nf.format(dueCount)})
-              </Link>
-            )}
-          </div>
-
-          <div className="community-presence-card" aria-live="polite">
-            {presenceCount > 0 ? (
-              <>
-                <span className="community-presence-main">
-                  <span className="community-presence-count">{nf.format(presenceCount)}</span>
-                  <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
-                </span>
-                <span className="community-presence-label">memorizando agora</span>
-                <span className="community-presence-encourage">Continue assim!</span>
-                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                  Compartilhar
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="community-presence-encourage">Continue memorizando!</span>
-                <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                  Compartilhar
-                </button>
-              </>
-            )}
-          </div>
-
-          {show && (
-            <div className="install-guide-card">
-              <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
-                <X size={16} aria-hidden />
-              </button>
-              <span className="install-guide-icon" aria-hidden="true">
-                <Smartphone size={24} />
-              </span>
-              <div className="install-guide-body">
-                <strong className="install-guide-title">Instalar como aplicativo</strong>
-                <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
-                {deferredPrompt ? (
-                  <button type="button" className="btn btn-primary install-guide-btn" onClick={handleInstall}>
-                    Instalar App
+                </>
+              ) : (
+                <>
+                  <span className="community-presence-encourage">Seja o primeiro a memorizar hoje!</span>
+                  <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
+                    Compartilhar
                   </button>
-                ) : isIOS ? (
-                  <ol className="install-guide-steps">
-                    <li>
-                      Abra este app no <strong>Safari</strong> (não funciona no Chrome)
-                    </li>
-                    <li>
-                      Toque no ícone <strong>Compartilhar</strong>{' '}
-                      <span className="install-guide-share-icon" aria-hidden="true">
-                        <Share2 size={14} />
-                      </span>{' '}
-                      na barra inferior
-                    </li>
-                    <li>
-                      Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
-                    </li>
-                    <li>
-                      Toque <strong>"Adicionar"</strong> no canto superior direito
-                    </li>
-                  </ol>
-                ) : isAndroid ? (
-                  <ol className="install-guide-steps">
-                    <li>
-                      Abra no <strong>Chrome</strong>
-                    </li>
-                    <li>
-                      Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
-                    </li>
-                    <li>
-                      Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
-                    </li>
-                    <li>
-                      Toque em <strong>"Instalar"</strong>
-                    </li>
-                  </ol>
-                ) : null}
+                </>
+              )}
+            </div>
+
+            {show && (
+              <div className="install-guide-card">
+                <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
+                  <X size={16} aria-hidden />
+                </button>
+                <span className="install-guide-icon" aria-hidden="true">
+                  <Smartphone size={24} />
+                </span>
+                <div className="install-guide-body">
+                  <strong className="install-guide-title">Instalar como aplicativo</strong>
+                  <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
+                  {deferredPrompt ? (
+                    <button type="button" className="btn btn-primary install-guide-btn" onClick={handleInstall}>
+                      Instalar App
+                    </button>
+                  ) : isIOS ? (
+                    <ol className="install-guide-steps">
+                      <li>
+                        Abra este app no <strong>Safari</strong> (não funciona no Chrome)
+                      </li>
+                      <li>
+                        Toque no ícone <strong>Compartilhar</strong>{' '}
+                        <span className="install-guide-share-icon" aria-hidden="true">
+                          <Share2 size={14} />
+                        </span>{' '}
+                        na barra inferior
+                      </li>
+                      <li>
+                        Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
+                      </li>
+                      <li>
+                        Toque <strong>"Adicionar"</strong> no canto superior direito
+                      </li>
+                    </ol>
+                  ) : isAndroid ? (
+                    <ol className="install-guide-steps">
+                      <li>
+                        Abra no <strong>Chrome</strong>
+                      </li>
+                      <li>
+                        Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
+                      </li>
+                      <li>
+                        Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
+                      </li>
+                      <li>
+                        Toque em <strong>"Instalar"</strong>
+                      </li>
+                    </ol>
+                  ) : null}
+                </div>
+              </div>
+            )}
+
+            <div className="stats-grid">
+              <div className="stat-card">
+                <span className="stat-value">{nf.format(totalMemorized)}</span>
+                <span className="stat-label">Em aprendizado</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{nf.format(streak)}</span>
+                <span className="stat-label">Dias de Streak</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{nf.format(dueCount)}</span>
+                <span className="stat-label">Pendentes</span>
               </div>
             </div>
-          )}
 
-          <div className="collections-teaser">
-            <p className="collections-teaser-text">Adicione vários versículos de uma vez com coleções temáticas</p>
-            <Link to="/collections" className="btn btn-secondary btn-sm">
-              Ver Coleções
-            </Link>
-          </div>
+            <div className="quick-actions">
+              <Link to="/browse" className="btn btn-secondary">
+                + Adicionar Versículo
+              </Link>
+              <Link to="/collections" className="btn btn-secondary">
+                Coleções
+              </Link>
+              <Link to="/stats" className="btn btn-secondary">
+                Ver Progresso
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="hero-card">
+              <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} para revisar` : 'Nada pendente!'}</h2>
+              {dueCount > 0 && (
+                <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
+                  Revisar Agora ({nf.format(dueCount)})
+                </Link>
+              )}
+            </div>
 
-          <div className="stats-grid">
-            <div className="stat-card">
-              <span className="stat-value">{nf.format(totalMemorized)}</span>
-              <span className="stat-label">Em aprendizado</span>
+            <div className="community-presence-card" aria-live="polite">
+              {presenceCount > 0 ? (
+                <>
+                  <span className="community-presence-main">
+                    <span className="community-presence-count">{nf.format(presenceCount)}</span>
+                    <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
+                  </span>
+                  <span className="community-presence-label">memorizando agora</span>
+                  <span className="community-presence-encourage">Continue assim!</span>
+                  <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
+                    Compartilhar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="community-presence-encourage">Continue memorizando!</span>
+                  <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
+                    Compartilhar
+                  </button>
+                </>
+              )}
             </div>
-            <div className="stat-card">
-              <span className="stat-value">{nf.format(streak)}</span>
-              <span className="stat-label">Dias de Streak</span>
-            </div>
-            <div className="stat-card">
-              <span className="stat-value">{nf.format(dueCount)}</span>
-              <span className="stat-label">Pendentes</span>
-            </div>
-          </div>
 
-          <div className="quick-actions">
-            {dueCount === 0 && totalMemorized > 0 ? (
-              <>
-                <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary">
-                  Revisar Agora
-                </Link>
-                <Link to="/collections" className="btn btn-secondary">
-                  Coleções
-                </Link>
-                <Link to="/browse" className="btn btn-secondary">
-                  + Memorizar novos
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/browse" className="btn btn-secondary">
-                  + Adicionar Versículo
-                </Link>
-                <Link to="/collections" className="btn btn-secondary">
-                  Coleções
-                </Link>
-                <Link to="/stats" className="btn btn-secondary">
-                  Ver Progresso
-                </Link>
-              </>
+            {show && (
+              <div className="install-guide-card">
+                <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
+                  <X size={16} aria-hidden />
+                </button>
+                <span className="install-guide-icon" aria-hidden="true">
+                  <Smartphone size={24} />
+                </span>
+                <div className="install-guide-body">
+                  <strong className="install-guide-title">Instalar como aplicativo</strong>
+                  <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
+                  {deferredPrompt ? (
+                    <button type="button" className="btn btn-primary install-guide-btn" onClick={handleInstall}>
+                      Instalar App
+                    </button>
+                  ) : isIOS ? (
+                    <ol className="install-guide-steps">
+                      <li>
+                        Abra este app no <strong>Safari</strong> (não funciona no Chrome)
+                      </li>
+                      <li>
+                        Toque no ícone <strong>Compartilhar</strong>{' '}
+                        <span className="install-guide-share-icon" aria-hidden="true">
+                          <Share2 size={14} />
+                        </span>{' '}
+                        na barra inferior
+                      </li>
+                      <li>
+                        Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
+                      </li>
+                      <li>
+                        Toque <strong>"Adicionar"</strong> no canto superior direito
+                      </li>
+                    </ol>
+                  ) : isAndroid ? (
+                    <ol className="install-guide-steps">
+                      <li>
+                        Abra no <strong>Chrome</strong>
+                      </li>
+                      <li>
+                        Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
+                      </li>
+                      <li>
+                        Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
+                      </li>
+                      <li>
+                        Toque em <strong>"Instalar"</strong>
+                      </li>
+                    </ol>
+                  ) : null}
+                </div>
+              </div>
             )}
-          </div>
-        </>
-      )}
-    </div>
+
+            <div className="collections-teaser">
+              <p className="collections-teaser-text">Adicione vários versículos de uma vez com coleções temáticas</p>
+              <Link to="/collections" className="btn btn-secondary btn-sm">
+                Ver Coleções
+              </Link>
+            </div>
+
+            <div className="stats-grid">
+              <div className="stat-card">
+                <span className="stat-value">{nf.format(totalMemorized)}</span>
+                <span className="stat-label">Em aprendizado</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{nf.format(streak)}</span>
+                <span className="stat-label">Dias de Streak</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{nf.format(dueCount)}</span>
+                <span className="stat-label">Pendentes</span>
+              </div>
+            </div>
+
+            <div className="quick-actions">
+              {dueCount === 0 && totalMemorized > 0 ? (
+                <>
+                  <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary">
+                    Revisar Agora
+                  </Link>
+                  <Link to="/collections" className="btn btn-secondary">
+                    Coleções
+                  </Link>
+                  <Link to="/browse" className="btn btn-secondary">
+                    + Memorizar novos
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/browse" className="btn btn-secondary">
+                    + Adicionar Versículo
+                  </Link>
+                  <Link to="/collections" className="btn btn-secondary">
+                    Coleções
+                  </Link>
+                  <Link to="/stats" className="btn btn-secondary">
+                    Ver Progresso
+                  </Link>
+                </>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </>
   )
 }

@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { Check, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
+import { PageMeta } from '../components/page-meta'
 import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
 import { addVersesToCollection, db, ensureNonBibleTextSeeded, ensureTranslationSeeded, type TextSourceType, textKey } from '../lib/db'
@@ -185,6 +186,11 @@ export function AddVersesToCollectionPage() {
 
   return (
     <>
+      <PageMeta
+        title="Adicionar Versículos · Verbum Vitae"
+        description="Adicione versículos da Bíblia a uma coleção para memorização organizada por temas."
+        path={`/collections/${slug}/add`}
+      />
       <div className="page browse-page">
         <Link to="/collections/$slug" params={{ slug }} className="back-btn">
           ← {collectionName || 'Coleção'}

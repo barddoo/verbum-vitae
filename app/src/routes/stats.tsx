@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import { MemorizedVersesTab } from '../components/memorized-verses-tab'
+import { PageMeta } from '../components/page-meta'
 import { db } from '../lib/db'
 import { computeStreak } from '../lib/stats'
 import { RankingTab } from './stats/ranking-tab'
@@ -55,6 +56,11 @@ export function StatsPage() {
 
   return (
     <div className="page stats-page">
+      <PageMeta
+        title="Progresso · Verbum Vitae"
+        description="Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
+        path="/stats"
+      />
       <h2>Progresso</h2>
 
       <div className="stats-tabs" role="tablist">

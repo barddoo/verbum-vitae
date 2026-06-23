@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { DEFAULT_TRANSLATION } from 'shared/bible'
 import { type CollectionFormData, CollectionFormModal } from '../components/collection-form-modal'
 import { MemorizedVersePickerModal } from '../components/memorized-verse-picker-modal'
+import { PageMeta } from '../components/page-meta'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { useSwipeToDelete } from '../hooks/use-swipe'
 import {
@@ -191,6 +192,11 @@ export function CollectionsListPage() {
 
   return (
     <div className="page collections-page">
+      <PageMeta
+        title="Coleções · Verbum Vitae"
+        description="Crie e gerencie coleções de versículos para memorizar. Organize seus versículos favoritos por temas e acompanhe seu progresso."
+        path="/collections"
+      />
       <h2 className="collections-title">Coleções</h2>
       <p className="collections-subtitle">Conjuntos de textos para memorizar</p>
 
@@ -392,6 +398,13 @@ export function CollectionDetailPage() {
 
   return (
     <div className="page collection-detail-page">
+      <PageMeta
+        title={col ? `${col.name} · Verbum Vitae` : 'Coleção · Verbum Vitae'}
+        description={
+          col ? `Revise e gerencie os versículos da coleção "${col.name}".` : 'Detalhes da coleção de versículos para memorização.'
+        }
+        path={`/collections/${slug}`}
+      />
       <div className="collection-detail-topbar">
         <Link to="/collections" className="back-btn">
           ← Coleções

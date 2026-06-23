@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://verbum-vitae.pages.dev/sitemap.xml
+Sitemap: https://vvitae.com/sitemap.xml

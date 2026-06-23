@@ -2,6 +2,7 @@ import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Check } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { PageMeta } from '../components/page-meta'
 import { type CollectionVerse, db, fetchVersesBatch, parseTextKey } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
 import { getNextCard } from '../lib/scheduler'
@@ -517,6 +518,11 @@ export function ReviewPage() {
 
   return (
     <div className="page review-page review-session">
+      <PageMeta
+        title="Revisar · Verbum Vitae"
+        description="Revise versículos memorizados com repetição espaçada. Flashcards, preenchimento de lacunas e prática de digitação para fixar a Palavra."
+        path="/review"
+      />
       <div className="review-header">
         <button type="button" className="btn-icon" onClick={goBack} aria-label="Voltar">
           ←
