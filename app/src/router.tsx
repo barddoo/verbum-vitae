@@ -1,6 +1,6 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
 import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
-import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
+import { createContext, lazy, Suspense, useCallback, useEffect, useReducer, useState } from 'react'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
 import { PresenceBadge } from './components/presence-badge'
@@ -14,6 +14,8 @@ const AuthModal = lazy(() => import('./components/auth-modal').then((m) => ({ de
 const WelcomeModal = lazy(() => import('./components/welcome-modal').then((m) => ({ default: m.WelcomeModal })))
 
 import { useAuth } from './lib/auth'
+
+export const WelcomeModalContext = createContext<{ closeWelcome: () => void }>({ closeWelcome: () => {} })
 
 const loadingSpinner = <div className="loading">Carregando…</div>
 
@@ -54,6 +56,8 @@ function RootLayout() {
   const showDonate = modals.includes('donate')
   const showHelp = modals.includes('help')
   const showWelcome = modals.includes('welcome')
+
+  const closeWelcome = useCallback(() => dispatch({ type: 'close', modal: 'welcome' }), [])
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 900px)')
@@ -116,9 +120,11 @@ function RootLayout() {
         )}
 
         <main className="main-content">
-          <Suspense fallback={loadingSpinner}>
-            <Outlet />
-          </Suspense>
+          <WelcomeModalContext.Provider value={{ closeWelcome }}>
+            <Suspense fallback={loadingSpinner}>
+              <Outlet />
+            </Suspense>
+          </WelcomeModalContext.Provider>
         </main>
       </div>
 

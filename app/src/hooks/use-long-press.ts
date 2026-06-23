@@ -1,3 +1,4 @@
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { useRef } from 'react'
 
 interface LongPressConfig {
@@ -18,7 +19,7 @@ export function useLongPress({ onLongPress, onTap, enabled }: LongPressConfig) {
     e.currentTarget.setPointerCapture(e.pointerId)
     longPressTimer.current = setTimeout(() => {
       didLongPress.current = true
-      navigator.vibrate?.(30)
+      Haptics.impact({ style: ImpactStyle.Light }).catch(() => {})
       onLongPress(v)
     }, 500)
   }

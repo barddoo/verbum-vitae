@@ -1,7 +1,11 @@
 /// <reference types="@capacitor/status-bar" />
 /// <reference types="@capacitor/splash-screen" />
+/// <reference types="@capacitor/haptics" />
+/// <reference types="@capacitor/keyboard" />
+/// <reference types="@capacitor/share" />
 
 import type { CapacitorConfig } from '@capacitor/cli'
+import { KeyboardResize, KeyboardStyle } from '@capacitor/keyboard'
 
 const config: CapacitorConfig = {
   appId: 'com.verbumvitae.app',
@@ -14,14 +18,17 @@ const config: CapacitorConfig = {
   plugins: {
     StatusBar: {
       style: 'DARK',
-      overlaysWebView: false,
-      backgroundColor: '#0f1117',
     },
     SplashScreen: {
       launchAutoHide: false,
       backgroundColor: '#0f1117',
       splashFullScreen: true,
       splashImmersive: true,
+    },
+    Keyboard: {
+      resize: KeyboardResize.None,
+      style: KeyboardStyle.Dark,
+      resizeOnFullScreen: true,
     },
   },
 }

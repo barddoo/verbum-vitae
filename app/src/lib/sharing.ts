@@ -1,3 +1,7 @@
+import { Capacitor } from '@capacitor/core'
+import { Directory, Filesystem } from '@capacitor/filesystem'
+import { Share } from '@capacitor/share'
+
 interface ShareVerseParams {
   verseRef?: string
   verseText?: string
@@ -56,17 +60,8 @@ function fallbackCopy({ title, text, url }: { title: string; text: string; url: 
 }
 
 export async function shareImageBlob(blob: Blob, title: string): Promise<void> {
-  if (isNative()) return shareNative(blob, title)
+  if (Capacitor.isNativePlatform()) return shareNative(blob, title)
   return shareWeb(blob, title)
-}
-
-function isNative(): boolean {
-  try {
-    const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor
-    return cap?.isNativePlatform?.() === true
-  } catch {
-    return false
-  }
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -81,22 +76,14 @@ async function blobToBase64(blob: Blob): Promise<string> {
 }
 
 async function shareNative(blob: Blob, title: string): Promise<void> {
-  const cap = (
-    window as unknown as {
-      Capacitor?: {
-        plugins: { Share: { share: (o: { title?: string; files: string[] }) => Promise<void> }; Filesystem: typeof FilesystemNS }
-      }
-    }
-  ).Capacitor
-  if (!cap?.plugins?.Share || !cap?.plugins?.Filesystem) return shareWeb(blob, title)
   const base64 = await blobToBase64(blob)
-  const { uri } = await cap.plugins.Filesystem.writeFile({
+  const { uri } = await Filesystem.writeFile({
     path: `versiculo-${Date.now()}.png`,
     data: base64,
-    directory: 'CACHE',
+    directory: Directory.Cache,
   })
   try {
-    await cap.plugins.Share.share({ title, files: [uri] })
+    await Share.share({ title, files: [uri] })
   } catch {
     // user dismissed the sheet — no-op
   }
@@ -118,8 +105,4 @@ async function shareWeb(blob: Blob, title: string): Promise<void> {
   a.download = 'versiculo.png'
   a.click()
   URL.revokeObjectURL(url)
-}
-
-declare const FilesystemNS: {
-  writeFile: (o: { path: string; data: string; directory: string }) => Promise<{ uri: string }>
 }

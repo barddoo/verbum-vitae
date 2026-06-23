@@ -346,3 +346,90 @@
   margin-top: 0.375rem;
   display: block;
 }
+
+/* WELCOME HERO (new user onboarding) */
+
+.welcome-hero {
+  background: linear-gradient(175deg, var(--leather), var(--leather-gradient-end));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem 1.75rem;
+  text-align: center;
+  margin-bottom: 1.25rem;
+  position: relative;
+  box-shadow: var(--card-shadow);
+}
+
+.welcome-hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 1.75rem;
+  right: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.15), transparent);
+}
+
+.welcome-headline {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 5vw, 1.7rem);
+  color: var(--parchment);
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.0125rem;
+  line-height: 1.3;
+}
+
+.welcome-headline-accent {
+  color: var(--gold);
+}
+
+.welcome-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--aged);
+  line-height: 1.5;
+  margin: 0 0 1.5rem;
+}
+
+.welcome-features {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.welcome-feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.welcome-feature-icon {
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.welcome-feature-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  color: var(--aged);
+  text-transform: uppercase;
+  letter-spacing: 0.0625rem;
+  font-weight: 500;
+}
+
+.welcome-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.welcome-reassurance {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  color: var(--aged);
+  margin-top: 0.75rem;
+  opacity: 0.7;
+}

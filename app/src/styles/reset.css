@@ -58,6 +58,13 @@ html[data-theme="light"] body::before {
     radial-gradient(ellipse 37.5rem 25rem at 80% 100%, rgba(168, 136, 42, 0.02) 0%, transparent 50%);
 }
 
+html {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
 html,
 body {
   font-family: var(--font-body);

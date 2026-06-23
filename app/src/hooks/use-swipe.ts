@@ -1,3 +1,4 @@
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { useCallback, useRef, useState } from 'react'
 
 const SWIPE_THRESHOLD = 80
@@ -50,6 +51,7 @@ export function useSwipeToDelete(onDelete: () => void) {
       const offset = e.clientX - startX.current
       if (offset < -SWIPE_THRESHOLD && !deleting.current) {
         deleting.current = true
+        Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {})
         setTranslateX(-MAX_TRANSLATE)
         setTimeout(() => {
           onDelete()

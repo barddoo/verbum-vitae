@@ -1,7 +1,8 @@
 import '@fontsource-variable/fraunces'
 import '@fontsource-variable/nunito'
 import { App as CapApp } from '@capacitor/app'
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core'
+import { Keyboard } from '@capacitor/keyboard'
 import { SplashScreen } from '@capacitor/splash-screen'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { StrictMode } from 'react'
@@ -13,7 +14,8 @@ import './styles/index.css'
 
 if (Capacitor.isNativePlatform()) {
   StatusBar.setStyle({ style: Style.Dark }).catch(() => {})
-  StatusBar.setBackgroundColor({ color: '#0f1117' }).catch(() => {})
+  SystemBars.setStyle({ style: SystemBarsStyle.Dark }).catch(() => {})
+  Keyboard.setAccessoryBarVisible({ isVisible: false }).catch(() => {})
 
   CapApp.addListener('appStateChange', ({ isActive }) => {
     if (isActive) syncNow()
