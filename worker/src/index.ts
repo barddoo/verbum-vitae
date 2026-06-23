@@ -126,6 +126,14 @@ app.get('/api/presence/count', async (c) => {
   return stub.fetch(c.req.raw)
 })
 
+app.get('/robots.txt', async (c) => {
+  return c.env.ASSETS.fetch(new Request(new URL('/robots.txt', c.req.url)))
+})
+
+app.get('/sitemap.xml', async (c) => {
+  return c.env.ASSETS.fetch(new Request(new URL('/sitemap.xml', c.req.url)))
+})
+
 app.get('*', async (c) => {
   const url = new URL(c.req.url)
   return c.env.ASSETS.fetch(new Request(`${url.origin}/index.html`))
