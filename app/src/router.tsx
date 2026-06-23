@@ -135,7 +135,11 @@ function RootLayout() {
             <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
               Charles Fonseca
             </a>{' '}
-            &mdash;{' '}
+            em{' '}
+            <a href="https://www.google.com/maps?q=19°55′55.44″S+43°56′17.03″W" target="_blank" rel="noopener noreferrer">
+              Belo Horizonte
+            </a>{' '}
+            🔺 &mdash;{' '}
             <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
               código aberto
             </a>
