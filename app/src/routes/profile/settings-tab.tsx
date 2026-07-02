@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useEffect, useState } from 'react'
 import { DEFAULT_TRANSLATION, getTranslationLabels, TRANSLATIONS, type Translation } from 'shared/bible'
@@ -7,7 +6,6 @@ import type { LeaderboardResponse } from 'shared/types'
 import { ThemeToggle } from '../../components/theme-toggle'
 import { useAuth } from '../../lib/auth'
 import { db } from '../../lib/db'
-import { detectLocale, type Locale, setLocale } from '../../lib/locale'
 import { cachedGet, cachedSet } from '../../lib/storage'
 import { api } from '../../lib/worker'
 
@@ -20,8 +18,6 @@ export function SettingsTab({ onClearProgress }: Props) {
   const [translation, setTranslationState] = useState<Translation>(
     () => (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION,
   )
-  const [locale, setLocaleState] = useState<Locale>(detectLocale)
-  const [switching, setSwitching] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [hiddenLoaded, setHiddenLoaded] = useState(false)
   const [confirming, setConfirming] = useState(false)
@@ -36,14 +32,6 @@ export function SettingsTab({ onClearProgress }: Props) {
       })
       .catch(() => setHiddenLoaded(true))
   }, [user])
-
-  async function handleLocaleToggle(next: Locale) {
-    if (switching || next === locale) return
-    setSwitching(true)
-    await setLocale(next)
-    setLocaleState(next)
-    setSwitching(false)
-  }
 
   function handleTranslationChange(tx: Translation) {
     cachedSet('translation', tx)
@@ -80,35 +68,6 @@ export function SettingsTab({ onClearProgress }: Props) {
             <Trans>Tema</Trans>
           </span>
           <ThemeToggle />
-        </div>
-      </section>
-
-      <section className="settings-section">
-        <h3 className="settings-section-title">
-          <Trans>Idioma & Região</Trans>
-        </h3>
-        <div className="settings-row">
-          <span className="settings-row-label">
-            <Trans>Idioma</Trans>
-          </span>
-          <fieldset className="settings-locale-toggle" aria-label={t`Selecionar idioma`}>
-            <button
-              type="button"
-              className={`settings-locale-btn${locale === 'pt-BR' ? ' active' : ''}`}
-              onClick={() => handleLocaleToggle('pt-BR')}
-              disabled={switching}
-            >
-              PT
-            </button>
-            <button
-              type="button"
-              className={`settings-locale-btn${locale === 'en' ? ' active' : ''}`}
-              onClick={() => handleLocaleToggle('en')}
-              disabled={switching}
-            >
-              EN
-            </button>
-          </fieldset>
         </div>
       </section>
 
@@ -154,9 +113,11 @@ export function SettingsTab({ onClearProgress }: Props) {
           <Trans>Zona de perigo</Trans>
         </h3>
         {!confirming ? (
-          <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
-            <Trans>Recomeçar do zero</Trans>
-          </button>
+          <div className="settings-row">
+            <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
+              <Trans>Recomeçar do zero</Trans>
+            </button>
+          </div>
         ) : (
           <div className="settings-confirm">
             <span className="settings-confirm-label">

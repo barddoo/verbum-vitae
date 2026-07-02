@@ -153,12 +153,12 @@ export const TRANSLATION_LABELS: Record<string, string> = {
 }
 
 export const TRANSLATION_LABELS_EN: Record<string, string> = {
-  ara: 'Revised and Updated Almeida (PT)',
-  acf: 'Faithful Corrected Almeida (PT)',
-  nvi: 'New International Version (PT)',
-  a21: 'Almeida 21st Century (PT)',
-  nvt: 'New Transforming Version (PT)',
-  naa: 'New Updated Almeida (PT)',
+  ara: 'Revised and Updated Almeida',
+  acf: 'Faithful Corrected Almeida',
+  nvi: 'New International Version',
+  a21: 'Almeida 21st Century',
+  nvt: 'New Transforming Version',
+  naa: 'New Updated Almeida',
   kjv: 'King James Version',
   web: 'World English Bible',
 }

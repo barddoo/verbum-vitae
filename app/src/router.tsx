@@ -5,6 +5,7 @@ import { BookOpen, Home, Layers, RotateCcw, User } from 'lucide-react'
 import { createContext, lazy, Suspense, useCallback, useEffect, useReducer, useState } from 'react'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
+import { LocaleToggle } from './components/locale-toggle'
 import { PresenceBadge } from './components/presence-badge'
 import { PwaInstallButton } from './components/pwa-install-button'
 import { SyncErrorBanner } from './components/sync-error-banner'
@@ -87,6 +88,7 @@ function RootLayout() {
           </button>
           <PwaInstallButton />
           <ThemeToggle />
+          <LocaleToggle />
           <PresenceBadge />
           {user && !isOnline && <span className="offline-badge">Offline</span>}
           {user && <SyncIndicator />}

@@ -146,6 +146,40 @@
   color: var(--gold);
 }
 
+.locale-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--aged);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.locale-select-wrapper:hover {
+  color: var(--gold);
+}
+
+.locale-select {
+  appearance: none;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.25rem 0.125rem;
+  outline: none;
+}
+
+.locale-select:focus-visible {
+  color: var(--gold);
+}
+
+.locale-select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .presence-badge {
   display: inline-flex;
   align-items: center;
@@ -224,6 +258,20 @@
 
 .sync-now-btn:hover:not(:disabled) {
   color: var(--gold);
+}
+
+@media (max-width: 56.25rem) {
+  .top-bar-title {
+    display: none;
+  }
+
+  .presence-badge {
+    display: none;
+  }
+
+  .sync-now-btn {
+    display: none;
+  }
 }
 
 .sync-now-btn:disabled {
@@ -468,27 +516,6 @@
 
 .bottom-nav .nav-donate .nav-donate-icon {
   font-size: 1.1rem;
-}
-
-.bottom-nav .nav-locale-toggle {
-  color: var(--aged);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.bottom-nav .nav-locale-toggle:hover {
-  background: rgba(212, 168, 83, 0.06);
-  color: var(--parchment);
-}
-
-.bottom-nav .nav-locale-toggle:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.bottom-nav .nav-locale-icon {
-  font-size: 1rem;
 }
 
 /* FOOTER */
