@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: cell.count
-#: src/routes/stats.tsx
+#: src/routes/profile/streak-calendar.tsx
 msgid "{0, plural, one {# revisão} other {# revisões}}"
 msgstr "{0, plural, one {# revisão} other {# revisões}}"
 
@@ -117,8 +117,8 @@ msgid "Abra Revisar para ver os versículos do dia. O app usa repetição espaç
 msgstr "Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa."
 
 #: src/routes/stats.tsx
-msgid "Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
-msgstr "Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
+#~ msgid "Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
+#~ msgstr "Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
 
 #: src/routes/collections.tsx
 msgid "Adicionado"
@@ -199,6 +199,10 @@ msgstr "Âmbar"
 msgid "Antigo Testamento"
 msgstr "Antigo Testamento"
 
+#: src/routes/profile/settings-tab.tsx
+msgid "Aparência"
+msgstr "Aparência"
+
 #: src/components/donate-modal.tsx
 msgid "Apoiar o projeto"
 msgstr "Apoiar o projeto"
@@ -213,8 +217,8 @@ msgstr "Aprenda versículos no seu ritmo, com revisões inteligentes que aparece
 
 #: src/components/memorized-verses-tab.tsx
 #: src/components/verse-progress-card.tsx
+#: src/routes/profile.tsx
 #: src/routes/review.tsx
-#: src/routes/stats.tsx
 msgid "Aprendendo"
 msgstr "Aprendendo"
 
@@ -239,6 +243,7 @@ msgid "Bem-vindo ao Verbum Vitae"
 msgstr "Bem-vindo ao Verbum Vitae"
 
 #: src/router.tsx
+#: src/routes/profile/settings-tab.tsx
 msgid "Bíblia"
 msgstr "Bíblia"
 
@@ -281,7 +286,7 @@ msgstr "Buscar versículos…"
 msgid "Buscar…"
 msgstr "Buscar…"
 
-#: src/routes/stats.tsx
+#: src/routes/profile/streak-calendar.tsx
 msgid "Calendário de Revisões"
 msgstr "Calendário de Revisões"
 
@@ -289,8 +294,8 @@ msgstr "Calendário de Revisões"
 #: src/components/memorized-verse-picker-modal.tsx
 #: src/components/memorized-verses-tab.tsx
 #: src/routes/collections.tsx
-#: src/routes/stats.tsx
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile.tsx
+#: src/routes/profile/settings-tab.tsx
 msgid "Cancelar"
 msgstr "Cancelar"
 
@@ -301,8 +306,8 @@ msgstr "Cancelar"
 #: src/routes/collections.$slug.add.tsx
 #: src/routes/collections.tsx
 #: src/routes/index.tsx
+#: src/routes/profile/ranking-tab.tsx
 #: src/routes/review.tsx
-#: src/routes/stats/ranking-tab.tsx
 msgid "Carregando…"
 msgstr "Carregando…"
 
@@ -367,9 +372,17 @@ msgstr "Compartilhar imagem"
 msgid "Completar"
 msgstr "Completar"
 
+#: src/routes/profile/settings-tab.tsx
+msgid "Comunidade"
+msgstr "Comunidade"
+
 #: src/routes/review.tsx
 msgid "Concluídos"
 msgstr "Concluídos"
+
+#: src/routes/profile.tsx
+msgid "Configurações"
+msgstr "Configurações"
 
 #: src/components/auth-modal.tsx
 msgid "Confirmar senha"
@@ -432,8 +445,8 @@ msgid "Data de revisão"
 msgstr "Data de revisão"
 
 #: src/routes/stats/ranking-tab.tsx
-msgid "Defina seu nome público para aparecer no ranking."
-msgstr "Defina seu nome público para aparecer no ranking."
+#~ msgid "Defina seu nome público para aparecer no ranking."
+#~ msgstr "Defina seu nome público para aparecer no ranking."
 
 #: src/components/collection-form-modal.tsx
 msgid "Descrição"
@@ -501,7 +514,7 @@ msgstr "Editar"
 msgid "Editar coleção"
 msgstr "Editar coleção"
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile.tsx
 msgid "Editar nome de exibição"
 msgstr "Editar nome de exibição"
 
@@ -534,7 +547,11 @@ msgstr "Entrando…"
 msgid "Entrar"
 msgstr "Entrar"
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile.tsx
+msgid "Entre para sincronizar e participar do ranking"
+msgstr "Entre para sincronizar e participar do ranking"
+
+#: src/routes/profile/ranking-tab.tsx
 msgid "Erro ao carregar ranking."
 msgstr "Erro ao carregar ranking."
 
@@ -595,7 +612,7 @@ msgstr "Explorar a Bíblia"
 msgid "Explore e leia a Bíblia Sagrada em múltiplas traduções. Selecione livros, capítulos e versículos para estudo e memorização."
 msgstr "Explore e leia a Bíblia Sagrada em múltiplas traduções. Selecione livros, capítulos e versículos para estudo e memorização."
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile/ranking-tab.tsx
 msgid "Faça login para ver o ranking da comunidade."
 msgstr "Faça login para ver o ranking da comunidade."
 
@@ -649,13 +666,21 @@ msgstr "Grátis para sempre"
 msgid "Guardei no coração a tua palavra para não pecar contra ti."
 msgstr "Guardei no coração a tua palavra para não pecar contra ti."
 
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Hoje"
 msgstr "Hoje"
 
 #: src/components/collection-form-modal.tsx
 msgid "Ícone"
 msgstr "Ícone"
+
+#: src/routes/profile/settings-tab.tsx
+msgid "Idioma"
+msgstr "Idioma"
+
+#: src/routes/profile/settings-tab.tsx
+msgid "Idioma & Região"
+msgstr "Idioma & Região"
 
 #: src/routes/browse/selection-bar.tsx
 msgid "Imagem"
@@ -682,7 +707,7 @@ msgstr "Instalar como aplicativo"
 msgid "Instale como aplicativo"
 msgstr "Instale como aplicativo"
 
-#: src/routes/stats.tsx
+#: src/routes/profile/settings-tab.tsx
 msgid "Isso vai apagar todo o progresso. Tem certeza?"
 msgstr "Isso vai apagar todo o progresso. Tem certeza?"
 
@@ -718,7 +743,7 @@ msgstr "Limpar cor"
 msgid "Limpar seleção"
 msgstr "Limpar seleção"
 
-#: src/routes/stats.tsx
+#: src/routes/profile/streak-calendar.tsx
 msgid "Mais"
 msgstr "Mais"
 
@@ -755,7 +780,7 @@ msgstr "Memorize a Bíblia com <0>repetição espaçada</0>"
 msgid "Memorize versículos com repetição espaçada."
 msgstr "Memorize versículos com repetição espaçada."
 
-#: src/routes/stats.tsx
+#: src/routes/profile/streak-calendar.tsx
 msgid "Menos"
 msgstr "Menos"
 
@@ -809,11 +834,11 @@ msgstr "nenhum texto memorizado"
 msgid "Nenhum texto memorizado ainda.<0/>Adicione textos na página Textos para vê-los aqui."
 msgstr "Nenhum texto memorizado ainda.<0/>Adicione textos na página Textos para vê-los aqui."
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile/ranking-tab.tsx
 msgid "Nenhum usuário no ranking ainda. Seja o primeiro!"
 msgstr "Nenhum usuário no ranking ainda. Seja o primeiro!"
 
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Nenhum versículo estudado ainda.<0/>Comece a revisar para ver seu progresso aqui."
 msgstr "Nenhum versículo estudado ainda.<0/>Comece a revisar para ver seu progresso aqui."
 
@@ -847,7 +872,7 @@ msgstr "Nova versão disponível"
 
 #: src/components/memorized-verses-tab.tsx
 #: src/components/verse-progress-card.tsx
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Novo"
 msgstr "Novo"
 
@@ -872,9 +897,13 @@ msgstr "Obrigado por usar este app. Que a Palavra de Deus habite ricamente em vo
 msgid "Ocultar"
 msgstr "Ocultar"
 
+#: src/routes/profile/settings-tab.tsx
+msgid "Ocultar do ranking"
+msgstr "Ocultar do ranking"
+
 #: src/routes/stats/ranking-tab.tsx
-msgid "Ocultar meu nome do ranking"
-msgstr "Ocultar meu nome do ranking"
+#~ msgid "Ocultar meu nome do ranking"
+#~ msgstr "Ocultar meu nome do ranking"
 
 #: src/routes/review/session-complete.tsx
 msgid "Ok"
@@ -904,6 +933,14 @@ msgstr "Pendentes"
 msgid "Perfeito! 🎉"
 msgstr "Perfeito! 🎉"
 
+#: src/router.tsx
+msgid "Perfil"
+msgstr "Perfil"
+
+#: src/routes/profile.tsx
+msgid "Perfil · Verbum Vitae"
+msgstr "Perfil · Verbum Vitae"
+
 #: src/routes/index.tsx
 msgid "pessoa"
 msgstr "pessoa"
@@ -912,7 +949,7 @@ msgstr "pessoa"
 msgid "pessoas"
 msgstr "pessoas"
 
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Por estágio"
 msgstr "Por estágio"
 
@@ -928,14 +965,13 @@ msgstr "Preencha lacunas"
 msgid "Preparando…"
 msgstr "Preparando…"
 
-#: src/router.tsx
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Progresso"
 msgstr "Progresso"
 
 #: src/routes/stats.tsx
-msgid "Progresso · Verbum Vitae"
-msgstr "Progresso · Verbum Vitae"
+#~ msgid "Progresso · Verbum Vitae"
+#~ msgstr "Progresso · Verbum Vitae"
 
 #: src/routes/review/session-complete.tsx
 msgid "Próxima sessão ({remainingCount})"
@@ -961,13 +997,13 @@ msgstr "Pular versículo"
 msgid "Quadrado"
 msgstr "Quadrado"
 
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Ranking"
 msgstr "Ranking"
 
 #: src/components/memorized-verses-tab.tsx
 #: src/components/verse-progress-card.tsx
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Reaprendendo"
 msgstr "Reaprendendo"
 
@@ -979,7 +1015,7 @@ msgstr "Recite mentalmente"
 msgid "Recite o versículo em voz alta, como se estivesse ensinando alguém. O feedback auditivo fixa mais."
 msgstr "Recite o versículo em voz alta, como se estivesse ensinando alguém. O feedback auditivo fixa mais."
 
-#: src/routes/stats.tsx
+#: src/routes/profile/settings-tab.tsx
 msgid "Recomeçar do zero"
 msgstr "Recomeçar do zero"
 
@@ -1005,8 +1041,8 @@ msgid "Resposta:"
 msgstr "Resposta:"
 
 #: src/routes/stats.tsx
-msgid "Resumo"
-msgstr "Resumo"
+#~ msgid "Resumo"
+#~ msgstr "Resumo"
 
 #: src/routes/review/fill-in-blank-view.tsx
 #: src/routes/review/flashcard-view.tsx
@@ -1023,8 +1059,8 @@ msgstr "Revelar todos"
 
 #: src/components/memorized-verses-tab.tsx
 #: src/components/verse-progress-card.tsx
+#: src/routes/profile.tsx
 #: src/routes/review.tsx
-#: src/routes/stats.tsx
 msgid "Revisando"
 msgstr "Revisando"
 
@@ -1085,12 +1121,12 @@ msgid "Sair do modo seleção"
 msgstr "Sair do modo seleção"
 
 #: src/components/collection-form-modal.tsx
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile.tsx
 msgid "Salvando…"
 msgstr "Salvando…"
 
 #: src/components/collection-form-modal.tsx
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile.tsx
 msgid "Salvar"
 msgstr "Salvar"
 
@@ -1119,6 +1155,10 @@ msgstr "Seja o primeiro a memorizar hoje!"
 msgid "Selecionar"
 msgstr "Selecionar"
 
+#: src/routes/profile/settings-tab.tsx
+msgid "Selecionar idioma"
+msgstr "Selecionar idioma"
+
 #: src/routes/browse.tsx
 #: src/routes/collections.$slug.add.tsx
 msgid "Selecionar tradução"
@@ -1145,11 +1185,11 @@ msgid "Senhas não conferem"
 msgstr "Senhas não conferem"
 
 #: src/components/memorized-verses-tab.tsx
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Sequência"
 msgstr "Sequência"
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile/ranking-tab.tsx
 msgid "Sequência atual"
 msgstr "Sequência atual"
 
@@ -1157,15 +1197,19 @@ msgstr "Sequência atual"
 msgid "Sessão concluída!"
 msgstr "Sessão concluída!"
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile.tsx
 msgid "Seu nome público…"
 msgstr "Seu nome público…"
+
+#: src/routes/profile.tsx
+msgid "Seu perfil, configurações e progresso na memorização bíblica."
+msgstr "Seu perfil, configurações e progresso na memorização bíblica."
 
 #: src/components/verse-progress-card.tsx
 msgid "Sim"
 msgstr "Sim"
 
-#: src/routes/stats.tsx
+#: src/routes/profile/settings-tab.tsx
 msgid "Sim, limpar"
 msgstr "Sim, limpar"
 
@@ -1190,7 +1234,7 @@ msgstr "Sincronizar agora"
 msgid "Sincronize entre dispositivos"
 msgstr "Sincronize entre dispositivos"
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile/ranking-tab.tsx
 msgid "Sua posição"
 msgstr "Sua posição"
 
@@ -1205,6 +1249,10 @@ msgstr "Tamanho do texto"
 #: src/routes/collections.tsx
 msgid "Tem certeza que deseja excluir esta coleção?"
 msgstr "Tem certeza que deseja excluir esta coleção?"
+
+#: src/routes/profile/settings-tab.tsx
+msgid "Tema"
+msgstr "Tema"
 
 #: src/components/sync-error-banner.tsx
 msgid "Tentar novamente"
@@ -1271,6 +1319,10 @@ msgstr "Toque no menu <0>⋮</0> (três pontos) no canto superior direito"
 #: src/routes/collections.$slug.add.tsx
 msgid "Toque para selecionar"
 msgstr "Toque para selecionar"
+
+#: src/routes/profile/settings-tab.tsx
+msgid "Tradução padrão"
+msgstr "Tradução padrão"
 
 #: src/components/help-modal.tsx
 msgid "Três modos de revisão"
@@ -1341,7 +1393,7 @@ msgstr "Verde-água"
 msgid "Verificar"
 msgstr "Verificar"
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile/ranking-tab.tsx
 msgid "versíc."
 msgstr "versíc."
 
@@ -1349,11 +1401,11 @@ msgstr "versíc."
 msgid "versículo selecionado"
 msgstr "versículo selecionado"
 
-#: src/routes/stats.tsx
+#: src/routes/profile.tsx
 msgid "Versículos"
 msgstr "Versículos"
 
-#: src/routes/stats/ranking-tab.tsx
+#: src/routes/profile/ranking-tab.tsx
 msgid "Versículos memorizados"
 msgstr "Versículos memorizados"
 
@@ -1365,13 +1417,17 @@ msgstr "versículos selecionados"
 msgid "Violeta"
 msgstr "Violeta"
 
+#: src/routes/profile.tsx
+msgid "Visitante"
+msgstr "Visitante"
+
 #: src/routes/review.tsx
 msgid "Você está em dia!"
 msgstr "Você está em dia!"
 
 #: src/routes/stats/ranking-tab.tsx
-msgid "Você está oculto do ranking."
-msgstr "Você está oculto do ranking."
+#~ msgid "Você está oculto do ranking."
+#~ msgstr "Você está oculto do ranking."
 
 #: src/routes/collections.tsx
 #: src/routes/review.tsx
@@ -1382,3 +1438,7 @@ msgstr "Voltar"
 #: src/routes/review.tsx
 msgid "Volte amanhã para a próxima revisão."
 msgstr "Volte amanhã para a próxima revisão."
+
+#: src/routes/profile/settings-tab.tsx
+msgid "Zona de perigo"
+msgstr "Zona de perigo"

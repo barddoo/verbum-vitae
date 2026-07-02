@@ -296,7 +296,7 @@ export function HomePage() {
               <Link to="/collections" className="btn btn-secondary">
                 <Trans>Coleções</Trans>
               </Link>
-              <Link to="/stats" className="btn btn-secondary">
+              <Link to="/profile" className="btn btn-secondary">
                 <Trans>Ver Progresso</Trans>
               </Link>
             </div>
@@ -466,7 +466,7 @@ export function HomePage() {
                   <Link to="/collections" className="btn btn-secondary">
                     <Trans>Coleções</Trans>
                   </Link>
-                  <Link to="/stats" className="btn btn-secondary">
+                  <Link to="/profile" className="btn btn-secondary">
                     <Trans>Ver Progresso</Trans>
                   </Link>
                 </>

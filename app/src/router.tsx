@@ -1,11 +1,10 @@
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
-import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
+import { BookOpen, Home, Layers, RotateCcw, User } from 'lucide-react'
 import { createContext, lazy, Suspense, useCallback, useEffect, useReducer, useState } from 'react'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
-import { LocaleToggle } from './components/locale-toggle'
 import { PresenceBadge } from './components/presence-badge'
 import { PwaInstallButton } from './components/pwa-install-button'
 import { SyncErrorBanner } from './components/sync-error-banner'
@@ -29,7 +28,7 @@ const loadingSpinner = (
 const HomePage = lazy(() => import('./routes/index').then((m) => ({ default: m.HomePage })))
 const BrowsePage = lazy(() => import('./routes/browse').then((m) => ({ default: m.BrowsePage })))
 const ReviewPage = lazy(() => import('./routes/review').then((m) => ({ default: m.ReviewPage })))
-const StatsPage = lazy(() => import('./routes/stats').then((m) => ({ default: m.StatsPage })))
+const ProfilePage = lazy(() => import('./routes/profile').then((m) => ({ default: m.ProfilePage })))
 const CollectionsListPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionsListPage })))
 const CollectionDetailPage = lazy(() => import('./routes/collections').then((m) => ({ default: m.CollectionDetailPage })))
 const AddVersesToCollectionPage = lazy(() =>
@@ -119,8 +118,8 @@ function RootLayout() {
             <Link to="/collections" className="nav-item" activeProps={{ className: 'nav-item active' }}>
               <Trans>Coleções</Trans>
             </Link>
-            <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-              <Trans>Progresso</Trans>
+            <Link to="/profile" className="nav-item" activeProps={{ className: 'nav-item active' }}>
+              <Trans>Perfil</Trans>
             </Link>
             <div className="sidebar-rule" />
           </nav>
@@ -185,10 +184,10 @@ function RootLayout() {
               <Trans>Coleções</Trans>
             </span>
           </Link>
-          <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-            <BarChart2 size={20} strokeWidth={1.5} />
+          <Link to="/profile" className="nav-item" activeProps={{ className: 'nav-item active' }}>
+            <User size={20} strokeWidth={1.5} />
             <span>
-              <Trans>Progresso</Trans>
+              <Trans>Perfil</Trans>
             </span>
           </Link>
           <button type="button" className="nav-item nav-donate" onClick={() => setShowDonate(true)}>
@@ -197,7 +196,6 @@ function RootLayout() {
               <Trans>Doar</Trans>
             </span>
           </button>
-          <LocaleToggle />
         </nav>
       )}
 
@@ -244,10 +242,10 @@ const reviewRoute = createRoute({
   component: ReviewPage,
 })
 
-const statsRoute = createRoute({
+const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/stats',
-  component: StatsPage,
+  path: '/profile',
+  component: ProfilePage,
 })
 
 const collectionsListRoute = createRoute({
@@ -275,7 +273,7 @@ const routeTree = rootRoute.addChildren([
   collectionsListRoute,
   collectionDetailRoute,
   addVersesRoute,
-  statsRoute,
+  profileRoute,
 ])
 
 export const router = createRouter({ routeTree })
