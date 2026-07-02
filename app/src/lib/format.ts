@@ -1,4 +1,6 @@
-import { BOOKS } from 'shared/bible'
+import { i18n } from '@lingui/core'
+import { t } from '@lingui/core/macro'
+import { getBooks } from 'shared/bible'
 import { SOURCE_LABELS } from 'shared/texts'
 import { parseTextKey } from './db'
 
@@ -6,7 +8,8 @@ export function verseIdToReference(verseId: string): string {
   const p = parseTextKey(verseId)
 
   if (p.sourceType === 'bible') {
-    const bookName = BOOKS[p.sectionIndex]
+    const books = getBooks(i18n.locale)
+    const bookName = books[p.sectionIndex]
     if (!bookName) return verseId
     const ref = `${bookName} ${p.blockIndex}:${p.itemIndex}`
     return p.itemEnd ? `${ref}-${p.itemEnd}` : ref
@@ -16,10 +19,6 @@ export function verseIdToReference(verseId: string): string {
   const name = meta?.name || p.sourceId
   const label = meta?.itemLabel || 'Item'
   const num = p.blockIndex + 1
-
-  if (p.sourceType === 'catechism') {
-    return `${name} — ${label} ${num}`
-  }
 
   return `${name} — ${label} ${num}`
 }
@@ -32,10 +31,10 @@ export function formatRelativeDueDate(dueDate: number): string {
   const diffDays = Math.round((due.getTime() - today.getTime()) / 86400000)
 
   if (diffDays < 0) {
-    if (diffDays === -1) return 'Venceu ontem'
-    return `Venceu há ${Math.abs(diffDays)} dias`
+    if (diffDays === -1) return t`Venceu ontem`
+    return t`Venceu há ${Math.abs(diffDays)} dias`
   }
-  if (diffDays === 0) return 'Vence hoje'
-  if (diffDays === 1) return 'Vence amanhã'
-  return `Vence em ${diffDays} dias`
+  if (diffDays === 0) return t`Vence hoje`
+  if (diffDays === 1) return t`Vence amanhã`
+  return t`Vence em ${diffDays} dias`
 }

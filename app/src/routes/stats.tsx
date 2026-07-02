@@ -1,3 +1,7 @@
+import { i18n } from '@lingui/core'
+import { plural, t } from '@lingui/core/macro'
+import { useLingui } from '@lingui/react'
+import { Trans } from '@lingui/react/macro'
 import { memo, useEffect, useMemo, useState } from 'react'
 import { MemorizedVersesTab } from '../components/memorized-verses-tab'
 import { PageMeta } from '../components/page-meta'
@@ -8,10 +12,11 @@ import { RankingTab } from './stats/ranking-tab'
 type Tab = 'resumo' | 'versiculos' | 'ranking'
 
 export function StatsPage() {
+  useLingui() // subscribe to locale changes
   const [tab, setTab] = useState<Tab>('resumo')
   const [progress, setProgress] = useState<{
     total: number
-    byState: Record<string, number>
+    byState: Record<number, number>
     streak: number
     reviewsToday: number
   }>({ total: 0, byState: {}, streak: 0, reviewsToday: 0 })
@@ -25,14 +30,12 @@ export function StatsPage() {
   async function loadStats() {
     const all = await db.progress.toArray()
     const today = new Date().toDateString()
-    const stateNames = ['Novo', 'Aprendendo', 'Revisando', 'Reaprendendo']
-    const byState: Record<string, number> = {}
+    const byState: Record<number, number> = {}
     let reviewsToday = 0
     const dayCount = new Map<string, number>()
 
     for (const p of all) {
-      const state = stateNames[p.state] || 'Novo'
-      byState[state] = (byState[state] || 0) + 1
+      byState[p.state] = (byState[p.state] || 0) + 1
       if (new Date(p.updatedAt).toDateString() === today) reviewsToday++
       const dayStr = new Date(p.updatedAt).toDateString()
       dayCount.set(dayStr, (dayCount.get(dayStr) || 0) + 1)
@@ -54,14 +57,23 @@ export function StatsPage() {
     loadStats()
   }
 
+  const stateNames: Record<number, string> = {
+    0: t`Novo`,
+    1: t`Aprendendo`,
+    2: t`Revisando`,
+    3: t`Reaprendendo`,
+  }
+
   return (
     <div className="page stats-page">
       <PageMeta
-        title="Progresso · Verbum Vitae"
-        description="Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
+        title={t`Progresso · Verbum Vitae`}
+        description={t`Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos.`}
         path="/stats"
       />
-      <h2>Progresso</h2>
+      <h2>
+        <Trans>Progresso</Trans>
+      </h2>
 
       <div className="stats-tabs" role="tablist">
         <button
@@ -71,7 +83,7 @@ export function StatsPage() {
           className={`stats-tab${tab === 'resumo' ? ' active' : ''}`}
           onClick={() => setTab('resumo')}
         >
-          Resumo
+          <Trans>Resumo</Trans>
         </button>
         <button
           type="button"
@@ -80,7 +92,7 @@ export function StatsPage() {
           className={`stats-tab${tab === 'versiculos' ? ' active' : ''}`}
           onClick={() => setTab('versiculos')}
         >
-          Versículos
+          <Trans>Versículos</Trans>
         </button>
         <button
           type="button"
@@ -89,7 +101,7 @@ export function StatsPage() {
           className={`stats-tab${tab === 'ranking' ? ' active' : ''}`}
           onClick={() => setTab('ranking')}
         >
-          Ranking
+          <Trans>Ranking</Trans>
         </button>
       </div>
 
@@ -98,25 +110,33 @@ export function StatsPage() {
           <div className="stats-grid">
             <div className="stat-card">
               <span className="stat-value">{progress.total}</span>
-              <span className="stat-label">Versículos</span>
+              <span className="stat-label">
+                <Trans>Versículos</Trans>
+              </span>
             </div>
             <div className="stat-card">
               <span className="stat-value">{progress.streak}</span>
-              <span className="stat-label">Sequência</span>
+              <span className="stat-label">
+                <Trans>Sequência</Trans>
+              </span>
             </div>
             <div className="stat-card">
               <span className="stat-value">{progress.reviewsToday}</span>
-              <span className="stat-label">Hoje</span>
+              <span className="stat-label">
+                <Trans>Hoje</Trans>
+              </span>
             </div>
           </div>
 
-          <StreakCalendar reviewDays={reviewDays} />
+          <StreakCalendar reviewDays={reviewDays} locale={i18n.locale} />
 
           <div className="stats-breakdown">
-            <h3>Por estágio</h3>
-            {Object.entries(progress.byState).map(([state, count]) => (
-              <div key={state} className="breakdown-row">
-                <span className="breakdown-label">{state}</span>
+            <h3>
+              <Trans>Por estágio</Trans>
+            </h3>
+            {Object.entries(progress.byState).map(([stateNum, count]) => (
+              <div key={stateNum} className="breakdown-row">
+                <span className="breakdown-label">{stateNames[Number(stateNum)] ?? t`Novo`}</span>
                 <div className="breakdown-bar-container">
                   <div className="breakdown-bar" style={{ width: `${progress.total > 0 ? (count / progress.total) * 100 : 0}%` }} />
                 </div>
@@ -129,17 +149,19 @@ export function StatsPage() {
             <div className="stats-danger-zone">
               {!confirming ? (
                 <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
-                  Recomeçar do zero
+                  <Trans>Recomeçar do zero</Trans>
                 </button>
               ) : (
                 <div className="stats-confirm">
-                  <span className="stats-confirm-label">Isso vai apagar todo o progresso. Tem certeza?</span>
+                  <span className="stats-confirm-label">
+                    <Trans>Isso vai apagar todo o progresso. Tem certeza?</Trans>
+                  </span>
                   <div className="stats-confirm-actions">
                     <button type="button" className="btn btn-danger" onClick={clearProgress}>
-                      Sim, limpar
+                      <Trans>Sim, limpar</Trans>
                     </button>
                     <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>
-                      Cancelar
+                      <Trans>Cancelar</Trans>
                     </button>
                   </div>
                 </div>
@@ -149,9 +171,11 @@ export function StatsPage() {
 
           {progress.total === 0 && (
             <div className="stats-empty">
-              Nenhum versículo estudado ainda.
-              <br />
-              Comece a revisar para ver seu progresso aqui.
+              <Trans>
+                Nenhum versículo estudado ainda.
+                <br />
+                Comece a revisar para ver seu progresso aqui.
+              </Trans>
             </div>
           )}
         </>
@@ -163,7 +187,7 @@ export function StatsPage() {
   )
 }
 
-const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
+const StreakCalendar = memo(function StreakCalendar({ reviewDays, locale }: { reviewDays: Map<string, number>; locale: string }) {
   const cells = useMemo(() => {
     const weeks = 20
     const today = new Date()
@@ -190,15 +214,22 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
   const monthLabels = useMemo(() => {
     const labels: { label: string; cellIndex: number }[] = []
     let lastMonth = -1
+    const fmt = new Intl.DateTimeFormat(locale, { month: 'short' })
     cells.forEach((cell, ci) => {
       const m = cell.date.getMonth()
       if (m !== lastMonth) {
-        labels.push({ label: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][m], cellIndex: ci })
+        labels.push({ label: fmt.format(cell.date), cellIndex: ci })
         lastMonth = m
       }
     })
     return labels
-  }, [cells])
+  }, [cells, locale])
+
+  const dayLabels = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+    // Jan 2, 2000 is a Sunday
+    return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2000, 0, 2 + i)))
+  }, [locale])
 
   const maxCount = useMemo(() => Math.max(1, ...cells.map((c) => c.count)), [cells])
 
@@ -212,12 +243,14 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
   }
 
   function formatDate(d: Date): string {
-    return d.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+    return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
   }
 
   return (
     <div className="streak-calendar">
-      <h3>Calendário de Revisões</h3>
+      <h3>
+        <Trans>Calendário de Revisões</Trans>
+      </h3>
       <div className="sc-body">
         <div className="sc-months">
           {monthLabels.map((ml) => (
@@ -228,7 +261,7 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
         </div>
         <div className="sc-grid">
           <div className="sc-days">
-            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d) => (
+            {dayLabels.map((d) => (
               <span key={d} className="sc-day-label">
                 {d}
               </span>
@@ -241,7 +274,7 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
                   <div
                     key={cell.dateStr}
                     className={`sc-cell ${color(cell.count)}`}
-                    title={`${formatDate(cell.date)} — ${cell.count} revisões`}
+                    title={`${formatDate(cell.date)} — ${plural(cell.count, { one: '# revisão', other: '# revisões' })}`}
                   />
                 ))}
               </div>
@@ -249,13 +282,17 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
           </div>
         </div>
         <div className="sc-legend">
-          <span>Menos</span>
+          <span>
+            <Trans>Menos</Trans>
+          </span>
           <div className="sc-cell" />
           <div className="sc-cell level-1" />
           <div className="sc-cell level-2" />
           <div className="sc-cell level-3" />
           <div className="sc-cell level-4" />
-          <span>Mais</span>
+          <span>
+            <Trans>Mais</Trans>
+          </span>
         </div>
       </div>
     </div>

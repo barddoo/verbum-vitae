@@ -1,3 +1,5 @@
+import { plural, t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { Check, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { db, fetchVersesBatch } from '../lib/db'
@@ -89,8 +91,10 @@ export function MemorizedVersePickerModal({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card memorized-picker-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <div className="modal-header">
-          <h2 className="modal-title">Meus versículos</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
+          <h2 className="modal-title">
+            <Trans>Meus versículos</Trans>
+          </h2>
+          <button type="button" className="modal-close" onClick={onClose} aria-label={t`Fechar`}>
             <X size={18} aria-hidden />
           </button>
         </div>
@@ -98,8 +102,8 @@ export function MemorizedVersePickerModal({
         <input
           type="text"
           className="form-input memorized-picker-search"
-          placeholder="Buscar referência…"
-          aria-label="Buscar"
+          placeholder={t`Buscar referência…`}
+          aria-label={t`Buscar`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           spellCheck={false}
@@ -107,11 +111,17 @@ export function MemorizedVersePickerModal({
         />
 
         {loading ? (
-          <div className="loading">Carregando…</div>
+          <div className="loading">
+            <Trans>Carregando…</Trans>
+          </div>
         ) : items.length === 0 ? (
-          <p className="memorized-picker-empty">Nenhum versículo memorizado ainda.</p>
+          <p className="memorized-picker-empty">
+            <Trans>Nenhum versículo memorizado ainda.</Trans>
+          </p>
         ) : filtered.length === 0 ? (
-          <p className="memorized-picker-empty">Nenhum resultado para &ldquo;{search}&rdquo;</p>
+          <p className="memorized-picker-empty">
+            <Trans>Nenhum resultado para &ldquo;{search}&rdquo;</Trans>
+          </p>
         ) : (
           <div className="memorized-picker-list">
             {filtered.map((item) => {
@@ -137,10 +147,10 @@ export function MemorizedVersePickerModal({
         {selected.size > 0 && (
           <div className="modal-actions">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
-              Cancelar
+              <Trans>Cancelar</Trans>
             </button>
             <button type="button" className="btn btn-primary" onClick={handleConfirm}>
-              Adicionar {selected.size} {selected.size === 1 ? 'versículo' : 'versículos'}
+              {plural(selected.size, { one: 'Adicionar # versículo', other: 'Adicionar # versículos' })}
             </button>
           </div>
         )}

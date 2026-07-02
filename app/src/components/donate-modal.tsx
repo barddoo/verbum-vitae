@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { Check, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -26,17 +28,21 @@ export function DonateModal({ onClose }: DonateModalProps) {
         className="modal donate-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Apoiar o projeto"
+        aria-label={t`Apoiar o projeto`}
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label={t`Fechar`}>
           <X size={18} aria-hidden />
         </button>
 
         <div className="donate-header">
           <span className="donate-icon">₿</span>
-          <h2 className="donate-title">Apoie este projeto</h2>
-          <p className="donate-subtitle">Verbum Vitae é gratuito e de código aberto. Se foi útil pra você, considere uma doação.</p>
+          <h2 className="donate-title">
+            <Trans>Apoie este projeto</Trans>
+          </h2>
+          <p className="donate-subtitle">
+            <Trans>Verbum Vitae é gratuito e de código aberto. Se foi útil pra você, considere uma doação.</Trans>
+          </p>
         </div>
 
         <div className="donate-btc">
@@ -44,20 +50,22 @@ export function DonateModal({ onClose }: DonateModalProps) {
           <div className="donate-btc-row">
             <code className="donate-btc-addr">{BTC_ADDRESS}</code>
             <button type="button" className="donate-copy-btn" onClick={() => handleCopy('btc', BTC_ADDRESS)} aria-live="polite">
-              {copied === 'btc' ? <Check size={14} aria-hidden /> : 'Copiar'}
+              {copied === 'btc' ? <Check size={14} aria-hidden /> : <Trans>Copiar</Trans>}
             </button>
           </div>
         </div>
 
         <div className="donate-church">
-          <span className="donate-church-label">Doe para a Igreja de Cristo</span>
+          <span className="donate-church-label">
+            <Trans>Doe para a Igreja de Cristo</Trans>
+          </span>
           <p className="donate-church-hint">
-            Se preferir, doe diretamente para uma igreja local. Abaixo, a chave Pix da minha — use a sua se quiser:
+            <Trans>Se preferir, doe diretamente para uma igreja local. Abaixo, a chave Pix da minha — use a sua se quiser:</Trans>
           </p>
           <div className="donate-btc-row">
             <code className="donate-btc-addr">{CHURCH_PIX_KEY}</code>
             <button type="button" className="donate-copy-btn" onClick={() => handleCopy('church', CHURCH_PIX_KEY)} aria-live="polite">
-              {copied === 'church' ? <Check size={14} aria-hidden /> : 'Copiar'}
+              {copied === 'church' ? <Check size={14} aria-hidden /> : <Trans>Copiar</Trans>}
             </button>
           </div>
         </div>

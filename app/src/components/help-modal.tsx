@@ -1,3 +1,6 @@
+import { i18n } from '@lingui/core'
+import { msg, t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { BookOpen, Brain, Cloud, Plus, RotateCcw, Smartphone, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 
@@ -5,42 +8,47 @@ interface HelpModalProps {
   onClose: () => void
 }
 
-const steps: { icon: ReactNode; title: string; text: ReactNode }[] = [
+const steps: { icon: ReactNode; titleMsg: ReturnType<typeof msg>; text: ReactNode }[] = [
   {
     icon: <BookOpen size={20} aria-hidden />,
-    title: 'Encontre um versículo',
-    text: 'Vá em Bíblia, escolha um livro, capítulo e segure o dedo sobre o versículo que deseja memorizar.',
+    titleMsg: msg`Encontre um versículo`,
+    text: <Trans>Vá em Bíblia, escolha um livro, capítulo e segure o dedo sobre o versículo que deseja memorizar.</Trans>,
   },
   {
     icon: <Plus size={20} aria-hidden />,
-    title: 'Adicione à memória',
-    text: 'Selecione um ou mais versículos e toque em Memorizar. Eles entram na sua fila de revisão.',
+    titleMsg: msg`Adicione à memória`,
+    text: <Trans>Selecione um ou mais versículos e toque em Memorizar. Eles entram na sua fila de revisão.</Trans>,
   },
   {
     icon: <RotateCcw size={20} aria-hidden />,
-    title: 'Revise todo dia',
-    text: 'Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa.',
+    titleMsg: msg`Revise todo dia`,
+    text: <Trans>Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa.</Trans>,
   },
   {
     icon: <Brain size={20} aria-hidden />,
-    title: 'Três modos de revisão',
+    titleMsg: msg`Três modos de revisão`,
     text: (
-      <>
+      <Trans>
         <strong>Flashcard</strong> — recite mentalmente e revele. <strong>Lacunas</strong> — complete palavras ocultas (ative &ldquo;Palavra
         por palavra&rdquo; para mais desafio). <strong>Digitação</strong> — escreva de memória, o mais eficaz para versículos novos. Avalie
         com <strong>honestidade</strong>: 1&nbsp;=&nbsp;vê em breve · 4&nbsp;=&nbsp;vê em semanas.
-      </>
+      </Trans>
     ),
   },
   {
     icon: <Cloud size={20} aria-hidden />,
-    title: 'Sincronize entre dispositivos',
-    text: 'Crie uma conta (opcional) para salvar seu progresso na nuvem e acessar em qualquer aparelho.',
+    titleMsg: msg`Sincronize entre dispositivos`,
+    text: <Trans>Crie uma conta (opcional) para salvar seu progresso na nuvem e acessar em qualquer aparelho.</Trans>,
   },
   {
     icon: <Smartphone size={20} aria-hidden />,
-    title: 'Instale como aplicativo',
-    text: 'No Android/Chrome, toque em "Instalar App" no topo da tela. No iPhone, clique em Compartilhar e "Adicionar à Tela de Início". Instalado, o app funciona offline, sem distrações e com acesso rápido na tela inicial.',
+    titleMsg: msg`Instale como aplicativo`,
+    text: (
+      <Trans>
+        No Android/Chrome, toque em "Instalar App" no topo da tela. No iPhone, clique em Compartilhar e "Adicionar à Tela de Início".
+        Instalado, o app funciona offline, sem distrações e com acesso rápido na tela inicial.
+      </Trans>
+    ),
   },
 ]
 
@@ -54,25 +62,29 @@ export function HelpModal({ onClose }: HelpModalProps) {
         aria-labelledby="help-modal-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label={t`Fechar`}>
           <X size={18} aria-hidden />
         </button>
 
         <div className="help-header">
           <span className="help-icon">🕊️</span>
           <h2 id="help-modal-title" className="help-title">
-            Como usar o Verbum Vitae
+            <Trans>Como usar o Verbum Vitae</Trans>
           </h2>
-          <span className="help-free-badge">Grátis para sempre</span>
-          <p className="help-subtitle">Memorize versículos com repetição espaçada.</p>
+          <span className="help-free-badge">
+            <Trans>Grátis para sempre</Trans>
+          </span>
+          <p className="help-subtitle">
+            <Trans>Memorize versículos com repetição espaçada.</Trans>
+          </p>
         </div>
 
         <ol className="help-steps">
           {steps.map((s) => (
-            <li key={s.title} className="help-step">
+            <li key={i18n._(s.titleMsg)} className="help-step">
               <span className="help-step-icon">{s.icon}</span>
               <div>
-                <strong className="help-step-title">{s.title}</strong>
+                <strong className="help-step-title">{i18n._(s.titleMsg)}</strong>
                 <p className="help-step-text">{s.text}</p>
               </div>
             </li>
@@ -80,11 +92,13 @@ export function HelpModal({ onClose }: HelpModalProps) {
         </ol>
 
         <p className="help-feedback">
-          Encontrou um bug ou quer sugerir uma funcionalidade? <a href="mailto:vvitae.com.galleria929@passmail.net">Envie um email</a>
+          <Trans>
+            Encontrou um bug ou quer sugerir uma funcionalidade? <a href="mailto:vvitae.com.galleria929@passmail.net">Envie um email</a>
+          </Trans>
         </p>
 
         <button type="button" className="btn btn-primary help-cta" onClick={onClose}>
-          Entendido!
+          <Trans>Entendido!</Trans>
         </button>
       </div>
     </div>

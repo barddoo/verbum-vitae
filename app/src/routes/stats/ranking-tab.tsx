@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { useEffect, useRef, useState } from 'react'
 import type { LeaderboardEntry, LeaderboardResponse } from 'shared/types'
 import { useAuth } from '../../lib/auth'
@@ -15,11 +17,14 @@ function EntryRow({ entry, highlight }: { entry: LeaderboardEntry; highlight: bo
     <div className={`ranking-row${highlight ? ' ranking-row--me' : ''}`}>
       <RankBadge rank={entry.rank} />
       <span className="ranking-name">{entry.displayName}</span>
-      <span className="ranking-stat" title="Versículos memorizados">
-        {entry.memorizedCount} <span className="ranking-stat-label">versíc.</span>
+      <span className="ranking-stat" title={t`Versículos memorizados`}>
+        {entry.memorizedCount}{' '}
+        <span className="ranking-stat-label">
+          <Trans>versíc.</Trans>
+        </span>
       </span>
       {entry.currentStreak > 0 && (
-        <span className="ranking-streak" title="Sequência atual">
+        <span className="ranking-streak" title={t`Sequência atual`}>
           🔥{entry.currentStreak}
         </span>
       )}
@@ -58,13 +63,25 @@ export function RankingTab() {
   if (!user) {
     return (
       <div className="ranking-empty">
-        <p>Faça login para ver o ranking da comunidade.</p>
+        <p>
+          <Trans>Faça login para ver o ranking da comunidade.</Trans>
+        </p>
       </div>
     )
   }
 
-  if (loading) return <div className="ranking-loading">Carregando…</div>
-  if (error) return <div className="ranking-error">Erro ao carregar ranking.</div>
+  if (loading)
+    return (
+      <div className="ranking-loading">
+        <Trans>Carregando…</Trans>
+      </div>
+    )
+  if (error)
+    return (
+      <div className="ranking-error">
+        <Trans>Erro ao carregar ranking.</Trans>
+      </div>
+    )
 
   const emailPrefix = user.email.split('@')[0]
   const currentDisplayName = user.displayName ?? emailPrefix
@@ -113,15 +130,15 @@ export function RankingTab() {
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
               maxLength={40}
-              placeholder="Seu nome público…"
+              placeholder={t`Seu nome público…`}
               spellCheck={false}
               onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
             />
             <button type="button" className="btn btn-primary btn-sm" onClick={handleSaveName} disabled={saving}>
-              {saving ? 'Salvando…' : 'Salvar'}
+              {saving ? <Trans>Salvando…</Trans> : <Trans>Salvar</Trans>}
             </button>
             <button type="button" className="btn btn-secondary btn-sm" onClick={() => setEditing(false)} disabled={saving}>
-              Cancelar
+              <Trans>Cancelar</Trans>
             </button>
           </div>
         ) : (
@@ -130,7 +147,7 @@ export function RankingTab() {
             <button
               type="button"
               className="ranking-edit-btn"
-              aria-label="Editar nome de exibição"
+              aria-label={t`Editar nome de exibição`}
               onClick={() => {
                 setNameInput(user.displayName ?? '')
                 setEditing(true)
@@ -140,17 +157,29 @@ export function RankingTab() {
             </button>
           </div>
         )}
-        {!user.displayName && !editing && <p className="ranking-name-hint">Defina seu nome público para aparecer no ranking.</p>}
+        {!user.displayName && !editing && (
+          <p className="ranking-name-hint">
+            <Trans>Defina seu nome público para aparecer no ranking.</Trans>
+          </p>
+        )}
         <label className="ranking-visibility-toggle">
           <input type="checkbox" checked={hidden} onChange={handleToggleVisibility} />
-          <span>Ocultar meu nome do ranking</span>
+          <span>
+            <Trans>Ocultar meu nome do ranking</Trans>
+          </span>
         </label>
-        {hidden && <p className="ranking-hidden-notice">Você está oculto do ranking.</p>}
+        {hidden && (
+          <p className="ranking-hidden-notice">
+            <Trans>Você está oculto do ranking.</Trans>
+          </p>
+        )}
       </div>
 
       {data && data.entries.length === 0 ? (
         <div className="ranking-empty">
-          <p>Nenhum usuário no ranking ainda. Seja o primeiro!</p>
+          <p>
+            <Trans>Nenhum usuário no ranking ainda. Seja o primeiro!</Trans>
+          </p>
         </div>
       ) : (
         <div className="ranking-list">
@@ -163,7 +192,9 @@ export function RankingTab() {
       {data?.currentUserEntry && (
         <>
           <div className="ranking-separator">
-            <span>Sua posição</span>
+            <span>
+              <Trans>Sua posição</Trans>
+            </span>
           </div>
           <div className="ranking-list">
             <EntryRow entry={data.currentUserEntry} highlight />

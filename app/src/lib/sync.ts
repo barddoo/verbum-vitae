@@ -141,7 +141,7 @@ export async function syncNow(cb?: SyncStateCallback) {
 async function pushPending() {
   const userId = getUserId()
   if (!userId) {
-    syncStateCallback?.({ error: 'Não foi possível identificar o utilizador. Tente fazer login novamente.' })
+    syncStateCallback?.({ error: 'Não foi possível identificar o usuário. Tente fazer login novamente.' })
     return
   }
 

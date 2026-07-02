@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseTextKey, textKey, verseKey } from './db'
+import { cleanVerseText, parseTextKey, textKey, verseKey } from './db'
 
 describe('textKey', () => {
   it('creates bible key without sourceId', () => {
@@ -84,5 +84,33 @@ describe('verseKey', () => {
   it('creates bible key with end verse', () => {
     const key = verseKey(42, 3, 16, 17)
     expect(key).toBe('b:42:3:16:17')
+  })
+})
+
+describe('cleanVerseText', () => {
+  it("strips Strong's numbers from KJV text", () => {
+    const raw = 'Every man376 of the children1121 of Israel3478 shall pitch2583 by his own standard1714.'
+    expect(cleanVerseText(raw, 'kjv')).toBe('Every man of the children of Israel shall pitch by his own standard.')
+  })
+
+  it("removes standalone Strong's numbers and collapses spaces", () => {
+    const raw = 'In the beginning7225 God430 created1254 853 the heaven8064 and853 the earth776.'
+    expect(cleanVerseText(raw, 'kjv')).toBe('In the beginning God created the heaven and the earth.')
+  })
+
+  it('preserves apostrophes and punctuation', () => {
+    const raw = "of their father's1 house1004: far off5048 about5439 the tabernacle168"
+    expect(cleanVerseText(raw, 'kjv')).toBe("of their father's house: far off about the tabernacle")
+  })
+
+  it('does not strip numbers from non-KJV translations', () => {
+    const raw = 'Aos 130 anos, Adão gerou um filho à sua semelhança.'
+    expect(cleanVerseText(raw, 'nvi')).toBe(raw)
+  })
+
+  it('strips HTML tags from any translation', () => {
+    const raw = '<S>Hello</S> world'
+    expect(cleanVerseText(raw, 'kjv')).toBe('Hello world')
+    expect(cleanVerseText(raw, 'nvi')).toBe('Hello world')
   })
 })

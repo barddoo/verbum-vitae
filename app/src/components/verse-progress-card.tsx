@@ -1,3 +1,6 @@
+import { i18n } from '@lingui/core'
+import { msg, t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { Check } from 'lucide-react'
 import { memo, useState } from 'react'
 import { formatRelativeDueDate, verseIdToReference } from '../lib/format'
@@ -13,7 +16,7 @@ interface VerseProgressCardProps {
   onSelect?: (verseId: string) => void
 }
 
-const STATE_LABELS = ['Novo', 'Aprendendo', 'Revisando', 'Reaprendendo']
+const STATE_LABELS = [msg`Novo`, msg`Aprendendo`, msg`Revisando`, msg`Reaprendendo`]
 const STATE_CLASSES = ['state-new', 'state-learning', 'state-review', 'state-relearning']
 
 export const VerseProgressCard = memo(function VerseProgressCard({
@@ -29,7 +32,7 @@ export const VerseProgressCard = memo(function VerseProgressCard({
   const [confirming, setConfirming] = useState(false)
   const reference = verseIdToReference(verseId)
   const dueLabel = formatRelativeDueDate(dueDate)
-  const stateLabel = STATE_LABELS[state] || 'Novo'
+  const stateLabel = i18n._(STATE_LABELS[state] ?? msg`Novo`)
   const stateClass = STATE_CLASSES[state] || STATE_CLASSES[0]
   const selectionMode = onSelect !== undefined
 
@@ -60,13 +63,15 @@ export const VerseProgressCard = memo(function VerseProgressCard({
               e.stopPropagation()
               setConfirming(true)
             }}
-            aria-label={`Remover ${reference}`}
+            aria-label={t`Remover ${reference}`}
           >
             ×
           </button>
         ) : (
           <div className="verse-card-confirm">
-            <span className="verse-card-confirm-text">Remover?</span>
+            <span className="verse-card-confirm-text">
+              <Trans>Remover?</Trans>
+            </span>
             <button
               type="button"
               className="verse-card-confirm-yes"
@@ -75,7 +80,7 @@ export const VerseProgressCard = memo(function VerseProgressCard({
                 onRemove(verseId)
               }}
             >
-              Sim
+              <Trans>Sim</Trans>
             </button>
             <button
               type="button"
@@ -85,7 +90,7 @@ export const VerseProgressCard = memo(function VerseProgressCard({
                 setConfirming(false)
               }}
             >
-              Não
+              <Trans>Não</Trans>
             </button>
           </div>
         )}

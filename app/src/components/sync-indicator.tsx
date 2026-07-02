@@ -1,3 +1,4 @@
+import { t } from '@lingui/core/macro'
 import { Cloud, RefreshCw } from 'lucide-react'
 import { formatTimeAgo, useSync } from '../lib/sync-context'
 
@@ -6,13 +7,13 @@ export function SyncIndicator() {
 
   let tooltip = ''
   if (isSyncing) {
-    tooltip = 'Sincronizando…'
+    tooltip = t`Sincronizando…`
   } else if (error) {
-    tooltip = 'Erro ao sincronizar'
+    tooltip = t`Erro ao sincronizar`
   } else if (lastSynced) {
-    tooltip = `Sincronizado há ${formatTimeAgo(lastSynced)}`
+    tooltip = t`Sincronizado há ${formatTimeAgo(lastSynced)}`
   } else {
-    tooltip = 'Sincronizar'
+    tooltip = t`Sincronizar`
   }
 
   let statusClass = 'sync-indicator'
@@ -33,8 +34,8 @@ export function SyncIndicator() {
           syncNow()
         }}
         disabled={isSyncing}
-        aria-label="Sincronizar agora"
-        title="Sincronizar agora"
+        aria-label={t`Sincronizar agora`}
+        title={t`Sincronizar agora`}
       >
         <RefreshCw size={14} strokeWidth={1.5} className={isSyncing ? 'spin' : ''} aria-hidden />
       </button>

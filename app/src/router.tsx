@@ -1,8 +1,11 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
 import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
 import { createContext, lazy, Suspense, useCallback, useEffect, useReducer, useState } from 'react'
 import { DonateModal } from './components/donate-modal'
 import { HelpModal } from './components/help-modal'
+import { LocaleToggle } from './components/locale-toggle'
 import { PresenceBadge } from './components/presence-badge'
 import { PwaInstallButton } from './components/pwa-install-button'
 import { SyncErrorBanner } from './components/sync-error-banner'
@@ -17,7 +20,11 @@ import { useAuth } from './lib/auth'
 
 export const WelcomeModalContext = createContext<{ closeWelcome: () => void }>({ closeWelcome: () => {} })
 
-const loadingSpinner = <div className="loading">Carregando…</div>
+const loadingSpinner = (
+  <div className="loading">
+    <Trans>Carregando…</Trans>
+  </div>
+)
 
 const HomePage = lazy(() => import('./routes/index').then((m) => ({ default: m.HomePage })))
 const BrowsePage = lazy(() => import('./routes/browse').then((m) => ({ default: m.BrowsePage })))
@@ -76,7 +83,7 @@ function RootLayout() {
           <h1 className="top-bar-title">Verbum Vitae</h1>
         </Link>
         <div className="top-bar-right">
-          <button type="button" className="btn-help" onClick={() => setShowHelp(true)} aria-label="Ajuda">
+          <button type="button" className="btn-help" onClick={() => setShowHelp(true)} aria-label={t`Ajuda`}>
             ?
           </button>
           <PwaInstallButton />
@@ -86,11 +93,11 @@ function RootLayout() {
           {user && <SyncIndicator />}
           {user ? (
             <button type="button" className="btn btn-sm btn-secondary" onClick={logout}>
-              Sair
+              <Trans>Sair</Trans>
             </button>
           ) : (
             <button type="button" className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>
-              Entrar
+              <Trans>Entrar</Trans>
             </button>
           )}
         </div>
@@ -101,19 +108,19 @@ function RootLayout() {
           <nav className="sidebar-nav">
             <div className="sidebar-rule" />
             <Link to="/" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-              Início
+              <Trans>Início</Trans>
             </Link>
             <Link to="/browse" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-              Bíblia
+              <Trans>Bíblia</Trans>
             </Link>
             <Link to="/review" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-              Revisar
+              <Trans>Revisar</Trans>
             </Link>
             <Link to="/collections" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-              Coleções
+              <Trans>Coleções</Trans>
             </Link>
             <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
-              Progresso
+              <Trans>Progresso</Trans>
             </Link>
             <div className="sidebar-rule" />
           </nav>
@@ -131,21 +138,23 @@ function RootLayout() {
       {isDesktop && (
         <footer className="app-footer">
           <div>
-            Feito por{' '}
-            <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
-              Charles Fonseca
-            </a>{' '}
-            em{' '}
-            <a href="https://www.google.com/maps?q=19°55′55.44″S+43°56′17.03″W" target="_blank" rel="noopener noreferrer">
-              Belo Horizonte
-            </a>{' '}
-            🔺 &mdash;{' '}
-            <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
-              código aberto
-            </a>
+            <Trans>
+              Feito por{' '}
+              <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
+                Charles Fonseca
+              </a>{' '}
+              em{' '}
+              <a href="https://www.google.com/maps?q=19°55′55.44″S+43°56′17.03″W" target="_blank" rel="noopener noreferrer">
+                Belo Horizonte
+              </a>{' '}
+              🔺 &mdash;{' '}
+              <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
+                código aberto
+              </a>
+            </Trans>
           </div>
           <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
-            ₿ Doar
+            <Trans>₿ Doar</Trans>
           </button>
         </footer>
       )}
@@ -154,28 +163,41 @@ function RootLayout() {
         <nav className="bottom-nav">
           <Link to="/" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             <Home size={20} strokeWidth={1.5} />
-            <span>Início</span>
+            <span>
+              <Trans>Início</Trans>
+            </span>
           </Link>
           <Link to="/browse" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             <BookOpen size={20} strokeWidth={1.5} />
-            <span>Bíblia</span>
+            <span>
+              <Trans>Bíblia</Trans>
+            </span>
           </Link>
           <Link to="/review" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             <RotateCcw size={20} strokeWidth={1.5} />
-            <span>Revisar</span>
+            <span>
+              <Trans>Revisar</Trans>
+            </span>
           </Link>
           <Link to="/collections" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             <Layers size={20} strokeWidth={1.5} />
-            <span>Coleções</span>
+            <span>
+              <Trans>Coleções</Trans>
+            </span>
           </Link>
           <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             <BarChart2 size={20} strokeWidth={1.5} />
-            <span>Stats</span>
+            <span>
+              <Trans>Progresso</Trans>
+            </span>
           </Link>
           <button type="button" className="nav-item nav-donate" onClick={() => setShowDonate(true)}>
             <span className="nav-donate-icon">₿</span>
-            <span>Doar</span>
+            <span>
+              <Trans>Doar</Trans>
+            </span>
           </button>
+          <LocaleToggle />
         </nav>
       )}
 

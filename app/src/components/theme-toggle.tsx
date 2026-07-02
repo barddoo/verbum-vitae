@@ -1,3 +1,4 @@
+import { t } from '@lingui/core/macro'
 import { useTheme } from '../lib/theme'
 
 export function ThemeToggle() {
@@ -8,8 +9,8 @@ export function ThemeToggle() {
       type="button"
       className="theme-toggle"
       onClick={toggleTheme}
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+      aria-label={theme === 'dark' ? t`Alternar para tema claro` : t`Alternar para tema escuro`}
+      title={theme === 'dark' ? t`Alternar para tema claro` : t`Alternar para tema escuro`}
     >
       {theme === 'dark' ? (
         <svg

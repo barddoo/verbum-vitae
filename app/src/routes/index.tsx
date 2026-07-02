@@ -1,3 +1,6 @@
+import { t } from '@lingui/core/macro'
+import { useLingui } from '@lingui/react'
+import { Trans } from '@lingui/react/macro'
 import { Link } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BookOpen, Brain, Share2, Smartphone, WifiOff, X } from 'lucide-react'
@@ -9,7 +12,11 @@ import { shareVerse } from '../lib/sharing'
 import { computeStreak } from '../lib/stats'
 import { WelcomeModalContext } from '../router'
 
-const loadingSpinner = <div className="loading">Carregando…</div>
+const loadingSpinner = (
+  <div className="loading">
+    <Trans>Carregando…</Trans>
+  </div>
+)
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -72,6 +79,7 @@ function useInstallGuide() {
 }
 
 export function HomePage() {
+  const { i18n } = useLingui()
   const { count: presenceCount } = usePresence()
   const allProgress = useLiveQuery(() => db.progress.toArray(), [])
   const { show, deferredPrompt, isIOS, isAndroid, handleInstall, dismiss } = useInstallGuide()
@@ -99,7 +107,7 @@ export function HomePage() {
   const dueCount = stats?.dueCount ?? 0
   const totalMemorized = stats?.totalMemorized ?? 0
   const streak = stats?.streak ?? 0
-  const nf = useMemo(() => new Intl.NumberFormat('pt-BR'), [])
+  const nf = useMemo(() => new Intl.NumberFormat(i18n.locale), [i18n.locale])
 
   useEffect(() => {
     if (allProgress && allProgress.length === 0) {
@@ -111,8 +119,8 @@ export function HomePage() {
   return (
     <>
       <PageMeta
-        title="Verbum Vitae — Memorização Bíblica"
-        description="Memorização bíblica com repetição espaçada. Aprenda e memorize versículos da Bíblia com flashcards inteligentes e acompanhamento de progresso."
+        title={t`Verbum Vitae — Memorização Bíblica`}
+        description={t`Memorização bíblica com repetição espaçada. Aprenda e memorize versículos da Bíblia com flashcards inteligentes e acompanhamento de progresso.`}
       />
       <div className="page home-page">
         {!stats ? (
@@ -121,13 +129,19 @@ export function HomePage() {
           <>
             <div className="welcome-hero">
               <h2 className="welcome-headline">
-                Memorize a Bíblia com <span className="welcome-headline-accent">repetição espaçada</span>
+                <Trans>
+                  Memorize a Bíblia com <span className="welcome-headline-accent">repetição espaçada</span>
+                </Trans>
               </h2>
-              <p className="welcome-subtitle">Aprenda versículos no seu ritmo, com revisões inteligentes que aparecem no momento certo.</p>
+              <p className="welcome-subtitle">
+                <Trans>Aprenda versículos no seu ritmo, com revisões inteligentes que aparecem no momento certo.</Trans>
+              </p>
               <div className="welcome-features">
                 <div className="welcome-feature-item">
                   <BookOpen size={20} className="welcome-feature-icon" />
-                  <span className="welcome-feature-label">6 traduções</span>
+                  <span className="welcome-feature-label">
+                    <Trans>6 traduções</Trans>
+                  </span>
                 </div>
                 <div className="welcome-feature-item">
                   <Brain size={20} className="welcome-feature-icon" />
@@ -140,13 +154,15 @@ export function HomePage() {
               </div>
               <div className="welcome-cta">
                 <Link to="/browse" className="btn btn-primary btn-large">
-                  Explorar a Bíblia
+                  <Trans>Explorar a Bíblia</Trans>
                 </Link>
                 <Link to="/collections" className="btn btn-secondary btn-large">
-                  Ver Coleções Temáticas
+                  <Trans>Ver Coleções Temáticas</Trans>
                 </Link>
               </div>
-              <p className="welcome-reassurance">Grátis · Sem cadastro</p>
+              <p className="welcome-reassurance">
+                <Trans>Grátis · Sem cadastro</Trans>
+              </p>
             </div>
 
             <div className="community-presence-card" aria-live="polite">
@@ -154,19 +170,25 @@ export function HomePage() {
                 <>
                   <span className="community-presence-main">
                     <span className="community-presence-count">{nf.format(presenceCount)}</span>
-                    <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
+                    <span className="community-presence-unit">{presenceCount === 1 ? t`pessoa` : t`pessoas`}</span>
                   </span>
-                  <span className="community-presence-label">memorizando agora</span>
-                  <span className="community-presence-encourage">Junte-se a eles!</span>
+                  <span className="community-presence-label">
+                    <Trans>memorizando agora</Trans>
+                  </span>
+                  <span className="community-presence-encourage">
+                    <Trans>Junte-se a eles!</Trans>
+                  </span>
                   <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                    Compartilhar
+                    <Trans>Compartilhar</Trans>
                   </button>
                 </>
               ) : (
                 <>
-                  <span className="community-presence-encourage">Seja o primeiro a memorizar hoje!</span>
+                  <span className="community-presence-encourage">
+                    <Trans>Seja o primeiro a memorizar hoje!</Trans>
+                  </span>
                   <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                    Compartilhar
+                    <Trans>Compartilhar</Trans>
                   </button>
                 </>
               )}
@@ -174,51 +196,71 @@ export function HomePage() {
 
             {show && (
               <div className="install-guide-card">
-                <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
+                <button type="button" className="install-guide-close" onClick={dismiss} aria-label={t`Fechar`}>
                   <X size={16} aria-hidden />
                 </button>
                 <span className="install-guide-icon" aria-hidden="true">
                   <Smartphone size={24} />
                 </span>
                 <div className="install-guide-body">
-                  <strong className="install-guide-title">Instalar como aplicativo</strong>
-                  <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
+                  <strong className="install-guide-title">
+                    <Trans>Instalar como aplicativo</Trans>
+                  </strong>
+                  <p className="install-guide-subtitle">
+                    <Trans>Funciona offline, sem distrações e com acesso rápido na tela inicial.</Trans>
+                  </p>
                   {deferredPrompt ? (
                     <button type="button" className="btn btn-primary install-guide-btn" onClick={handleInstall}>
-                      Instalar App
+                      <Trans>Instalar App</Trans>
                     </button>
                   ) : isIOS ? (
                     <ol className="install-guide-steps">
                       <li>
-                        Abra este app no <strong>Safari</strong> (não funciona no Chrome)
+                        <Trans>
+                          Abra este app no <strong>Safari</strong> (não funciona no Chrome)
+                        </Trans>
                       </li>
                       <li>
-                        Toque no ícone <strong>Compartilhar</strong>{' '}
-                        <span className="install-guide-share-icon" aria-hidden="true">
-                          <Share2 size={14} />
-                        </span>{' '}
-                        na barra inferior
+                        <Trans>
+                          Toque no ícone <strong>Compartilhar</strong>{' '}
+                          <span className="install-guide-share-icon" aria-hidden="true">
+                            <Share2 size={14} />
+                          </span>{' '}
+                          na barra inferior
+                        </Trans>
                       </li>
                       <li>
-                        Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
+                        <Trans>
+                          Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
+                        </Trans>
                       </li>
                       <li>
-                        Toque <strong>"Adicionar"</strong> no canto superior direito
+                        <Trans>
+                          Toque <strong>"Adicionar"</strong> no canto superior direito
+                        </Trans>
                       </li>
                     </ol>
                   ) : isAndroid ? (
                     <ol className="install-guide-steps">
                       <li>
-                        Abra no <strong>Chrome</strong>
+                        <Trans>
+                          Abra no <strong>Chrome</strong>
+                        </Trans>
                       </li>
                       <li>
-                        Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
+                        <Trans>
+                          Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
+                        </Trans>
                       </li>
                       <li>
-                        Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
+                        <Trans>
+                          Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
+                        </Trans>
                       </li>
                       <li>
-                        Toque em <strong>"Instalar"</strong>
+                        <Trans>
+                          Toque em <strong>"Instalar"</strong>
+                        </Trans>
                       </li>
                     </ol>
                   ) : null}
@@ -229,37 +271,43 @@ export function HomePage() {
             <div className="stats-grid">
               <div className="stat-card">
                 <span className="stat-value">{nf.format(totalMemorized)}</span>
-                <span className="stat-label">Em aprendizado</span>
+                <span className="stat-label">
+                  <Trans>Em aprendizado</Trans>
+                </span>
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(streak)}</span>
-                <span className="stat-label">Dias de Streak</span>
+                <span className="stat-label">
+                  <Trans>Dias de Streak</Trans>
+                </span>
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(dueCount)}</span>
-                <span className="stat-label">Pendentes</span>
+                <span className="stat-label">
+                  <Trans>Pendentes</Trans>
+                </span>
               </div>
             </div>
 
             <div className="quick-actions">
               <Link to="/browse" className="btn btn-secondary">
-                + Adicionar Versículo
+                <Trans>+ Adicionar Versículo</Trans>
               </Link>
               <Link to="/collections" className="btn btn-secondary">
-                Coleções
+                <Trans>Coleções</Trans>
               </Link>
               <Link to="/stats" className="btn btn-secondary">
-                Ver Progresso
+                <Trans>Ver Progresso</Trans>
               </Link>
             </div>
           </>
         ) : (
           <>
             <div className="hero-card">
-              <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} para revisar` : 'Nada pendente!'}</h2>
+              <h2 className="hero-greeting">{dueCount > 0 ? t`${nf.format(dueCount)} para revisar` : t`Nada pendente!`}</h2>
               {dueCount > 0 && (
                 <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
-                  Revisar Agora ({nf.format(dueCount)})
+                  <Trans>Revisar Agora ({nf.format(dueCount)})</Trans>
                 </Link>
               )}
             </div>
@@ -269,19 +317,25 @@ export function HomePage() {
                 <>
                   <span className="community-presence-main">
                     <span className="community-presence-count">{nf.format(presenceCount)}</span>
-                    <span className="community-presence-unit">{presenceCount === 1 ? 'pessoa' : 'pessoas'}</span>
+                    <span className="community-presence-unit">{presenceCount === 1 ? t`pessoa` : t`pessoas`}</span>
                   </span>
-                  <span className="community-presence-label">memorizando agora</span>
-                  <span className="community-presence-encourage">Continue assim!</span>
+                  <span className="community-presence-label">
+                    <Trans>memorizando agora</Trans>
+                  </span>
+                  <span className="community-presence-encourage">
+                    <Trans>Continue assim!</Trans>
+                  </span>
                   <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                    Compartilhar
+                    <Trans>Compartilhar</Trans>
                   </button>
                 </>
               ) : (
                 <>
-                  <span className="community-presence-encourage">Continue memorizando!</span>
+                  <span className="community-presence-encourage">
+                    <Trans>Continue memorizando!</Trans>
+                  </span>
                   <button type="button" className="btn btn-sm btn-secondary" onClick={() => shareVerse()}>
-                    Compartilhar
+                    <Trans>Compartilhar</Trans>
                   </button>
                 </>
               )}
@@ -289,51 +343,71 @@ export function HomePage() {
 
             {show && (
               <div className="install-guide-card">
-                <button type="button" className="install-guide-close" onClick={dismiss} aria-label="Fechar">
+                <button type="button" className="install-guide-close" onClick={dismiss} aria-label={t`Fechar`}>
                   <X size={16} aria-hidden />
                 </button>
                 <span className="install-guide-icon" aria-hidden="true">
                   <Smartphone size={24} />
                 </span>
                 <div className="install-guide-body">
-                  <strong className="install-guide-title">Instalar como aplicativo</strong>
-                  <p className="install-guide-subtitle">Funciona offline, sem distrações e com acesso rápido na tela inicial.</p>
+                  <strong className="install-guide-title">
+                    <Trans>Instalar como aplicativo</Trans>
+                  </strong>
+                  <p className="install-guide-subtitle">
+                    <Trans>Funciona offline, sem distrações e com acesso rápido na tela inicial.</Trans>
+                  </p>
                   {deferredPrompt ? (
                     <button type="button" className="btn btn-primary install-guide-btn" onClick={handleInstall}>
-                      Instalar App
+                      <Trans>Instalar App</Trans>
                     </button>
                   ) : isIOS ? (
                     <ol className="install-guide-steps">
                       <li>
-                        Abra este app no <strong>Safari</strong> (não funciona no Chrome)
+                        <Trans>
+                          Abra este app no <strong>Safari</strong> (não funciona no Chrome)
+                        </Trans>
                       </li>
                       <li>
-                        Toque no ícone <strong>Compartilhar</strong>{' '}
-                        <span className="install-guide-share-icon" aria-hidden="true">
-                          <Share2 size={14} />
-                        </span>{' '}
-                        na barra inferior
+                        <Trans>
+                          Toque no ícone <strong>Compartilhar</strong>{' '}
+                          <span className="install-guide-share-icon" aria-hidden="true">
+                            <Share2 size={14} />
+                          </span>{' '}
+                          na barra inferior
+                        </Trans>
                       </li>
                       <li>
-                        Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
+                        <Trans>
+                          Role para baixo e toque <strong>"Adicionar à Tela de Início"</strong>
+                        </Trans>
                       </li>
                       <li>
-                        Toque <strong>"Adicionar"</strong> no canto superior direito
+                        <Trans>
+                          Toque <strong>"Adicionar"</strong> no canto superior direito
+                        </Trans>
                       </li>
                     </ol>
                   ) : isAndroid ? (
                     <ol className="install-guide-steps">
                       <li>
-                        Abra no <strong>Chrome</strong>
+                        <Trans>
+                          Abra no <strong>Chrome</strong>
+                        </Trans>
                       </li>
                       <li>
-                        Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
+                        <Trans>
+                          Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito
+                        </Trans>
                       </li>
                       <li>
-                        Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
+                        <Trans>
+                          Toque em <strong>"Instalar app"</strong> ou <strong>"Adicionar à tela inicial"</strong>
+                        </Trans>
                       </li>
                       <li>
-                        Toque em <strong>"Instalar"</strong>
+                        <Trans>
+                          Toque em <strong>"Instalar"</strong>
+                        </Trans>
                       </li>
                     </ol>
                   ) : null}
@@ -342,24 +416,32 @@ export function HomePage() {
             )}
 
             <div className="collections-teaser">
-              <p className="collections-teaser-text">Adicione vários versículos de uma vez com coleções temáticas</p>
+              <p className="collections-teaser-text">
+                <Trans>Adicione vários versículos de uma vez com coleções temáticas</Trans>
+              </p>
               <Link to="/collections" className="btn btn-secondary btn-sm">
-                Ver Coleções
+                <Trans>Ver Coleções</Trans>
               </Link>
             </div>
 
             <div className="stats-grid">
               <div className="stat-card">
                 <span className="stat-value">{nf.format(totalMemorized)}</span>
-                <span className="stat-label">Em aprendizado</span>
+                <span className="stat-label">
+                  <Trans>Em aprendizado</Trans>
+                </span>
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(streak)}</span>
-                <span className="stat-label">Dias de Streak</span>
+                <span className="stat-label">
+                  <Trans>Dias de Streak</Trans>
+                </span>
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(dueCount)}</span>
-                <span className="stat-label">Pendentes</span>
+                <span className="stat-label">
+                  <Trans>Pendentes</Trans>
+                </span>
               </div>
             </div>
 
@@ -367,25 +449,25 @@ export function HomePage() {
               {dueCount === 0 && totalMemorized > 0 ? (
                 <>
                   <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary">
-                    Revisar Agora
+                    <Trans>Revisar Agora</Trans>
                   </Link>
                   <Link to="/collections" className="btn btn-secondary">
-                    Coleções
+                    <Trans>Coleções</Trans>
                   </Link>
                   <Link to="/browse" className="btn btn-secondary">
-                    + Memorizar novos
+                    <Trans>+ Memorizar novos</Trans>
                   </Link>
                 </>
               ) : (
                 <>
                   <Link to="/browse" className="btn btn-secondary">
-                    + Adicionar Versículo
+                    <Trans>+ Adicionar Versículo</Trans>
                   </Link>
                   <Link to="/collections" className="btn btn-secondary">
-                    Coleções
+                    <Trans>Coleções</Trans>
                   </Link>
                   <Link to="/stats" className="btn btn-secondary">
-                    Ver Progresso
+                    <Trans>Ver Progresso</Trans>
                   </Link>
                 </>
               )}

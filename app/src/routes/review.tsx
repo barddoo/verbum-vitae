@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { useSearch } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Check } from 'lucide-react'
@@ -29,7 +31,11 @@ interface DueItem {
   question?: string
 }
 
-const loadingSpinner = <div className="loading">Carregando…</div>
+const loadingSpinner = (
+  <div className="loading">
+    <Trans>Carregando…</Trans>
+  </div>
+)
 
 export function ReviewPage() {
   const { autostart } = useSearch({ from: '/review' })
@@ -76,7 +82,10 @@ export function ReviewPage() {
   const collections = useLiveQuery(() => db.collections.toArray(), [])
   const allCollectionVerses = useLiveQuery(() => db.collectionVerses.toArray(), [])
   const collectionVerseIds = useLiveQuery<CollectionVerse[] | null>(
-    () => (filterCollectionId != null ? db.collectionVerses.where({ collectionId: filterCollectionId }).toArray() : Promise.resolve(null)),
+    () =>
+      filterCollectionId != null
+        ? db.collectionVerses.where({ collectionId: filterCollectionId }).sortBy('sortOrder')
+        : Promise.resolve(null),
     [filterCollectionId],
   )
 
@@ -113,7 +122,6 @@ export function ReviewPage() {
   const filteredProgress = useMemo(() => {
     if (!allProgress) return []
 
-    // pinned verse selection bypasses all other filters
     if (filterVerseIds !== null) {
       const idSet = new Set(filterVerseIds)
       return allProgress.filter((p) => idSet.has(p.verseId))
@@ -130,8 +138,9 @@ export function ReviewPage() {
 
     if (filterCollectionId !== null) {
       if (!collectionVerseIds) return []
-      const cvSet = new Set(collectionVerseIds.map((cv) => cv.verseId))
-      base = base.filter((p) => cvSet.has(p.verseId))
+      const cvOrderMap = new Map(collectionVerseIds.map((cv, i) => [cv.verseId, i]))
+      base = base.filter((p) => cvOrderMap.has(p.verseId))
+      base = [...base].sort((a, b) => (cvOrderMap.get(a.verseId) ?? 0) - (cvOrderMap.get(b.verseId) ?? 0))
     }
 
     if (filterCardState !== 'all') {
@@ -309,7 +318,7 @@ export function ReviewPage() {
         <div className="review-queue-hero">
           <span className="review-queue-big-num">{reviewCount}</span>
           <span className="review-queue-big-label">
-            {totalAll === 0 ? 'nenhum texto memorizado' : reviewCount === 1 ? 'texto para revisar' : 'textos para revisar'}
+            {totalAll === 0 ? t`nenhum texto memorizado` : reviewCount === 1 ? t`texto para revisar` : t`textos para revisar`}
           </span>
           {filterStatus === 'due' && noFiltersActive && totalAll > totalDue && totalAll > 0 && (
             <span className="review-queue-total-hint">{totalAll} total</span>
@@ -319,9 +328,9 @@ export function ReviewPage() {
         {filterVerseIds !== null ? (
           <div className="review-pinned-filter">
             <span className="review-pinned-label">
-              {filterVerseIds.length} {filterVerseIds.length === 1 ? 'versículo selecionado' : 'versículos selecionados'}
+              {filterVerseIds.length} {filterVerseIds.length === 1 ? t`versículo selecionado` : t`versículos selecionados`}
             </span>
-            <button type="button" className="review-pinned-clear" onClick={() => setFilterVerseIds(null)} aria-label="Limpar seleção">
+            <button type="button" className="review-pinned-clear" onClick={() => setFilterVerseIds(null)} aria-label={t`Limpar seleção`}>
               ×
             </button>
           </div>
@@ -329,14 +338,16 @@ export function ReviewPage() {
           <>
             {hasCollections && (
               <div className="review-filter-section">
-                <span className="review-filter-label">Coleção</span>
+                <span className="review-filter-label">
+                  <Trans>Coleção</Trans>
+                </span>
                 <div className="source-picker-options">
                   <button
                     type="button"
                     className={`source-chip ${filterCollectionId === null ? 'active' : ''}`}
                     onClick={() => setAndPersistCollectionId(null)}
                   >
-                    Todas
+                    <Trans>Todas</Trans>
                   </button>
                   {collections
                     .filter((c) => c.isBuiltin === 0 || (collectionProgress.get(c.id!)?.total ?? 0) > 0)
@@ -359,14 +370,16 @@ export function ReviewPage() {
             )}
 
             <div className="review-filter-section">
-              <span className="review-filter-label">Estado</span>
+              <span className="review-filter-label">
+                <Trans>Estado</Trans>
+              </span>
               <div className="review-filter-toggle">
                 {(
                   [
-                    ['all', 'Todos'],
-                    ['new', 'Novos'],
-                    ['learning', 'Aprendendo'],
-                    ['review', 'Revisando'],
+                    ['all', t`Todos`],
+                    ['new', t`Novos`],
+                    ['learning', t`Aprendendo`],
+                    ['review', t`Revisando`],
                   ] as [CardStateFilter, string][]
                 ).map(([val, label]) => (
                   <button
@@ -382,7 +395,9 @@ export function ReviewPage() {
             </div>
 
             <div className="review-filter-section">
-              <span className="review-filter-label">Limite por sessão</span>
+              <span className="review-filter-label">
+                <Trans>Limite por sessão</Trans>
+              </span>
               <div className="review-filter-toggle">
                 {LIMIT_OPTIONS.map((limit) => (
                   <button
@@ -399,7 +414,7 @@ export function ReviewPage() {
                   className={`filter-toggle-btn ${sessionLimit === null ? 'active' : ''}`}
                   onClick={() => setAndPersistLimit(null)}
                 >
-                  Todos
+                  <Trans>Todos</Trans>
                 </button>
               </div>
             </div>
@@ -415,10 +430,10 @@ export function ReviewPage() {
               onClick={() => setAndPersistMode(m)}
             >
               <span className="review-mode-card-title">
-                {m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
+                {m === 'flashcard' ? t`Flashcard` : m === 'fill-blank' ? t`Completar` : t`Digitar`}
               </span>
               <span className="review-mode-card-desc">
-                {m === 'flashcard' ? 'Recite mentalmente' : m === 'fill-blank' ? 'Preencha lacunas' : 'Digite de memória'}
+                {m === 'flashcard' ? t`Recite mentalmente` : m === 'fill-blank' ? t`Preencha lacunas` : t`Digite de memória`}
               </span>
             </button>
           ))}
@@ -434,33 +449,47 @@ export function ReviewPage() {
                 localStorage.setItem('review_fill_blank_progressive', e.target.checked ? '1' : '0')
               }}
             />
-            <span>Palavra por palavra</span>
-            <span className="review-sub-toggle-hint">Toque em cada lacuna para revelar uma palavra por vez</span>
+            <span>
+              <Trans>Palavra por palavra</Trans>
+            </span>
+            <span className="review-sub-toggle-hint">
+              <Trans>Toque em cada lacuna para revelar uma palavra por vez</Trans>
+            </span>
           </label>
         )}
 
         {totalAll === 0 ? (
           <>
             <button type="button" className="btn btn-primary btn-large btn-start" disabled>
-              Adicione textos para começar
+              <Trans>Adicione textos para começar</Trans>
             </button>
             <p className="queue-empty-hint">
-              Vá para <a href="/browse">Textos</a> para adicionar itens.
+              <Trans>
+                Vá para <a href="/browse">Textos</a> para adicionar itens.
+              </Trans>
             </p>
           </>
         ) : filteredProgress.length === 0 && noFiltersActive ? (
           <div className="queue-up-to-date">
-            <p className="queue-up-to-date-msg">Você está em dia!</p>
-            <p className="queue-up-to-date-hint">Volte amanhã para a próxima revisão.</p>
+            <p className="queue-up-to-date-msg">
+              <Trans>Você está em dia!</Trans>
+            </p>
+            <p className="queue-up-to-date-hint">
+              <Trans>Volte amanhã para a próxima revisão.</Trans>
+            </p>
           </div>
         ) : filteredProgress.length === 0 ? (
           <div className="queue-up-to-date">
-            <p className="queue-up-to-date-msg">Sem resultados</p>
-            <p className="queue-up-to-date-hint">Nenhum texto encontrado com esses filtros.</p>
+            <p className="queue-up-to-date-msg">
+              <Trans>Sem resultados</Trans>
+            </p>
+            <p className="queue-up-to-date-hint">
+              <Trans>Nenhum texto encontrado com esses filtros.</Trans>
+            </p>
           </div>
         ) : (
           <button type="button" className="btn btn-primary btn-large btn-start" onClick={startReview}>
-            Iniciar Revisão
+            <Trans>Iniciar Revisão</Trans>
           </button>
         )}
       </div>
@@ -471,11 +500,13 @@ export function ReviewPage() {
     return (
       <div className="page review-page">
         <div className="empty-state">
-          <h2>Nada para revisar!</h2>
-          <p>{filterStatus === 'due' ? 'Todos os textos estão em dia.' : 'Nenhum texto encontrado.'}</p>
+          <h2>
+            <Trans>Nada para revisar!</Trans>
+          </h2>
+          <p>{filterStatus === 'due' ? t`Todos os textos estão em dia.` : t`Nenhum texto encontrado.`}</p>
           <div className="empty-actions">
             <button type="button" className="btn btn-secondary" onClick={goBack}>
-              Voltar
+              <Trans>Voltar</Trans>
             </button>
           </div>
         </div>
@@ -519,12 +550,12 @@ export function ReviewPage() {
   return (
     <div className="page review-page review-session">
       <PageMeta
-        title="Revisar · Verbum Vitae"
-        description="Revise versículos memorizados com repetição espaçada. Flashcards, preenchimento de lacunas e prática de digitação para fixar a Palavra."
+        title={t`Revisar · Verbum Vitae`}
+        description={t`Revise versículos memorizados com repetição espaçada. Flashcards, preenchimento de lacunas e prática de digitação para fixar a Palavra.`}
         path="/review"
       />
       <div className="review-header">
-        <button type="button" className="btn-icon" onClick={goBack} aria-label="Voltar">
+        <button type="button" className="btn-icon" onClick={goBack} aria-label={t`Voltar`}>
           ←
         </button>
         <div className="review-header-center">
@@ -538,16 +569,16 @@ export function ReviewPage() {
                 key={m}
                 className={`mode-dot ${practiceMode === m ? 'active' : ''}`}
                 onClick={() => setAndPersistMode(m)}
-                aria-label={m}
-                title={m === 'flashcard' ? 'Flashcard' : m === 'fill-blank' ? 'Completar' : 'Digitar'}
+                aria-label={m === 'flashcard' ? t`Flashcard` : m === 'fill-blank' ? t`Completar` : t`Digitar`}
+                title={m === 'flashcard' ? t`Flashcard` : m === 'fill-blank' ? t`Completar` : t`Digitar`}
               />
             ))}
             <span className="mode-label">
-              {practiceMode === 'flashcard' ? 'Flashcard' : practiceMode === 'fill-blank' ? 'Completar' : 'Digitar'}
+              {practiceMode === 'flashcard' ? t`Flashcard` : practiceMode === 'fill-blank' ? t`Completar` : t`Digitar`}
             </span>
           </div>
         </div>
-        <span className="review-completed" title="Concluídos">
+        <span className="review-completed" title={t`Concluídos`}>
           {completed} <Check size={12} aria-hidden />
         </span>
       </div>
@@ -555,8 +586,8 @@ export function ReviewPage() {
         <div className="review-progress-fill" style={{ width: `${(currentIndex / items.length) * 100}%` }} />
       </div>
       <div className="review-skip-row">
-        <button type="button" className="btn-skip" onClick={handleSkip} aria-label="Pular versículo">
-          Pular →
+        <button type="button" className="btn-skip" onClick={handleSkip} aria-label={t`Pular versículo`}>
+          <Trans>Pular →</Trans>
         </button>
       </div>
 

@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getWordHeat } from '../../lib/db'
 import type { Grade } from '../../lib/srs'
@@ -44,6 +46,8 @@ export function FlashcardView({
       .join(' ')
   }, [verseText, hintLevel])
 
+  const hintLabel = hintLevel === 0 ? t`Dica (1ª letra)` : hintLevel + 1 >= words.length ? t`Dica (revelar)` : t`Dica (mais palavras)`
+
   return (
     <div className="flashcard">
       <div className={`flip-card ${flipped ? 'flipped' : ''}`}>
@@ -51,7 +55,13 @@ export function FlashcardView({
           <div className="flip-card-front">
             <div className="flip-card-top">
               <h2 className="flashcard-ref">{reference}</h2>
-              {question ? <p className="flashcard-question">{question}</p> : <p className="flashcard-hint">Tente recitar mentalmente…</p>}
+              {question ? (
+                <p className="flashcard-question">{question}</p>
+              ) : (
+                <p className="flashcard-hint">
+                  <Trans>Tente recitar mentalmente…</Trans>
+                </p>
+              )}
               {hintLevel > 0 && (
                 <div className="flashcard-hint-text">
                   <p>{getHiddenText()}</p>
@@ -67,16 +77,20 @@ export function FlashcardView({
                   else setHintLevel((h) => h + 1)
                 }}
               >
-                Dica {hintLevel === 0 ? '(1ª letra)' : hintLevel + 1 >= words.length ? '(revelar)' : '(mais palavras)'}
+                {hintLabel}
               </button>
               <button type="button" className="btn btn-primary" onClick={() => setFlipped(true)}>
-                Revelar
+                <Trans>Revelar</Trans>
               </button>
             </div>
           </div>
           <div className="flip-card-back">
             <h3 className="flashcard-ref-back">{reference}</h3>
-            {question && <p className="flashcard-back-label">Resposta:</p>}
+            {question && (
+              <p className="flashcard-back-label">
+                <Trans>Resposta:</Trans>
+              </p>
+            )}
             <HeatVerse words={words} heat={heat} />
             <p className="flashcard-translation-label">{translation.toUpperCase()}</p>
           </div>

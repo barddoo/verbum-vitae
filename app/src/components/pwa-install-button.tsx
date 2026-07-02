@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core'
+import { Trans } from '@lingui/react/macro'
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -43,7 +44,7 @@ export function PwaInstallButton() {
   return (
     <button type="button" className="btn btn-sm pwa-install-btn" onClick={handleInstall}>
       <Download size={16} strokeWidth={1.5} />
-      Instalar App
+      <Trans>Instalar App</Trans>
     </button>
   )
 }

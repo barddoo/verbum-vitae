@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { Check, Pencil, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -80,8 +82,6 @@ async function ensureCollectionsSeeded() {
   )
 }
 
-const loadingSpinner = <div className="loading">Carregando…</div>
-
 function SwipeableVerseRow({
   verseId,
   reference,
@@ -113,7 +113,9 @@ function SwipeableVerseRow({
 
   return (
     <div className="swipe-container">
-      <div className="swipe-action">Remover</div>
+      <div className="swipe-action">
+        <Trans>Remover</Trans>
+      </div>
       <div
         className={`swipe-content collection-verse-row ${memorized ? 'memorized' : ''}`}
         style={{ transform: `translateX(${swipe.translateX}px)`, transition: swipe.translateX === 0 ? 'transform 0.2s ease' : 'none' }}
@@ -126,9 +128,20 @@ function SwipeableVerseRow({
         <span className="collection-verse-text">{text}</span>
         {memorized && (
           <span className="memorized-badge">
-            <Check size={10} aria-hidden /> Memorizado
+            <Check size={10} aria-hidden /> <Trans>Memorizado</Trans>
           </span>
         )}
+        <button
+          type="button"
+          className="verse-remove-btn"
+          aria-label={t`Remover ${reference}`}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleDelete()
+          }}
+        >
+          <X size={14} aria-hidden />
+        </button>
       </div>
     </div>
   )
@@ -188,25 +201,38 @@ export function CollectionsListPage() {
   const userCollections = collections.filter((c) => !c.isBuiltin)
   const builtinCollections = collections.filter((c) => c.isBuiltin)
 
-  if (loading) return <div className="page">{loadingSpinner}</div>
+  if (loading)
+    return (
+      <div className="page">
+        <div className="loading">
+          <Trans>Carregando…</Trans>
+        </div>
+      </div>
+    )
 
   return (
     <div className="page collections-page">
       <PageMeta
-        title="Coleções · Verbum Vitae"
-        description="Crie e gerencie coleções de versículos para memorizar. Organize seus versículos favoritos por temas e acompanhe seu progresso."
+        title={t`Coleções · Verbum Vitae`}
+        description={t`Crie e gerencie coleções de versículos para memorizar. Organize seus versículos favoritos por temas e acompanhe seu progresso.`}
         path="/collections"
       />
-      <h2 className="collections-title">Coleções</h2>
-      <p className="collections-subtitle">Conjuntos de textos para memorizar</p>
+      <h2 className="collections-title">
+        <Trans>Coleções</Trans>
+      </h2>
+      <p className="collections-subtitle">
+        <Trans>Conjuntos de textos para memorizar</Trans>
+      </p>
 
       <button type="button" className="btn btn-primary btn-collection-create" onClick={() => setShowForm(true)}>
-        + Criar coleção
+        <Trans>+ Criar coleção</Trans>
       </button>
 
       {userCollections.length > 0 && (
         <>
-          <h3 className="collection-section-title">Suas coleções</h3>
+          <h3 className="collection-section-title">
+            <Trans>Suas coleções</Trans>
+          </h3>
           <div className="collection-grid">
             {userCollections.map((col) => (
               <Link key={col.dbId} to="/collections/$slug" params={{ slug: col.slug }} className="collection-card-link">
@@ -236,7 +262,9 @@ export function CollectionsListPage() {
 
       {builtinCollections.length > 0 && (
         <>
-          <h3 className="collection-section-title">Coleções integradas</h3>
+          <h3 className="collection-section-title">
+            <Trans>Coleções integradas</Trans>
+          </h3>
           <div className="collection-grid">
             {builtinCollections.map((col) => (
               <Link key={col.dbId} to="/collections/$slug" params={{ slug: col.slug }} className="collection-card-link">
@@ -263,7 +291,9 @@ export function CollectionsListPage() {
 
       {collections.length === 0 && (
         <div className="empty-state">
-          <p>Nenhuma coleção encontrada.</p>
+          <p>
+            <Trans>Nenhuma coleção encontrada.</Trans>
+          </p>
         </div>
       )}
 
@@ -382,15 +412,24 @@ export function CollectionDetailPage() {
 
   const isUserCollection = col && !col.isBuiltin
 
-  if (loading) return <div className="page">{loadingSpinner}</div>
+  if (loading)
+    return (
+      <div className="page">
+        <div className="loading">
+          <Trans>Carregando…</Trans>
+        </div>
+      </div>
+    )
 
   if (!col)
     return (
       <div className="page">
         <div className="empty-state">
-          <p>Coleção não encontrada.</p>
+          <p>
+            <Trans>Coleção não encontrada.</Trans>
+          </p>
           <Link to="/collections" className="btn btn-secondary">
-            Voltar
+            <Trans>Voltar</Trans>
           </Link>
         </div>
       </div>
@@ -399,15 +438,15 @@ export function CollectionDetailPage() {
   return (
     <div className="page collection-detail-page">
       <PageMeta
-        title={col ? `${col.name} · Verbum Vitae` : 'Coleção · Verbum Vitae'}
+        title={col ? t`${col.name} · Verbum Vitae` : t`Coleção · Verbum Vitae`}
         description={
-          col ? `Revise e gerencie os versículos da coleção "${col.name}".` : 'Detalhes da coleção de versículos para memorização.'
+          col ? t`Revise e gerencie os versículos da coleção "${col.name}".` : t`Detalhes da coleção de versículos para memorização.`
         }
         path={`/collections/${slug}`}
       />
       <div className="collection-detail-topbar">
         <Link to="/collections" className="back-btn">
-          ← Coleções
+          <Trans>← Coleções</Trans>
         </Link>
         {isUserCollection && (
           <div className="collection-detail-actions-edit">
@@ -415,8 +454,8 @@ export function CollectionDetailPage() {
               type="button"
               className="btn btn-sm btn-secondary"
               onClick={() => setShowEdit(true)}
-              aria-label="Editar coleção"
-              title="Editar"
+              aria-label={t`Editar coleção`}
+              title={t`Editar`}
             >
               <Pencil size={14} aria-hidden />
             </button>
@@ -424,8 +463,8 @@ export function CollectionDetailPage() {
               type="button"
               className="btn btn-sm btn-secondary btn-danger"
               onClick={() => setShowDeleteConfirm(true)}
-              aria-label="Excluir coleção"
-              title="Excluir"
+              aria-label={t`Excluir coleção`}
+              title={t`Excluir`}
             >
               <X size={14} aria-hidden />
             </button>
@@ -452,7 +491,9 @@ export function CollectionDetailPage() {
       </div>
 
       {isUserCollection && verses.length > 0 && (
-        <p className="collection-swipe-hint">← Deslize para a esquerda para remover um versículo</p>
+        <p className="collection-swipe-hint">
+          <Trans>← Deslize para a esquerda para remover um versículo</Trans>
+        </p>
       )}
 
       <div className="collection-verse-list">
@@ -474,7 +515,7 @@ export function CollectionDetailPage() {
               <span className="collection-verse-text">{v.text}</span>
               {v.memorized && (
                 <span className="memorized-badge">
-                  <Check size={10} aria-hidden /> Memorizado
+                  <Check size={10} aria-hidden /> <Trans>Memorizado</Trans>
                 </span>
               )}
             </div>
@@ -491,23 +532,23 @@ export function CollectionDetailPage() {
             disabled={adding || added || col.memorized === col.total}
           >
             {adding ? (
-              'Adicionando…'
+              <Trans>Adicionando…</Trans>
             ) : added ? (
               <>
-                <Check size={16} aria-hidden /> Adicionado
+                <Check size={16} aria-hidden /> <Trans>Adicionado</Trans>
               </>
             ) : col.total === 0 ? (
-              'Sem versículos'
+              <Trans>Sem versículos</Trans>
             ) : (
-              `Adicionar à memória (${col.total - col.memorized})`
+              t`Adicionar à memória (${col.total - col.memorized})`
             )}
           </button>
           <div className="collection-detail-actions-row">
             <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
-              + Versículos
+              <Trans>+ Versículos</Trans>
             </Link>
             <button type="button" className="btn btn-secondary" onClick={() => setShowMemorized(true)}>
-              Meus versículos
+              <Trans>Meus versículos</Trans>
             </button>
           </div>
         </div>
@@ -522,15 +563,15 @@ export function CollectionDetailPage() {
             disabled={adding || added || col.memorized === col.total}
           >
             {adding ? (
-              'Adicionando…'
+              <Trans>Adicionando…</Trans>
             ) : added ? (
               <>
-                <Check size={16} aria-hidden /> Adicionado
+                <Check size={16} aria-hidden /> <Trans>Adicionado</Trans>
               </>
             ) : col.total === 0 ? (
-              'Sem versículos'
+              <Trans>Sem versículos</Trans>
             ) : (
-              `Adicionar todos (${col.total - col.memorized})`
+              t`Adicionar todos (${col.total - col.memorized})`
             )}
           </button>
         </div>
@@ -557,14 +598,18 @@ export function CollectionDetailPage() {
       {showDeleteConfirm && (
         <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
           <div className="modal-card modal-confirm" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-            <p className="modal-confirm-text">Tem certeza que deseja excluir esta coleção?</p>
-            <p className="modal-confirm-hint">Os versículos da coleção não serão removidos da sua memória.</p>
+            <p className="modal-confirm-text">
+              <Trans>Tem certeza que deseja excluir esta coleção?</Trans>
+            </p>
+            <p className="modal-confirm-hint">
+              <Trans>Os versículos da coleção não serão removidos da sua memória.</Trans>
+            </p>
             <div className="modal-actions">
               <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
-                Cancelar
+                <Trans>Cancelar</Trans>
               </button>
               <button type="button" className="btn btn-primary btn-danger" onClick={handleDelete} disabled={deleting}>
-                {deleting ? 'Excluindo…' : 'Excluir'}
+                {deleting ? <Trans>Excluindo…</Trans> : <Trans>Excluir</Trans>}
               </button>
             </div>
           </div>

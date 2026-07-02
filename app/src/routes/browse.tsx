@@ -1,7 +1,10 @@
+import { plural, t } from '@lingui/core/macro'
+import { useLingui } from '@lingui/react'
+import { Trans } from '@lingui/react/macro'
 import { useSearch } from '@tanstack/react-router'
 import { Check, X } from 'lucide-react'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
+import { BOOKS, DEFAULT_TRANSLATION, getBooks, getTranslationLabels, TRANSLATIONS, type Translation } from 'shared/bible'
 import { PageMeta } from '../components/page-meta'
 import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
@@ -21,8 +24,6 @@ interface SearchResult {
   text: string
   ref: string
 }
-
-const loadingSpinner = <div className="loading">Carregando…</div>
 
 function SourcePicker({ current, onChange }: { current: SourceOption; onChange: (s: SourceOption) => void }) {
   return (
@@ -44,6 +45,8 @@ function SourcePicker({ current, onChange }: { current: SourceOption; onChange: 
 }
 
 export function BrowsePage() {
+  const { i18n } = useLingui()
+  const locale = i18n.locale
   const search = useSearch({ from: '/browse' })
   const [source, setSource] = useState<SourceOption>(() => AVAILABLE_SOURCES[0])
   const [translation, setTranslation] = useState<Translation>(() => (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION)
@@ -119,17 +122,18 @@ export function BrowsePage() {
         .filter((v) => v.text.toLowerCase().includes(lower))
         .limit(50)
         .toArray()
+      const books = getBooks(locale)
       const results: SearchResult[] = all.map((v) => ({
         bookNumber: v.bookNumber,
         chapter: v.chapter,
         verse: v.verse,
         text: v.text,
-        ref: `${BOOKS[v.bookNumber]} ${v.chapter}:${v.verse}`,
+        ref: `${books[v.bookNumber]} ${v.chapter}:${v.verse}`,
       }))
       setSearchResults(results)
       setSearching(false)
     },
-    [translation, isBible],
+    [translation, isBible, locale],
   )
 
   useEffect(() => {
@@ -259,22 +263,24 @@ export function BrowsePage() {
     if (!isBible) {
       return Array.from({ length: source.sectionCount }, (_, i) => ({ name: `${source.sectionLabel} ${i + 1}`, idx: i }))
     }
-    return BOOKS.reduce<{ name: string; idx: number }[]>((acc, name, i) => {
+    const books = getBooks(locale)
+    return books.reduce<{ name: string; idx: number }[]>((acc, name, i) => {
       if (!bookQuery || name.toLowerCase().includes(bookQuery.toLowerCase())) acc.push({ name, idx: i })
       return acc
     }, [])
-  }, [bookQuery, isBible, source])
+  }, [bookQuery, isBible, source, locale])
 
   const sortedSelected = useMemo(() => [...selectedVerses].toSorted((a, b) => a - b), [selectedVerses])
   const chapterCount = isBible && bookIndex !== null ? CHAPTER_COUNTS[bookIndex] : verses.length
+  const books = getBooks(locale)
   const imageVerses = useMemo(() => {
     if (bookIndex === null || !isBible) return []
     return sortedSelected.map((v) => ({
-      ref: `${BOOKS[bookIndex]} ${chapter ?? 0}:${v}`,
+      ref: `${books[bookIndex]} ${chapter ?? 0}:${v}`,
       text: verses[v - 1] ?? '',
     }))
-  }, [sortedSelected, bookIndex, chapter, verses, isBible])
-  const imageBookName = bookIndex !== null && isBible ? BOOKS[bookIndex] : source.name
+  }, [sortedSelected, bookIndex, chapter, verses, isBible, books])
+  const imageBookName = bookIndex !== null && isBible ? books[bookIndex] : source.name
   const imageTranslation = isBible ? translation : source.id
 
   function handleBookClick(idx: number) {
@@ -324,11 +330,13 @@ export function BrowsePage() {
     )
   }
 
+  const translationLabels = getTranslationLabels(locale)
+
   return (
     <>
       <PageMeta
-        title="Bíblia · Verbum Vitae"
-        description="Explore e leia a Bíblia Sagrada em múltiplas traduções. Selecione livros, capítulos e versículos para estudo e memorização."
+        title={t`Bíblia · Verbum Vitae`}
+        description={t`Explore e leia a Bíblia Sagrada em múltiplas traduções. Selecione livros, capítulos e versículos para estudo e memorização.`}
         path="/browse"
       />
       <div className="page browse-page">
@@ -338,17 +346,17 @@ export function BrowsePage() {
           {isBible && (
             <div className="translate-picker">
               <select
-                aria-label="Selecionar tradução"
+                aria-label={t`Selecionar tradução`}
                 value={translation}
                 onChange={(e) => {
-                  const t = e.target.value as Translation
-                  cachedSet('translation', t)
-                  setTranslation(t)
+                  const tx = e.target.value as Translation
+                  cachedSet('translation', tx)
+                  setTranslation(tx)
                 }}
               >
-                {TRANSLATIONS.map((t) => (
-                  <option key={t} value={t}>
-                    {TRANSLATION_LABELS[t]}
+                {TRANSLATIONS.map((tx) => (
+                  <option key={tx} value={tx}>
+                    {translationLabels[tx]}
                   </option>
                 ))}
               </select>
@@ -359,15 +367,15 @@ export function BrowsePage() {
             <input
               type="search"
               className="search-input"
-              placeholder={isBible ? 'Buscar versículos…' : 'Buscar…'}
-              aria-label="Buscar"
+              placeholder={isBible ? t`Buscar versículos…` : t`Buscar…`}
+              aria-label={t`Buscar`}
               name="verse-search"
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
-              <button type="button" className="search-clear" aria-label="Limpar busca" onClick={clearSearch}>
+              <button type="button" className="search-clear" aria-label={t`Limpar busca`} onClick={clearSearch}>
                 <X size={14} aria-hidden />
               </button>
             )}
@@ -377,9 +385,13 @@ export function BrowsePage() {
         {isBible && searchQuery.trim().length >= 2 && (
           <div className="search-results" aria-live="polite" aria-atomic="false">
             {searching ? (
-              <div className="loading">Buscando…</div>
+              <div className="loading">
+                <Trans>Buscando…</Trans>
+              </div>
             ) : searchResults.length === 0 ? (
-              <p className="search-empty">Nenhum resultado para &quot;{searchQuery}&quot;</p>
+              <p className="search-empty">
+                <Trans>Nenhum resultado para &quot;{searchQuery}&quot;</Trans>
+              </p>
             ) : (
               searchResults.map((r) => (
                 <button type="button" key={r.ref} className="search-result-row" onClick={() => goToVerse(r.bookNumber, r.chapter)}>
@@ -394,7 +406,9 @@ export function BrowsePage() {
         {(!searchQuery || searchQuery.trim().length < 2) && bookIndex === null ? (
           <div className="book-list">
             {filteredBooks.length === 0 ? (
-              <p className="search-empty">Nenhum livro encontrado</p>
+              <p className="search-empty">
+                <Trans>Nenhum livro encontrado</Trans>
+              </p>
             ) : (
               filteredBooks.flatMap(({ name, idx }) => {
                 const items = []
@@ -402,13 +416,13 @@ export function BrowsePage() {
                   if (!bookQuery && idx === 0)
                     items.push(
                       <div key="at-label" className="book-section-label">
-                        Antigo Testamento
+                        <Trans>Antigo Testamento</Trans>
                       </div>,
                     )
                   if (!bookQuery && idx === 39)
                     items.push(
                       <div key="nt-label" className="book-section-label">
-                        Novo Testamento
+                        <Trans>Novo Testamento</Trans>
                       </div>,
                     )
                 }
@@ -424,9 +438,9 @@ export function BrowsePage() {
         ) : (!searchQuery || searchQuery.trim().length < 2) && chapter === null ? (
           <div className="chapter-view">
             <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
-              ← Voltar
+              <Trans>← Voltar</Trans>
             </button>
-            <h3>{isBible ? BOOKS[bookIndex!] : source.name}</h3>
+            <h3>{isBible ? books[bookIndex!] : source.name}</h3>
             <div className="chapter-grid">
               {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
                 <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
@@ -438,61 +452,67 @@ export function BrowsePage() {
         ) : !searchQuery || searchQuery.trim().length < 2 ? (
           <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
             <button type="button" className="back-btn" onClick={() => (isBible ? setChapter(null) : setBookIndex(null))}>
-              ← {isBible ? BOOKS[bookIndex!] : source.name}
+              ← {isBible ? books[bookIndex!] : source.name}
             </button>
             <div className="verse-header">
               {selectionMode ? (
                 <>
                   <span className="select-mode-label">
                     {selectedVerses.size > 0
-                      ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
-                      : 'Toque para selecionar'}
+                      ? plural(selectedVerses.size, { one: '# selecionado', other: '# selecionados' })
+                      : t`Toque para selecionar`}
                   </span>
-                  <button type="button" className="select-mode-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
+                  <button type="button" className="select-mode-exit" aria-label={t`Sair do modo seleção`} onClick={exitSelectionMode}>
                     <X size={16} aria-hidden />
                   </button>
                 </>
               ) : (
                 <>
-                  <h3>{isBible ? `${BOOKS[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
-                  <p className="verse-hint">Segure para selecionar</p>
+                  <h3>{isBible ? `${books[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
+                  <p className="verse-hint">
+                    <Trans>Segure para selecionar</Trans>
+                  </p>
                 </>
               )}
             </div>
-            {loadingVerses
-              ? loadingSpinner
-              : verses.map((text, i) => {
-                  const v = i + 1
-                  const mem = isMemorized(v)
-                  const add = isAdded(v)
-                  const sel = selectedVerses.has(v)
-                  const label = isBible ? v : `${source.itemLabel} ${v}`
-                  return (
-                    <button
-                      type="button"
-                      key={i}
-                      className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                      onPointerDown={(e) => longPress.handlePointerDown(v, e)}
-                      onPointerMove={longPress.handlePointerMove}
-                      onPointerUp={() => longPress.handlePointerUp(v)}
-                      onPointerCancel={longPress.handlePointerCancel}
-                    >
-                      <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>
-                        {selectionMode ? sel ? <Check size={10} aria-hidden /> : '' : label}
+            {loadingVerses ? (
+              <div className="loading">
+                <Trans>Carregando…</Trans>
+              </div>
+            ) : (
+              verses.map((text, i) => {
+                const v = i + 1
+                const mem = isMemorized(v)
+                const add = isAdded(v)
+                const sel = selectedVerses.has(v)
+                const label = isBible ? v : `${source.itemLabel} ${v}`
+                return (
+                  <button
+                    type="button"
+                    key={i}
+                    className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
+                    onPointerDown={(e) => longPress.handlePointerDown(v, e)}
+                    onPointerMove={longPress.handlePointerMove}
+                    onPointerUp={() => longPress.handlePointerUp(v)}
+                    onPointerCancel={longPress.handlePointerCancel}
+                  >
+                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>
+                      {selectionMode ? sel ? <Check size={10} aria-hidden /> : '' : label}
+                    </span>
+                    <span className="verse-text">{text}</span>
+                    {add ? (
+                      <span className="added-check">
+                        <Check size={14} aria-hidden />
                       </span>
-                      <span className="verse-text">{text}</span>
-                      {add ? (
-                        <span className="added-check">
-                          <Check size={14} aria-hidden />
-                        </span>
-                      ) : mem ? (
-                        <span className="memorized-badge">
-                          <Check size={10} aria-hidden /> Memorizado
-                        </span>
-                      ) : null}
-                    </button>
-                  )
-                })}
+                    ) : mem ? (
+                      <span className="memorized-badge">
+                        <Check size={10} aria-hidden /> <Trans>Memorizado</Trans>
+                      </span>
+                    ) : null}
+                  </button>
+                )
+              })
+            )}
           </div>
         ) : null}
       </div>

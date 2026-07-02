@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useSync } from '../lib/sync-context'
@@ -22,9 +24,9 @@ export function SyncErrorBanner() {
     <div className="sync-error-banner" role="alert">
       <span className="sync-error-banner-text">{error}</span>
       <button type="button" className="sync-error-banner-btn" onClick={() => syncNow()}>
-        Tentar novamente
+        <Trans>Tentar novamente</Trans>
       </button>
-      <button type="button" className="sync-error-banner-dismiss" onClick={resetError} aria-label="Fechar">
+      <button type="button" className="sync-error-banner-dismiss" onClick={resetError} aria-label={t`Fechar`}>
         <X size={12} aria-hidden />
       </button>
     </div>

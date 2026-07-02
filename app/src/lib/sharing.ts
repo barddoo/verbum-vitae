@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
+import { t } from '@lingui/core/macro'
 
 interface ShareVerseParams {
   verseRef?: string
@@ -21,7 +22,7 @@ function buildMessage({ verseRef, verseText }: ShareVerseParams = {}): { title: 
 
   return {
     title: 'Verbum Vitae',
-    text: 'Estou memorizando a Bíblia!',
+    text: t`Estou memorizando a Bíblia!`,
     url: browseUrl,
   }
 }
@@ -30,8 +31,8 @@ export async function shareSession(reviewed: number): Promise<void> {
   const appUrl = window.location.origin
   const text =
     reviewed === 1
-      ? `Revisei 1 versículo agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada.`
-      : `Revisei ${reviewed} versículos agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada.`
+      ? t`Revisei 1 versículo agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada.`
+      : t`Revisei ${reviewed} versículos agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada.`
   const shareData = { title: 'Verbum Vitae', text, url: appUrl }
   try {
     await navigator.share(shareData)

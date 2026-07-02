@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../lib/auth'
@@ -19,7 +21,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
     e.preventDefault()
     setError('')
     if (tab === 'register' && password !== confirm) {
-      setError('Senhas não conferem')
+      setError(t`Senhas não conferem`)
       return
     }
     setLoading(true)
@@ -31,7 +33,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
       }
       onClose()
     } catch (err: any) {
-      setError(err.message || 'Erro de autenticação')
+      setError(err.message || t`Erro de autenticação`)
     } finally {
       setLoading(false)
     }
@@ -50,19 +52,19 @@ export function AuthModal({ onClose }: AuthModalProps) {
         className="modal"
         role="dialog"
         aria-modal="true"
-        aria-label={tab === 'login' ? 'Entrar' : 'Criar conta'}
+        aria-label={tab === 'login' ? t`Entrar` : t`Criar conta`}
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
+        <button type="button" className="modal-close" onClick={onClose} aria-label={t`Fechar`}>
           <X size={18} aria-hidden />
         </button>
 
         <div className="modal-tabs">
           <button type="button" className={`modal-tab ${tab === 'login' ? 'active' : ''}`} onClick={() => switchTab('login')}>
-            Entrar
+            <Trans>Entrar</Trans>
           </button>
           <button type="button" className={`modal-tab ${tab === 'register' ? 'active' : ''}`} onClick={() => switchTab('register')}>
-            Criar Conta
+            <Trans>Criar Conta</Trans>
           </button>
         </div>
 
@@ -72,7 +74,9 @@ export function AuthModal({ onClose }: AuthModalProps) {
               {error}
             </p>
           )}
-          <label htmlFor="auth-email">Email</label>
+          <label htmlFor="auth-email">
+            <Trans>Email</Trans>
+          </label>
           <input
             id="auth-email"
             type="email"
@@ -82,7 +86,9 @@ export function AuthModal({ onClose }: AuthModalProps) {
             spellCheck={false}
             required
           />
-          <label htmlFor="auth-password">Senha</label>
+          <label htmlFor="auth-password">
+            <Trans>Senha</Trans>
+          </label>
           <input
             id="auth-password"
             type="password"
@@ -94,7 +100,9 @@ export function AuthModal({ onClose }: AuthModalProps) {
           />
           {tab === 'register' && (
             <>
-              <label htmlFor="auth-confirm">Confirmar senha</label>
+              <label htmlFor="auth-confirm">
+                <Trans>Confirmar senha</Trans>
+              </label>
               <input
                 id="auth-confirm"
                 type="password"
@@ -106,13 +114,15 @@ export function AuthModal({ onClose }: AuthModalProps) {
             </>
           )}
           <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? (tab === 'login' ? 'Entrando…' : 'Criando…') : tab === 'login' ? 'Entrar' : 'Criar conta'}
+            {loading ? (tab === 'login' ? t`Entrando…` : t`Criando…`) : tab === 'login' ? t`Entrar` : t`Criar conta`}
           </button>
         </form>
 
         <p className="auth-free-notice">
-          Verbum Vitae é <strong>100% gratuito</strong> e sempre será. A conta serve apenas para sincronizar seu progresso entre
-          dispositivos: sem cobranças, sem planos, sem coleta de dados.
+          <Trans>
+            Verbum Vitae é <strong>100% gratuito</strong> e sempre será. A conta serve apenas para sincronizar seu progresso entre
+            dispositivos: sem cobranças, sem planos, sem coleta de dados.
+          </Trans>
         </p>
       </div>
     </div>

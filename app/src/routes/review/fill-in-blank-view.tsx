@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { getWordHeat } from '../../lib/db'
 import type { Grade } from '../../lib/srs'
@@ -107,7 +109,7 @@ export function FillInBlankView({
                   type="button"
                   className="fill-blank-word blank-word blank-interactive"
                   onClick={() => revealWord(i)}
-                  aria-label="Revelar palavra"
+                  aria-label={t`Revelar palavra`}
                 >
                   {blankFor(word)}
                 </button>{' '}
@@ -128,12 +130,12 @@ export function FillInBlankView({
           blankIndices.size > 0 &&
           !revealedAll && (
             <button type="button" className="btn btn-secondary" onClick={revealAll}>
-              Revelar todos
+              <Trans>Revelar todos</Trans>
             </button>
           )
         ) : (
           <button type="button" className="btn btn-secondary" onClick={() => setRevealed(!revealed)}>
-            {revealed ? 'Ocultar' : 'Revelar'}
+            {revealed ? <Trans>Ocultar</Trans> : <Trans>Revelar</Trans>}
           </button>
         )}
       </div>

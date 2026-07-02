@@ -133,6 +133,15 @@ db.version(6)
       })
   })
 
+db.version(7).upgrade(async (tx) => {
+  await tx
+    .table('verses')
+    .where({ sourceType: 'b', sourceId: '', translation: 'kjv' })
+    .modify((verse) => {
+      verse.text = verse.text.replace(/\d+/g, '').replace(/\s+/g, ' ').trim()
+    })
+})
+
 export type TextSourceType = 'bible' | 'creed' | 'catechism'
 
 export interface TextKeyParsed {
@@ -256,6 +265,14 @@ export async function fetchVersesBatch(keys: { verseId: string; translation: str
   return new Map(results.flat())
 }
 
+export function cleanVerseText(text: string, translation: string): string {
+  let cleaned = text.replace(/<[^>]+>/g, '')
+  if (translation === 'kjv') {
+    cleaned = cleaned.replace(/\d+/g, '').replace(/\s+/g, ' ')
+  }
+  return cleaned.trim()
+}
+
 async function seedBibleText(translation: string) {
   const count = await db.verses.where({ sourceType: 'b', sourceId: '', translation }).count()
   if (count > 0) return
@@ -293,7 +310,7 @@ async function seedBibleText(translation: string) {
     bookNumber: v.b,
     chapter: v.c,
     verse: v.v,
-    text: v.t.replace(/<[^>]+>/g, '').trim(),
+    text: cleanVerseText(v.t, translation),
     translation,
   }))
 

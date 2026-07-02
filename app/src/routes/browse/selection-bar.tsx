@@ -1,3 +1,6 @@
+import { plural, t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
+
 export function SelectionBar({
   count,
   previewText,
@@ -18,9 +21,7 @@ export function SelectionBar({
   return (
     <div className="selection-bar">
       <div className="selection-bar-info">
-        <span className="selection-bar-count">
-          {count} selecionado{count > 1 ? 's' : ''}
-        </span>
+        <span className="selection-bar-count">{plural(count, { one: '# selecionado', other: '# selecionados' })}</span>
         <span className="selection-bar-preview">
           &ldquo;{previewText.slice(0, 60)}
           {previewText.length > 60 ? '…' : ''}&rdquo;
@@ -28,15 +29,15 @@ export function SelectionBar({
       </div>
       <div className="selection-bar-actions">
         <button type="button" className="btn btn-sm btn-secondary" onClick={onClear}>
-          Limpar
+          <Trans>Limpar</Trans>
         </button>
         {onShareImage && (
           <button type="button" className="btn btn-sm btn-secondary" onClick={onShareImage}>
-            Imagem
+            <Trans>Imagem</Trans>
           </button>
         )}
         <button type="button" className="btn btn-sm btn-primary" onClick={onMemorize}>
-          {actionLabel || 'Memorizar'}
+          {actionLabel || t`Memorizar`}
         </button>
       </div>
     </div>

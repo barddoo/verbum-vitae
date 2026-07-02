@@ -1,3 +1,6 @@
+import { i18n } from '@lingui/core'
+import { msg, plural, t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Progress } from '../lib/db'
@@ -129,24 +132,30 @@ export function MemorizedVersesTab() {
     return result
   }, [items, filterState, search, sort, parseBookNumber])
 
-  const filterOptions: { label: string; value: FilterState }[] = [
-    { label: 'Todos', value: null },
-    { label: 'Novo', value: 0 },
-    { label: 'Aprendendo', value: 1 },
-    { label: 'Revisando', value: 2 },
-    { label: 'Reaprendendo', value: 3 },
+  const filterOptions: { labelMsg: ReturnType<typeof msg>; value: FilterState }[] = [
+    { labelMsg: msg`Todos`, value: null },
+    { labelMsg: msg`Novo`, value: 0 },
+    { labelMsg: msg`Aprendendo`, value: 1 },
+    { labelMsg: msg`Revisando`, value: 2 },
+    { labelMsg: msg`Reaprendendo`, value: 3 },
   ]
 
   if (loading) {
-    return <div className="stats-empty">Carregando…</div>
+    return (
+      <div className="stats-empty">
+        <Trans>Carregando…</Trans>
+      </div>
+    )
   }
 
   if (items.length === 0) {
     return (
       <div className="stats-empty">
-        Nenhum texto memorizado ainda.
-        <br />
-        Adicione textos na página Textos para vê-los aqui.
+        <Trans>
+          Nenhum texto memorizado ainda.
+          <br />
+          Adicione textos na página Textos para vê-los aqui.
+        </Trans>
       </div>
     )
   }
@@ -156,12 +165,12 @@ export function MemorizedVersesTab() {
       <div className="filter-chips">
         {filterOptions.map((opt) => (
           <button
-            key={opt.label}
+            key={i18n._(opt.labelMsg)}
             type="button"
             className={`filter-chip${filterState === opt.value ? ' active' : ''}`}
             onClick={() => setFilterState(opt.value)}
           >
-            {opt.label}
+            {i18n._(opt.labelMsg)}
           </button>
         ))}
       </div>
@@ -170,25 +179,25 @@ export function MemorizedVersesTab() {
         <input
           type="text"
           className="verse-search"
-          placeholder="Buscar…"
-          aria-label="Buscar"
+          placeholder={t`Buscar…`}
+          aria-label={t`Buscar`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           spellCheck={false}
         />
-        <select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Ordenar por">
-          <option value="dueDate">Data de revisão</option>
-          <option value="reference">Referência</option>
-          <option value="state">Estágio</option>
-          <option value="streak">Sequência</option>
+        <select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label={t`Ordenar por`}>
+          <option value="dueDate">{t`Data de revisão`}</option>
+          <option value="reference">{t`Referência`}</option>
+          <option value="state">{t`Estágio`}</option>
+          <option value="streak">{t`Sequência`}</option>
         </select>
         {!selectionMode ? (
           <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectionMode(true)}>
-            Selecionar
+            <Trans>Selecionar</Trans>
           </button>
         ) : (
           <button type="button" className="btn btn-secondary btn-sm" onClick={clearSelection}>
-            Cancelar
+            <Trans>Cancelar</Trans>
           </button>
         )}
       </div>
@@ -209,20 +218,26 @@ export function MemorizedVersesTab() {
         ))}
       </div>
 
-      {filtered.length === 0 && <div className="stats-empty">Nenhum texto encontrado.</div>}
+      {filtered.length === 0 && (
+        <div className="stats-empty">
+          <Trans>Nenhum texto encontrado.</Trans>
+        </div>
+      )}
 
       {selectedIds.size > 0 && (
         <div className="selection-bar">
           <div className="selection-bar-info">
             <span className="selection-bar-count">{selectedIds.size}</span>
-            <span className="selection-bar-preview">{selectedIds.size === 1 ? 'versículo selecionado' : 'versículos selecionados'}</span>
+            <span className="selection-bar-preview">
+              {plural(selectedIds.size, { one: 'versículo selecionado', other: 'versículos selecionados' })}
+            </span>
           </div>
           <div className="selection-bar-actions">
             <button type="button" className="btn btn-primary" onClick={reviewSelected}>
-              Revisar
+              <Trans>Revisar</Trans>
             </button>
             <button type="button" className="btn btn-secondary" onClick={clearSelection}>
-              Cancelar
+              <Trans>Cancelar</Trans>
             </button>
           </div>
         </div>

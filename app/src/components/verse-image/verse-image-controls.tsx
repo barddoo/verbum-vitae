@@ -1,3 +1,6 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
+
 interface ControlsProps {
   format: 'square' | 'story'
   font: 'body' | 'display'
@@ -13,15 +16,17 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
   return (
     <div className="verse-image-controls">
       <div className="control-group">
-        <span className="control-label">Formato</span>
-        <fieldset className="segmented" aria-label="Formato">
+        <span className="control-label">
+          <Trans>Formato</Trans>
+        </span>
+        <fieldset className="segmented" aria-label={t`Formato`}>
           <button
             type="button"
             className={`segmented-btn ${format === 'square' ? 'active' : ''}`}
             onClick={() => onChange({ format: 'square' })}
             aria-pressed={format === 'square'}
           >
-            Quadrado
+            <Trans>Quadrado</Trans>
           </button>
           <button
             type="button"
@@ -35,8 +40,10 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
       </div>
 
       <div className="control-group">
-        <span className="control-label">Fonte</span>
-        <fieldset className="segmented" aria-label="Fonte">
+        <span className="control-label">
+          <Trans>Fonte</Trans>
+        </span>
+        <fieldset className="segmented" aria-label={t`Fonte`}>
           <button
             type="button"
             className={`segmented-btn ${font === 'body' ? 'active' : ''}`}
@@ -57,15 +64,17 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
       </div>
 
       <div className="control-group">
-        <span className="control-label">Alinhamento</span>
-        <fieldset className="segmented" aria-label="Alinhamento">
+        <span className="control-label">
+          <Trans>Alinhamento</Trans>
+        </span>
+        <fieldset className="segmented" aria-label={t`Alinhamento`}>
           <button
             type="button"
             className={`segmented-btn ${align === 'left' ? 'active' : ''}`}
             onClick={() => onChange({ align: 'left' })}
             aria-pressed={align === 'left'}
           >
-            Esq
+            <Trans>Esq</Trans>
           </button>
           <button
             type="button"
@@ -73,14 +82,14 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
             onClick={() => onChange({ align: 'center' })}
             aria-pressed={align === 'center'}
           >
-            Centro
+            <Trans>Centro</Trans>
           </button>
         </fieldset>
       </div>
 
       <div className="control-group">
         <label className="control-label" htmlFor="verse-image-size">
-          Tamanho do texto
+          <Trans>Tamanho do texto</Trans>
         </label>
         <input
           id="verse-image-size"
@@ -91,7 +100,7 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
           step="0.05"
           value={fontScale}
           onChange={(e) => onChange({ fontScale: Number(e.target.value) })}
-          aria-label="Tamanho do texto"
+          aria-label={t`Tamanho do texto`}
         />
       </div>
 
@@ -99,7 +108,7 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
         <>
           <div className="control-group">
             <label className="control-label" htmlFor="verse-image-blur">
-              Desfoque
+              <Trans>Desfoque</Trans>
             </label>
             <input
               id="verse-image-blur"
@@ -110,13 +119,13 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
               step="1"
               value={blur}
               onChange={(e) => onChange({ blur: Number(e.target.value) })}
-              aria-label="Desfoque do fundo"
+              aria-label={t`Desfoque do fundo`}
             />
           </div>
 
           <div className="control-group">
             <label className="control-label" htmlFor="verse-image-brightness">
-              Brilho
+              <Trans>Brilho</Trans>
             </label>
             <input
               id="verse-image-brightness"
@@ -127,7 +136,7 @@ export function VerseImageControls({ format, font, align, fontScale, blur, brigh
               step="0.05"
               value={brightness}
               onChange={(e) => onChange({ brightness: Number(e.target.value) })}
-              aria-label="Brilho do fundo"
+              aria-label={t`Brilho do fundo`}
             />
           </div>
         </>

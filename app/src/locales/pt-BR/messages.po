@@ -1,0 +1,1384 @@
+msgid ""
+msgstr ""
+"Language: pt-BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. placeholder {0}: cell.count
+#: src/routes/stats.tsx
+msgid "{0, plural, one {# revisão} other {# revisões}}"
+msgstr "{0, plural, one {# revisão} other {# revisões}}"
+
+#. placeholder {0}: selectedVerses.size
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "{0, plural, one {# selecionado} other {# selecionados}}"
+msgstr "{0, plural, one {# selecionado} other {# selecionados}}"
+
+#. placeholder {0}: selected.size
+#: src/components/memorized-verse-picker-modal.tsx
+msgid "{0, plural, one {Adicionar # versículo} other {Adicionar # versículos}}"
+msgstr "{0, plural, one {Adicionar # versículo} other {Adicionar # versículos}}"
+
+#. placeholder {0}: selectedIds.size
+#: src/components/memorized-verses-tab.tsx
+msgid "{0, plural, one {versículo selecionado} other {versículos selecionados}}"
+msgstr "{0, plural, one {versículo selecionado} other {versículos selecionados}}"
+
+#. placeholder {0}: col.name
+#: src/routes/collections.tsx
+msgid "{0} · Verbum Vitae"
+msgstr "{0} · Verbum Vitae"
+
+#. placeholder {0}: nf.format(dueCount)
+#: src/routes/index.tsx
+msgid "{0} para revisar"
+msgstr "{0} para revisar"
+
+#: src/routes/review/typing-practice-view.tsx
+msgid "{accuracy}% de precisão"
+msgstr "{accuracy}% de precisão"
+
+#: src/routes/browse/selection-bar.tsx
+msgid "{count, plural, one {# selecionado} other {# selecionados}}"
+msgstr "{count, plural, one {# selecionado} other {# selecionados}}"
+
+#: src/routes/collections.tsx
+msgid "← Coleções"
+msgstr "← Coleções"
+
+#: src/routes/collections.tsx
+msgid "← Deslize para a esquerda para remover um versículo"
+msgstr "← Deslize para a esquerda para remover um versículo"
+
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "← Voltar"
+msgstr "← Voltar"
+
+#: src/routes/index.tsx
+msgid "+ Adicionar Versículo"
+msgstr "+ Adicionar Versículo"
+
+#: src/routes/collections.tsx
+msgid "+ Criar coleção"
+msgstr "+ Criar coleção"
+
+#: src/routes/index.tsx
+msgid "+ Memorizar novos"
+msgstr "+ Memorizar novos"
+
+#: src/routes/collections.tsx
+msgid "+ Versículos"
+msgstr "+ Versículos"
+
+#: src/components/help-modal.tsx
+msgid "<0>Flashcard</0> — recite mentalmente e revele. <1>Lacunas</1> — complete palavras ocultas (ative “Palavra por palavra” para mais desafio). <2>Digitação</2> — escreva de memória, o mais eficaz para versículos novos. Avalie com <3>honestidade</3>: 1 = vê em breve · 4 = vê em semanas."
+msgstr "<0>Flashcard</0> — recite mentalmente e revele. <1>Lacunas</1> — complete palavras ocultas (ative “Palavra por palavra” para mais desafio). <2>Digitação</2> — escreva de memória, o mais eficaz para versículos novos. Avalie com <3>honestidade</3>: 1 = vê em breve · 4 = vê em semanas."
+
+#: src/routes/review/session-complete.tsx
+msgid "💡 Dica"
+msgstr "💡 Dica"
+
+#: src/router.tsx
+msgid "₿ Doar"
+msgstr "₿ Doar"
+
+#: src/routes/review/grading-buttons.tsx
+msgid "1 = vejo em breve · 4 = vejo em semanas"
+msgstr "1 = vejo em breve · 4 = vejo em semanas"
+
+#: src/routes/index.tsx
+msgid "6 traduções"
+msgstr "6 traduções"
+
+#: src/components/welcome-modal.tsx
+msgid "A melhor forma de começar é pelas <0>Coleções</0> — escolha um tema e comece a memorizar versículos organizados para você."
+msgstr "A melhor forma de começar é pelas <0>Coleções</0> — escolha um tema e comece a memorizar versículos organizados para você."
+
+#: src/routes/index.tsx
+msgid "Abra este app no <0>Safari</0> (não funciona no Chrome)"
+msgstr "Abra este app no <0>Safari</0> (não funciona no Chrome)"
+
+#: src/routes/index.tsx
+msgid "Abra no <0>Chrome</0>"
+msgstr "Abra no <0>Chrome</0>"
+
+#: src/components/help-modal.tsx
+msgid "Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa."
+msgstr "Abra Revisar para ver os versículos do dia. O app usa repetição espaçada: você vê cada versículo na hora certa."
+
+#: src/routes/stats.tsx
+msgid "Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
+msgstr "Acompanhe seu progresso na memorização bíblica. Veja estatísticas, calendário de revisões e ranking de versículos."
+
+#: src/routes/collections.tsx
+msgid "Adicionado"
+msgstr "Adicionado"
+
+#: src/routes/collections.$slug.add.tsx
+msgid "Adicionado à coleção!"
+msgstr "Adicionado à coleção!"
+
+#: src/routes/collections.tsx
+msgid "Adicionando…"
+msgstr "Adicionando…"
+
+#: src/routes/collections.$slug.add.tsx
+msgid "Adicionar à coleção"
+msgstr "Adicionar à coleção"
+
+#. placeholder {0}: col.total - col.memorized
+#: src/routes/collections.tsx
+msgid "Adicionar à memória ({0})"
+msgstr "Adicionar à memória ({0})"
+
+#. placeholder {0}: col.total - col.memorized
+#: src/routes/collections.tsx
+msgid "Adicionar todos ({0})"
+msgstr "Adicionar todos ({0})"
+
+#: src/routes/collections.$slug.add.tsx
+msgid "Adicionar versículos"
+msgstr "Adicionar versículos"
+
+#: src/routes/collections.$slug.add.tsx
+msgid "Adicionar Versículos · Verbum Vitae"
+msgstr "Adicionar Versículos · Verbum Vitae"
+
+#: src/routes/review/session-complete.tsx
+msgid "Adicione 1–2 versículos novos por vez, nunca muitos de uma vez. O acúmulo rápido leva ao abandono."
+msgstr "Adicione 1–2 versículos novos por vez, nunca muitos de uma vez. O acúmulo rápido leva ao abandono."
+
+#: src/components/help-modal.tsx
+msgid "Adicione à memória"
+msgstr "Adicione à memória"
+
+#: src/routes/review.tsx
+msgid "Adicione textos para começar"
+msgstr "Adicione textos para começar"
+
+#: src/routes/index.tsx
+msgid "Adicione vários versículos de uma vez com coleções temáticas"
+msgstr "Adicione vários versículos de uma vez com coleções temáticas"
+
+#: src/routes/collections.$slug.add.tsx
+msgid "Adicione versículos da Bíblia a uma coleção para memorização organizada por temas."
+msgstr "Adicione versículos da Bíblia a uma coleção para memorização organizada por temas."
+
+#: src/router.tsx
+msgid "Ajuda"
+msgstr "Ajuda"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Alinhamento"
+msgstr "Alinhamento"
+
+#: src/components/theme-toggle.tsx
+msgid "Alternar para tema claro"
+msgstr "Alternar para tema claro"
+
+#: src/components/theme-toggle.tsx
+msgid "Alternar para tema escuro"
+msgstr "Alternar para tema escuro"
+
+#: src/components/collection-form-modal.tsx
+msgid "Âmbar"
+msgstr "Âmbar"
+
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "Antigo Testamento"
+msgstr "Antigo Testamento"
+
+#: src/components/donate-modal.tsx
+msgid "Apoiar o projeto"
+msgstr "Apoiar o projeto"
+
+#: src/components/donate-modal.tsx
+msgid "Apoie este projeto"
+msgstr "Apoie este projeto"
+
+#: src/routes/index.tsx
+msgid "Aprenda versículos no seu ritmo, com revisões inteligentes que aparecem no momento certo."
+msgstr "Aprenda versículos no seu ritmo, com revisões inteligentes que aparecem no momento certo."
+
+#: src/components/memorized-verses-tab.tsx
+#: src/components/verse-progress-card.tsx
+#: src/routes/review.tsx
+#: src/routes/stats.tsx
+msgid "Aprendendo"
+msgstr "Aprendendo"
+
+#: src/routes/review/session-complete.tsx
+msgid "Associe o versículo a uma situação concreta da sua vida. Memória emocional é muito mais durável."
+msgstr "Associe o versículo a uma situação concreta da sua vida. Memória emocional é muito mais durável."
+
+#: src/components/update-banner.tsx
+msgid "Atualizar"
+msgstr "Atualizar"
+
+#: src/routes/review/session-complete.tsx
+msgid "Avalie com honestidade. Dizer \"Fácil\" quando não está fluente engana o algoritmo e você esquece mais rápido."
+msgstr "Avalie com honestidade. Dizer \"Fácil\" quando não está fluente engana o algoritmo e você esquece mais rápido."
+
+#: src/components/collection-form-modal.tsx
+msgid "Azul"
+msgstr "Azul"
+
+#: src/components/welcome-modal.tsx
+msgid "Bem-vindo ao Verbum Vitae"
+msgstr "Bem-vindo ao Verbum Vitae"
+
+#: src/router.tsx
+msgid "Bíblia"
+msgstr "Bíblia"
+
+#: src/routes/browse.tsx
+msgid "Bíblia · Verbum Vitae"
+msgstr "Bíblia · Verbum Vitae"
+
+#: src/routes/review/grading-buttons.tsx
+msgid "Bom"
+msgstr "Bom"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Brilho"
+msgstr "Brilho"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Brilho do fundo"
+msgstr "Brilho do fundo"
+
+#: src/routes/browse.tsx
+msgid "Buscando…"
+msgstr "Buscando…"
+
+#: src/components/memorized-verse-picker-modal.tsx
+#: src/components/memorized-verses-tab.tsx
+#: src/routes/browse.tsx
+msgid "Buscar"
+msgstr "Buscar"
+
+#: src/components/memorized-verse-picker-modal.tsx
+msgid "Buscar referência…"
+msgstr "Buscar referência…"
+
+#: src/routes/browse.tsx
+msgid "Buscar versículos…"
+msgstr "Buscar versículos…"
+
+#: src/components/memorized-verses-tab.tsx
+#: src/routes/browse.tsx
+msgid "Buscar…"
+msgstr "Buscar…"
+
+#: src/routes/stats.tsx
+msgid "Calendário de Revisões"
+msgstr "Calendário de Revisões"
+
+#: src/components/collection-form-modal.tsx
+#: src/components/memorized-verse-picker-modal.tsx
+#: src/components/memorized-verses-tab.tsx
+#: src/routes/collections.tsx
+#: src/routes/stats.tsx
+#: src/routes/stats/ranking-tab.tsx
+msgid "Cancelar"
+msgstr "Cancelar"
+
+#: src/components/memorized-verse-picker-modal.tsx
+#: src/components/memorized-verses-tab.tsx
+#: src/router.tsx
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+#: src/routes/collections.tsx
+#: src/routes/index.tsx
+#: src/routes/review.tsx
+#: src/routes/stats/ranking-tab.tsx
+msgid "Carregando…"
+msgstr "Carregando…"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Centro"
+msgstr "Centro"
+
+#: src/components/collection-form-modal.tsx
+msgid "Cinza"
+msgstr "Cinza"
+
+#: src/routes/collections.$slug.add.tsx
+#: src/routes/review.tsx
+msgid "Coleção"
+msgstr "Coleção"
+
+#: src/routes/collections.tsx
+msgid "Coleção · Verbum Vitae"
+msgstr "Coleção · Verbum Vitae"
+
+#: src/routes/collections.tsx
+msgid "Coleção não encontrada."
+msgstr "Coleção não encontrada."
+
+#: src/router.tsx
+#: src/routes/collections.tsx
+#: src/routes/index.tsx
+msgid "Coleções"
+msgstr "Coleções"
+
+#: src/routes/collections.tsx
+msgid "Coleções · Verbum Vitae"
+msgstr "Coleções · Verbum Vitae"
+
+#: src/routes/collections.tsx
+msgid "Coleções integradas"
+msgstr "Coleções integradas"
+
+#: src/components/welcome-modal.tsx
+msgid "Começar"
+msgstr "Começar"
+
+#: src/routes/review/grading-buttons.tsx
+msgid "Como foi?"
+msgstr "Como foi?"
+
+#: src/components/help-modal.tsx
+msgid "Como usar o Verbum Vitae"
+msgstr "Como usar o Verbum Vitae"
+
+#: src/components/verse-image/verse-image-modal.tsx
+#: src/routes/index.tsx
+#: src/routes/review/session-complete.tsx
+msgid "Compartilhar"
+msgstr "Compartilhar"
+
+#: src/routes/review/session-complete.tsx
+msgid "Compartilhar imagem"
+msgstr "Compartilhar imagem"
+
+#: src/routes/review.tsx
+msgid "Completar"
+msgstr "Completar"
+
+#: src/routes/review.tsx
+msgid "Concluídos"
+msgstr "Concluídos"
+
+#: src/components/auth-modal.tsx
+msgid "Confirmar senha"
+msgstr "Confirmar senha"
+
+#: src/routes/collections.tsx
+msgid "Conjuntos de textos para memorizar"
+msgstr "Conjuntos de textos para memorizar"
+
+#: src/routes/review/session-complete.tsx
+msgid "Consistência supera intensidade — 5 versículos por dia superam 35 numa sessão semanal. Não pule dias."
+msgstr "Consistência supera intensidade — 5 versículos por dia superam 35 numa sessão semanal. Não pule dias."
+
+#: src/routes/index.tsx
+msgid "Continue assim!"
+msgstr "Continue assim!"
+
+#: src/routes/index.tsx
+msgid "Continue memorizando!"
+msgstr "Continue memorizando!"
+
+#: src/components/donate-modal.tsx
+msgid "Copiar"
+msgstr "Copiar"
+
+#: src/components/collection-form-modal.tsx
+msgid "Cor"
+msgstr "Cor"
+
+#: src/components/auth-modal.tsx
+msgid "Criando…"
+msgstr "Criando…"
+
+#: src/components/collection-form-modal.tsx
+msgid "Criar coleção"
+msgstr "Criar coleção"
+
+#: src/components/auth-modal.tsx
+msgid "Criar conta"
+msgstr "Criar conta"
+
+#: src/components/auth-modal.tsx
+msgid "Criar Conta"
+msgstr "Criar Conta"
+
+#: src/components/verse-image/verse-image-modal.tsx
+msgid "Criar Imagem"
+msgstr "Criar Imagem"
+
+#: src/routes/collections.tsx
+msgid "Crie e gerencie coleções de versículos para memorizar. Organize seus versículos favoritos por temas e acompanhe seu progresso."
+msgstr "Crie e gerencie coleções de versículos para memorizar. Organize seus versículos favoritos por temas e acompanhe seu progresso."
+
+#: src/components/help-modal.tsx
+msgid "Crie uma conta (opcional) para salvar seu progresso na nuvem e acessar em qualquer aparelho."
+msgstr "Crie uma conta (opcional) para salvar seu progresso na nuvem e acessar em qualquer aparelho."
+
+#: src/components/memorized-verses-tab.tsx
+msgid "Data de revisão"
+msgstr "Data de revisão"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Defina seu nome público para aparecer no ranking."
+msgstr "Defina seu nome público para aparecer no ranking."
+
+#: src/components/collection-form-modal.tsx
+msgid "Descrição"
+msgstr "Descrição"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Desfoque"
+msgstr "Desfoque"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Desfoque do fundo"
+msgstr "Desfoque do fundo"
+
+#: src/routes/collections.tsx
+msgid "Detalhes da coleção de versículos para memorização."
+msgstr "Detalhes da coleção de versículos para memorização."
+
+#: src/routes/index.tsx
+msgid "Dias de Streak"
+msgstr "Dias de Streak"
+
+#: src/routes/review/flashcard-view.tsx
+msgid "Dica (1ª letra)"
+msgstr "Dica (1ª letra)"
+
+#: src/routes/review/flashcard-view.tsx
+msgid "Dica (mais palavras)"
+msgstr "Dica (mais palavras)"
+
+#: src/routes/review/flashcard-view.tsx
+msgid "Dica (revelar)"
+msgstr "Dica (revelar)"
+
+#: src/routes/review/grading-buttons.tsx
+#: src/routes/review/session-complete.tsx
+msgid "Difícil"
+msgstr "Difícil"
+
+#: src/routes/review.tsx
+msgid "Digitar"
+msgstr "Digitar"
+
+#: src/routes/review.tsx
+msgid "Digite de memória"
+msgstr "Digite de memória"
+
+#: src/routes/review/typing-practice-view.tsx
+msgid "Digite de memória…"
+msgstr "Digite de memória…"
+
+#: src/router.tsx
+msgid "Doar"
+msgstr "Doar"
+
+#: src/components/donate-modal.tsx
+msgid "Doe para a Igreja de Cristo"
+msgstr "Doe para a Igreja de Cristo"
+
+#: src/routes/collections.tsx
+msgid "Editar"
+msgstr "Editar"
+
+#: src/components/collection-form-modal.tsx
+#: src/routes/collections.tsx
+msgid "Editar coleção"
+msgstr "Editar coleção"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Editar nome de exibição"
+msgstr "Editar nome de exibição"
+
+#: src/routes/index.tsx
+msgid "Em aprendizado"
+msgstr "Em aprendizado"
+
+#: src/components/auth-modal.tsx
+msgid "Email"
+msgstr "Email"
+
+#: src/components/help-modal.tsx
+msgid "Encontre um versículo"
+msgstr "Encontre um versículo"
+
+#: src/components/help-modal.tsx
+msgid "Encontrou um bug ou quer sugerir uma funcionalidade? <0>Envie um email</0>"
+msgstr "Encontrou um bug ou quer sugerir uma funcionalidade? <0>Envie um email</0>"
+
+#: src/components/help-modal.tsx
+msgid "Entendido!"
+msgstr "Entendido!"
+
+#: src/components/auth-modal.tsx
+msgid "Entrando…"
+msgstr "Entrando…"
+
+#: src/components/auth-modal.tsx
+#: src/router.tsx
+msgid "Entrar"
+msgstr "Entrar"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Erro ao carregar ranking."
+msgstr "Erro ao carregar ranking."
+
+#: src/components/sync-indicator.tsx
+msgid "Erro ao sincronizar"
+msgstr "Erro ao sincronizar"
+
+#: src/components/auth-modal.tsx
+msgid "Erro de autenticação"
+msgstr "Erro de autenticação"
+
+#: src/routes/review/session-complete.tsx
+msgid "Escreva o versículo à mão uma vez quando começar a memorizá-lo. O ato de escrever cria outro caminho de memória."
+msgstr "Escreva o versículo à mão uma vez quando começar a memorizá-lo. O ato de escrever cria outro caminho de memória."
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Esq"
+msgstr "Esq"
+
+#: src/routes/review/grading-buttons.tsx
+#: src/routes/review/session-complete.tsx
+msgid "Esqueci"
+msgstr "Esqueci"
+
+#: src/routes/review.tsx
+msgid "Estado"
+msgstr "Estado"
+
+#: src/components/memorized-verses-tab.tsx
+msgid "Estágio"
+msgstr "Estágio"
+
+#: src/lib/sharing.ts
+msgid "Estou memorizando a Bíblia!"
+msgstr "Estou memorizando a Bíblia!"
+
+#: src/components/collection-form-modal.tsx
+msgid "Ex: Versículos de confiança…"
+msgstr "Ex: Versículos de confiança…"
+
+#: src/routes/collections.tsx
+msgid "Excluindo…"
+msgstr "Excluindo…"
+
+#: src/routes/collections.tsx
+msgid "Excluir"
+msgstr "Excluir"
+
+#: src/routes/collections.tsx
+msgid "Excluir coleção"
+msgstr "Excluir coleção"
+
+#: src/routes/index.tsx
+msgid "Explorar a Bíblia"
+msgstr "Explorar a Bíblia"
+
+#: src/routes/browse.tsx
+msgid "Explore e leia a Bíblia Sagrada em múltiplas traduções. Selecione livros, capítulos e versículos para estudo e memorização."
+msgstr "Explore e leia a Bíblia Sagrada em múltiplas traduções. Selecione livros, capítulos e versículos para estudo e memorização."
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Faça login para ver o ranking da comunidade."
+msgstr "Faça login para ver o ranking da comunidade."
+
+#: src/routes/review/grading-buttons.tsx
+#: src/routes/review/session-complete.tsx
+msgid "Fácil"
+msgstr "Fácil"
+
+#: src/components/auth-modal.tsx
+#: src/components/collection-form-modal.tsx
+#: src/components/donate-modal.tsx
+#: src/components/help-modal.tsx
+#: src/components/memorized-verse-picker-modal.tsx
+#: src/components/sync-error-banner.tsx
+#: src/components/update-banner.tsx
+#: src/components/verse-image/verse-image-modal.tsx
+#: src/routes/index.tsx
+msgid "Fechar"
+msgstr "Fechar"
+
+#: src/router.tsx
+msgid "Feito por <0>Charles Fonseca</0> em <1>Belo Horizonte</1> 🔺 — <2>código aberto</2>"
+msgstr "Feito por <0>Charles Fonseca</0> em <1>Belo Horizonte</1> 🔺 — <2>código aberto</2>"
+
+#: src/routes/review.tsx
+msgid "Flashcard"
+msgstr "Flashcard"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Fonte"
+msgstr "Fonte"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Formato"
+msgstr "Formato"
+
+#: src/routes/index.tsx
+msgid "Funciona offline, sem distrações e com acesso rápido na tela inicial."
+msgstr "Funciona offline, sem distrações e com acesso rápido na tela inicial."
+
+#: src/routes/index.tsx
+msgid "Grátis · Sem cadastro"
+msgstr "Grátis · Sem cadastro"
+
+#: src/components/help-modal.tsx
+#: src/components/welcome-modal.tsx
+msgid "Grátis para sempre"
+msgstr "Grátis para sempre"
+
+#: src/components/welcome-modal.tsx
+msgid "Guardei no coração a tua palavra para não pecar contra ti."
+msgstr "Guardei no coração a tua palavra para não pecar contra ti."
+
+#: src/routes/stats.tsx
+msgid "Hoje"
+msgstr "Hoje"
+
+#: src/components/collection-form-modal.tsx
+msgid "Ícone"
+msgstr "Ícone"
+
+#: src/routes/browse/selection-bar.tsx
+msgid "Imagem"
+msgstr "Imagem"
+
+#: src/routes/review.tsx
+msgid "Iniciar Revisão"
+msgstr "Iniciar Revisão"
+
+#: src/router.tsx
+msgid "Início"
+msgstr "Início"
+
+#: src/components/pwa-install-button.tsx
+#: src/routes/index.tsx
+msgid "Instalar App"
+msgstr "Instalar App"
+
+#: src/routes/index.tsx
+msgid "Instalar como aplicativo"
+msgstr "Instalar como aplicativo"
+
+#: src/components/help-modal.tsx
+msgid "Instale como aplicativo"
+msgstr "Instale como aplicativo"
+
+#: src/routes/stats.tsx
+msgid "Isso vai apagar todo o progresso. Tem certeza?"
+msgstr "Isso vai apagar todo o progresso. Tem certeza?"
+
+#: src/routes/index.tsx
+msgid "Junte-se a eles!"
+msgstr "Junte-se a eles!"
+
+#: src/routes/review/session-complete.tsx
+msgid "Leia o contexto antes de memorizar — o parágrafo ao redor ancora o significado das palavras."
+msgstr "Leia o contexto antes de memorizar — o parágrafo ao redor ancora o significado das palavras."
+
+#: src/routes/review/session-complete.tsx
+msgid "Leia o versículo em voz alta. Vocalizar ativa a memória auditiva e aumenta a retenção em ~50%."
+msgstr "Leia o versículo em voz alta. Vocalizar ativa a memória auditiva e aumenta a retenção em ~50%."
+
+#: src/routes/review.tsx
+msgid "Limite por sessão"
+msgstr "Limite por sessão"
+
+#: src/routes/browse/selection-bar.tsx
+msgid "Limpar"
+msgstr "Limpar"
+
+#: src/routes/browse.tsx
+msgid "Limpar busca"
+msgstr "Limpar busca"
+
+#: src/components/collection-form-modal.tsx
+msgid "Limpar cor"
+msgstr "Limpar cor"
+
+#: src/routes/review.tsx
+msgid "Limpar seleção"
+msgstr "Limpar seleção"
+
+#: src/routes/stats.tsx
+msgid "Mais"
+msgstr "Mais"
+
+#: src/routes/review/session-complete.tsx
+msgid "Manhã é o melhor momento para revisar — aproveite a consolidação da memória que ocorre durante o sono."
+msgstr "Manhã é o melhor momento para revisar — aproveite a consolidação da memória que ocorre durante o sono."
+
+#: src/routes/review/session-complete.tsx
+msgid "Medite no significado do versículo. Entender o que ele diz torna a memorização mais rápida e a retenção mais longa."
+msgstr "Medite no significado do versículo. Entender o que ele diz torna a memorização mais rápida e a retenção mais longa."
+
+#: src/routes/index.tsx
+msgid "Memorização bíblica com repetição espaçada. Aprenda e memorize versículos da Bíblia com flashcards inteligentes e acompanhamento de progresso."
+msgstr "Memorização bíblica com repetição espaçada. Aprenda e memorize versículos da Bíblia com flashcards inteligentes e acompanhamento de progresso."
+
+#: src/routes/browse.tsx
+#: src/routes/collections.tsx
+msgid "Memorizado"
+msgstr "Memorizado"
+
+#: src/routes/index.tsx
+msgid "memorizando agora"
+msgstr "memorizando agora"
+
+#: src/routes/browse/selection-bar.tsx
+msgid "Memorizar"
+msgstr "Memorizar"
+
+#: src/routes/index.tsx
+msgid "Memorize a Bíblia com <0>repetição espaçada</0>"
+msgstr "Memorize a Bíblia com <0>repetição espaçada</0>"
+
+#: src/components/help-modal.tsx
+msgid "Memorize versículos com repetição espaçada."
+msgstr "Memorize versículos com repetição espaçada."
+
+#: src/routes/stats.tsx
+msgid "Menos"
+msgstr "Menos"
+
+#: src/components/memorized-verse-picker-modal.tsx
+#: src/routes/collections.tsx
+msgid "Meus versículos"
+msgstr "Meus versículos"
+
+#: src/routes/collections.$slug.add.tsx
+msgid "Na coleção"
+msgstr "Na coleção"
+
+#: src/routes/review.tsx
+msgid "Nada para revisar!"
+msgstr "Nada para revisar!"
+
+#: src/routes/index.tsx
+msgid "Nada pendente!"
+msgstr "Nada pendente!"
+
+#: src/components/verse-progress-card.tsx
+msgid "Não"
+msgstr "Não"
+
+#: src/routes/browse.tsx
+msgid "Nenhum livro encontrado"
+msgstr "Nenhum livro encontrado"
+
+#: src/components/memorized-verse-picker-modal.tsx
+msgid "Nenhum resultado para “{search}”"
+msgstr "Nenhum resultado para “{search}”"
+
+#: src/routes/browse.tsx
+msgid "Nenhum resultado para \"{searchQuery}\""
+msgstr "Nenhum resultado para \"{searchQuery}\""
+
+#: src/routes/review.tsx
+msgid "Nenhum texto encontrado com esses filtros."
+msgstr "Nenhum texto encontrado com esses filtros."
+
+#: src/components/memorized-verses-tab.tsx
+#: src/routes/review.tsx
+msgid "Nenhum texto encontrado."
+msgstr "Nenhum texto encontrado."
+
+#: src/routes/review.tsx
+msgid "nenhum texto memorizado"
+msgstr "nenhum texto memorizado"
+
+#: src/components/memorized-verses-tab.tsx
+msgid "Nenhum texto memorizado ainda.<0/>Adicione textos na página Textos para vê-los aqui."
+msgstr "Nenhum texto memorizado ainda.<0/>Adicione textos na página Textos para vê-los aqui."
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Nenhum usuário no ranking ainda. Seja o primeiro!"
+msgstr "Nenhum usuário no ranking ainda. Seja o primeiro!"
+
+#: src/routes/stats.tsx
+msgid "Nenhum versículo estudado ainda.<0/>Comece a revisar para ver seu progresso aqui."
+msgstr "Nenhum versículo estudado ainda.<0/>Comece a revisar para ver seu progresso aqui."
+
+#: src/components/memorized-verse-picker-modal.tsx
+msgid "Nenhum versículo memorizado ainda."
+msgstr "Nenhum versículo memorizado ainda."
+
+#: src/routes/collections.tsx
+msgid "Nenhuma coleção encontrada."
+msgstr "Nenhuma coleção encontrada."
+
+#: src/components/help-modal.tsx
+msgid "No Android/Chrome, toque em \"Instalar App\" no topo da tela. No iPhone, clique em Compartilhar e \"Adicionar à Tela de Início\". Instalado, o app funciona offline, sem distrações e com acesso rápido na tela inicial."
+msgstr "No Android/Chrome, toque em \"Instalar App\" no topo da tela. No iPhone, clique em Compartilhar e \"Adicionar à Tela de Início\". Instalado, o app funciona offline, sem distrações e com acesso rápido na tela inicial."
+
+#: src/components/collection-form-modal.tsx
+msgid "Nome"
+msgstr "Nome"
+
+#: src/components/collection-form-modal.tsx
+msgid "Nova coleção"
+msgstr "Nova coleção"
+
+#: src/routes/review/session-complete.tsx
+msgid "Nova Sessão"
+msgstr "Nova Sessão"
+
+#: src/components/update-banner.tsx
+msgid "Nova versão disponível"
+msgstr "Nova versão disponível"
+
+#: src/components/memorized-verses-tab.tsx
+#: src/components/verse-progress-card.tsx
+#: src/routes/stats.tsx
+msgid "Novo"
+msgstr "Novo"
+
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "Novo Testamento"
+msgstr "Novo Testamento"
+
+#: src/routes/review.tsx
+msgid "Novos"
+msgstr "Novos"
+
+#: src/components/collection-form-modal.tsx
+msgid "O nome não pode ser alterado após a criação."
+msgstr "O nome não pode ser alterado após a criação."
+
+#: src/components/welcome-modal.tsx
+msgid "Obrigado por usar este app. Que a Palavra de Deus habite ricamente em você."
+msgstr "Obrigado por usar este app. Que a Palavra de Deus habite ricamente em você."
+
+#: src/routes/review/fill-in-blank-view.tsx
+msgid "Ocultar"
+msgstr "Ocultar"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Ocultar meu nome do ranking"
+msgstr "Ocultar meu nome do ranking"
+
+#: src/routes/review/session-complete.tsx
+msgid "Ok"
+msgstr "Ok"
+
+#: src/components/memorized-verses-tab.tsx
+msgid "Ordenar por"
+msgstr "Ordenar por"
+
+#: src/routes/collections.tsx
+msgid "Os versículos da coleção não serão removidos da sua memória."
+msgstr "Os versículos da coleção não serão removidos da sua memória."
+
+#: src/components/collection-form-modal.tsx
+msgid "Ouro"
+msgstr "Ouro"
+
+#: src/routes/review.tsx
+msgid "Palavra por palavra"
+msgstr "Palavra por palavra"
+
+#: src/routes/index.tsx
+msgid "Pendentes"
+msgstr "Pendentes"
+
+#: src/routes/review/typing-practice-view.tsx
+msgid "Perfeito! 🎉"
+msgstr "Perfeito! 🎉"
+
+#: src/routes/index.tsx
+msgid "pessoa"
+msgstr "pessoa"
+
+#: src/routes/index.tsx
+msgid "pessoas"
+msgstr "pessoas"
+
+#: src/routes/stats.tsx
+msgid "Por estágio"
+msgstr "Por estágio"
+
+#: src/components/verse-image/verse-image-modal.tsx
+msgid "Pré-visualização do versículo"
+msgstr "Pré-visualização do versículo"
+
+#: src/routes/review.tsx
+msgid "Preencha lacunas"
+msgstr "Preencha lacunas"
+
+#: src/components/verse-image/verse-image-modal.tsx
+msgid "Preparando…"
+msgstr "Preparando…"
+
+#: src/router.tsx
+#: src/routes/stats.tsx
+msgid "Progresso"
+msgstr "Progresso"
+
+#: src/routes/stats.tsx
+msgid "Progresso · Verbum Vitae"
+msgstr "Progresso · Verbum Vitae"
+
+#: src/routes/review/session-complete.tsx
+msgid "Próxima sessão ({remainingCount})"
+msgstr "Próxima sessão ({remainingCount})"
+
+#: src/routes/review/session-complete.tsx
+msgid "pulado"
+msgstr "pulado"
+
+#: src/routes/review/session-complete.tsx
+msgid "pulados"
+msgstr "pulados"
+
+#: src/routes/review.tsx
+msgid "Pular →"
+msgstr "Pular →"
+
+#: src/routes/review.tsx
+msgid "Pular versículo"
+msgstr "Pular versículo"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Quadrado"
+msgstr "Quadrado"
+
+#: src/routes/stats.tsx
+msgid "Ranking"
+msgstr "Ranking"
+
+#: src/components/memorized-verses-tab.tsx
+#: src/components/verse-progress-card.tsx
+#: src/routes/stats.tsx
+msgid "Reaprendendo"
+msgstr "Reaprendendo"
+
+#: src/routes/review.tsx
+msgid "Recite mentalmente"
+msgstr "Recite mentalmente"
+
+#: src/routes/review/session-complete.tsx
+msgid "Recite o versículo em voz alta, como se estivesse ensinando alguém. O feedback auditivo fixa mais."
+msgstr "Recite o versículo em voz alta, como se estivesse ensinando alguém. O feedback auditivo fixa mais."
+
+#: src/routes/stats.tsx
+msgid "Recomeçar do zero"
+msgstr "Recomeçar do zero"
+
+#: src/components/memorized-verses-tab.tsx
+msgid "Referência"
+msgstr "Referência"
+
+#: src/routes/collections.tsx
+msgid "Remover"
+msgstr "Remover"
+
+#: src/components/verse-progress-card.tsx
+#: src/routes/collections.tsx
+msgid "Remover {reference}"
+msgstr "Remover {reference}"
+
+#: src/components/verse-progress-card.tsx
+msgid "Remover?"
+msgstr "Remover?"
+
+#: src/routes/review/flashcard-view.tsx
+msgid "Resposta:"
+msgstr "Resposta:"
+
+#: src/routes/stats.tsx
+msgid "Resumo"
+msgstr "Resumo"
+
+#: src/routes/review/fill-in-blank-view.tsx
+#: src/routes/review/flashcard-view.tsx
+msgid "Revelar"
+msgstr "Revelar"
+
+#: src/routes/review/fill-in-blank-view.tsx
+msgid "Revelar palavra"
+msgstr "Revelar palavra"
+
+#: src/routes/review/fill-in-blank-view.tsx
+msgid "Revelar todos"
+msgstr "Revelar todos"
+
+#: src/components/memorized-verses-tab.tsx
+#: src/components/verse-progress-card.tsx
+#: src/routes/review.tsx
+#: src/routes/stats.tsx
+msgid "Revisando"
+msgstr "Revisando"
+
+#: src/components/memorized-verses-tab.tsx
+#: src/router.tsx
+msgid "Revisar"
+msgstr "Revisar"
+
+#: src/routes/review.tsx
+msgid "Revisar · Verbum Vitae"
+msgstr "Revisar · Verbum Vitae"
+
+#: src/routes/index.tsx
+msgid "Revisar Agora"
+msgstr "Revisar Agora"
+
+#. placeholder {0}: nf.format(dueCount)
+#: src/routes/index.tsx
+msgid "Revisar Agora ({0})"
+msgstr "Revisar Agora ({0})"
+
+#. placeholder {0}: col.name
+#: src/routes/collections.tsx
+msgid "Revise e gerencie os versículos da coleção \"{0}\"."
+msgstr "Revise e gerencie os versículos da coleção \"{0}\"."
+
+#: src/components/help-modal.tsx
+msgid "Revise todo dia"
+msgstr "Revise todo dia"
+
+#: src/routes/review.tsx
+msgid "Revise versículos memorizados com repetição espaçada. Flashcards, preenchimento de lacunas e prática de digitação para fixar a Palavra."
+msgstr "Revise versículos memorizados com repetição espaçada. Flashcards, preenchimento de lacunas e prática de digitação para fixar a Palavra."
+
+#: src/lib/sharing.ts
+msgid "Revisei {reviewed} versículos agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada."
+msgstr "Revisei {reviewed} versículos agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada."
+
+#: src/lib/sharing.ts
+msgid "Revisei 1 versículo agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada."
+msgstr "Revisei 1 versículo agora no Verbum Vitae 🕊️ — memorizando a Bíblia com repetição espaçada."
+
+#: src/routes/index.tsx
+msgid "Role para baixo e toque <0>\"Adicionar à Tela de Início\"</0>"
+msgstr "Role para baixo e toque <0>\"Adicionar à Tela de Início\"</0>"
+
+#: src/components/collection-form-modal.tsx
+msgid "Rubi"
+msgstr "Rubi"
+
+#: src/router.tsx
+msgid "Sair"
+msgstr "Sair"
+
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "Sair do modo seleção"
+msgstr "Sair do modo seleção"
+
+#: src/components/collection-form-modal.tsx
+#: src/routes/stats/ranking-tab.tsx
+msgid "Salvando…"
+msgstr "Salvando…"
+
+#: src/components/collection-form-modal.tsx
+#: src/routes/stats/ranking-tab.tsx
+msgid "Salvar"
+msgstr "Salvar"
+
+#: src/components/verse-image/verse-image-modal.tsx
+msgid "Salvar imagem"
+msgstr "Salvar imagem"
+
+#: src/components/collection-form-modal.tsx
+msgid "Sálvia"
+msgstr "Sálvia"
+
+#: src/components/donate-modal.tsx
+msgid "Se preferir, doe diretamente para uma igreja local. Abaixo, a chave Pix da minha — use a sua se quiser:"
+msgstr "Se preferir, doe diretamente para uma igreja local. Abaixo, a chave Pix da minha — use a sua se quiser:"
+
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "Segure para selecionar"
+msgstr "Segure para selecionar"
+
+#: src/routes/index.tsx
+msgid "Seja o primeiro a memorizar hoje!"
+msgstr "Seja o primeiro a memorizar hoje!"
+
+#: src/components/memorized-verses-tab.tsx
+msgid "Selecionar"
+msgstr "Selecionar"
+
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "Selecionar tradução"
+msgstr "Selecionar tradução"
+
+#: src/components/help-modal.tsx
+msgid "Selecione um ou mais versículos e toque em Memorizar. Eles entram na sua fila de revisão."
+msgstr "Selecione um ou mais versículos e toque em Memorizar. Eles entram na sua fila de revisão."
+
+#: src/routes/review.tsx
+msgid "Sem resultados"
+msgstr "Sem resultados"
+
+#: src/routes/collections.tsx
+msgid "Sem versículos"
+msgstr "Sem versículos"
+
+#: src/components/auth-modal.tsx
+msgid "Senha"
+msgstr "Senha"
+
+#: src/components/auth-modal.tsx
+msgid "Senhas não conferem"
+msgstr "Senhas não conferem"
+
+#: src/components/memorized-verses-tab.tsx
+#: src/routes/stats.tsx
+msgid "Sequência"
+msgstr "Sequência"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Sequência atual"
+msgstr "Sequência atual"
+
+#: src/routes/review/session-complete.tsx
+msgid "Sessão concluída!"
+msgstr "Sessão concluída!"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Seu nome público…"
+msgstr "Seu nome público…"
+
+#: src/components/verse-progress-card.tsx
+msgid "Sim"
+msgstr "Sim"
+
+#: src/routes/stats.tsx
+msgid "Sim, limpar"
+msgstr "Sim, limpar"
+
+#. placeholder {0}: formatTimeAgo(lastSynced)
+#: src/components/sync-indicator.tsx
+msgid "Sincronizado há {0}"
+msgstr "Sincronizado há {0}"
+
+#: src/components/sync-indicator.tsx
+msgid "Sincronizando…"
+msgstr "Sincronizando…"
+
+#: src/components/sync-indicator.tsx
+msgid "Sincronizar"
+msgstr "Sincronizar"
+
+#: src/components/sync-indicator.tsx
+msgid "Sincronizar agora"
+msgstr "Sincronizar agora"
+
+#: src/components/help-modal.tsx
+msgid "Sincronize entre dispositivos"
+msgstr "Sincronize entre dispositivos"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Sua posição"
+msgstr "Sua posição"
+
+#: src/routes/collections.tsx
+msgid "Suas coleções"
+msgstr "Suas coleções"
+
+#: src/components/verse-image/verse-image-controls.tsx
+msgid "Tamanho do texto"
+msgstr "Tamanho do texto"
+
+#: src/routes/collections.tsx
+msgid "Tem certeza que deseja excluir esta coleção?"
+msgstr "Tem certeza que deseja excluir esta coleção?"
+
+#: src/components/sync-error-banner.tsx
+msgid "Tentar novamente"
+msgstr "Tentar novamente"
+
+#: src/routes/review/flashcard-view.tsx
+msgid "Tente recitar mentalmente…"
+msgstr "Tente recitar mentalmente…"
+
+#: src/routes/review.tsx
+msgid "texto para revisar"
+msgstr "texto para revisar"
+
+#: src/routes/review/session-complete.tsx
+msgid "texto revisado"
+msgstr "texto revisado"
+
+#: src/routes/review.tsx
+msgid "textos para revisar"
+msgstr "textos para revisar"
+
+#: src/routes/review/session-complete.tsx
+msgid "textos revisados"
+msgstr "textos revisados"
+
+#: src/routes/review.tsx
+msgid "Todas"
+msgstr "Todas"
+
+#: src/components/memorized-verses-tab.tsx
+#: src/routes/review.tsx
+msgid "Todos"
+msgstr "Todos"
+
+#: src/routes/review.tsx
+msgid "Todos os textos estão em dia."
+msgstr "Todos os textos estão em dia."
+
+#: src/routes/index.tsx
+msgid "Toque <0>\"Adicionar\"</0> no canto superior direito"
+msgstr "Toque <0>\"Adicionar\"</0> no canto superior direito"
+
+#: src/routes/index.tsx
+msgid "Toque em <0>\"Instalar app\"</0> ou <1>\"Adicionar à tela inicial\"</1>"
+msgstr "Toque em <0>\"Instalar app\"</0> ou <1>\"Adicionar à tela inicial\"</1>"
+
+#: src/routes/index.tsx
+msgid "Toque em <0>\"Instalar\"</0>"
+msgstr "Toque em <0>\"Instalar\"</0>"
+
+#: src/routes/review.tsx
+msgid "Toque em cada lacuna para revelar uma palavra por vez"
+msgstr "Toque em cada lacuna para revelar uma palavra por vez"
+
+#: src/routes/index.tsx
+msgid "Toque no ícone <0>Compartilhar</0> <1><2/></1> na barra inferior"
+msgstr "Toque no ícone <0>Compartilhar</0> <1><2/></1> na barra inferior"
+
+#: src/routes/index.tsx
+msgid "Toque no menu <0>⋮</0> (três pontos) no canto superior direito"
+msgstr "Toque no menu <0>⋮</0> (três pontos) no canto superior direito"
+
+#: src/routes/browse.tsx
+#: src/routes/collections.$slug.add.tsx
+msgid "Toque para selecionar"
+msgstr "Toque para selecionar"
+
+#: src/components/help-modal.tsx
+msgid "Três modos de revisão"
+msgstr "Três modos de revisão"
+
+#: src/components/collection-form-modal.tsx
+msgid "Uma breve descrição…"
+msgstr "Uma breve descrição…"
+
+#: src/components/help-modal.tsx
+msgid "Vá em Bíblia, escolha um livro, capítulo e segure o dedo sobre o versículo que deseja memorizar."
+msgstr "Vá em Bíblia, escolha um livro, capítulo e segure o dedo sobre o versículo que deseja memorizar."
+
+#: src/routes/review.tsx
+msgid "Vá para <0>Textos</0> para adicionar itens."
+msgstr "Vá para <0>Textos</0> para adicionar itens."
+
+#: src/lib/format.ts
+msgid "Vence amanhã"
+msgstr "Vence amanhã"
+
+#: src/lib/format.ts
+msgid "Vence em {diffDays} dias"
+msgstr "Vence em {diffDays} dias"
+
+#: src/lib/format.ts
+msgid "Vence hoje"
+msgstr "Vence hoje"
+
+#. placeholder {0}: Math.abs(diffDays)
+#: src/lib/format.ts
+msgid "Venceu há {0} dias"
+msgstr "Venceu há {0} dias"
+
+#: src/lib/format.ts
+msgid "Venceu ontem"
+msgstr "Venceu ontem"
+
+#: src/routes/index.tsx
+msgid "Ver Coleções"
+msgstr "Ver Coleções"
+
+#: src/routes/index.tsx
+msgid "Ver Coleções Temáticas"
+msgstr "Ver Coleções Temáticas"
+
+#: src/routes/index.tsx
+msgid "Ver Progresso"
+msgstr "Ver Progresso"
+
+#: src/routes/index.tsx
+msgid "Verbum Vitae — Memorização Bíblica"
+msgstr "Verbum Vitae — Memorização Bíblica"
+
+#: src/components/auth-modal.tsx
+msgid "Verbum Vitae é <0>100% gratuito</0> e sempre será. A conta serve apenas para sincronizar seu progresso entre dispositivos: sem cobranças, sem planos, sem coleta de dados."
+msgstr "Verbum Vitae é <0>100% gratuito</0> e sempre será. A conta serve apenas para sincronizar seu progresso entre dispositivos: sem cobranças, sem planos, sem coleta de dados."
+
+#: src/components/donate-modal.tsx
+msgid "Verbum Vitae é gratuito e de código aberto. Se foi útil pra você, considere uma doação."
+msgstr "Verbum Vitae é gratuito e de código aberto. Se foi útil pra você, considere uma doação."
+
+#: src/components/collection-form-modal.tsx
+msgid "Verde-água"
+msgstr "Verde-água"
+
+#: src/routes/review/typing-practice-view.tsx
+msgid "Verificar"
+msgstr "Verificar"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "versíc."
+msgstr "versíc."
+
+#: src/routes/review.tsx
+msgid "versículo selecionado"
+msgstr "versículo selecionado"
+
+#: src/routes/stats.tsx
+msgid "Versículos"
+msgstr "Versículos"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Versículos memorizados"
+msgstr "Versículos memorizados"
+
+#: src/routes/review.tsx
+msgid "versículos selecionados"
+msgstr "versículos selecionados"
+
+#: src/components/collection-form-modal.tsx
+msgid "Violeta"
+msgstr "Violeta"
+
+#: src/routes/review.tsx
+msgid "Você está em dia!"
+msgstr "Você está em dia!"
+
+#: src/routes/stats/ranking-tab.tsx
+msgid "Você está oculto do ranking."
+msgstr "Você está oculto do ranking."
+
+#: src/routes/collections.tsx
+#: src/routes/review.tsx
+#: src/routes/review/session-complete.tsx
+msgid "Voltar"
+msgstr "Voltar"
+
+#: src/routes/review.tsx
+msgid "Volte amanhã para a próxima revisão."
+msgstr "Volte amanhã para a próxima revisão."

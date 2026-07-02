@@ -1,5 +1,7 @@
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { Capacitor } from '@capacitor/core'
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { Download, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
@@ -90,11 +92,13 @@ export function UpdateBanner() {
 
   return (
     <div className="update-banner" role="status" aria-live="polite">
-      <span className="update-banner-text">Nova versão disponível</span>
+      <span className="update-banner-text">
+        <Trans>Nova versão disponível</Trans>
+      </span>
       <span className="update-banner-version">{newVersion}</span>
       <button type="button" className="update-banner-btn" onClick={() => updateServiceWorker(true)}>
         <Download size={14} aria-hidden />
-        Atualizar
+        <Trans>Atualizar</Trans>
       </button>
       <button
         type="button"
@@ -104,7 +108,7 @@ export function UpdateBanner() {
           if (id) localStorage.setItem(DISMISSED_KEY, id)
           setNeedRefresh(false)
         }}
-        aria-label="Fechar"
+        aria-label={t`Fechar`}
       >
         <X size={12} aria-hidden />
       </button>

@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { shareImageBlob } from '../../lib/sharing'
@@ -177,9 +179,9 @@ export function VerseImageModal({ open, onClose, verses, translation, bookName }
       >
         <div className="modal-header">
           <h2 id="verse-image-title" className="modal-title">
-            Criar Imagem
+            <Trans>Criar Imagem</Trans>
           </h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
+          <button type="button" className="modal-close" onClick={onClose} aria-label={t`Fechar`}>
             <X size={18} aria-hidden />
           </button>
         </div>
@@ -191,7 +193,7 @@ export function VerseImageModal({ open, onClose, verses, translation, bookName }
             width={previewW}
             height={previewH}
             style={{ aspectRatio: `${previewW} / ${previewH}` }}
-            aria-label="Pré-visualização do versículo"
+            aria-label={t`Pré-visualização do versículo`}
           />
         </div>
 
@@ -217,10 +219,10 @@ export function VerseImageModal({ open, onClose, verses, translation, bookName }
 
         <div className="modal-actions verse-image-actions">
           <button type="button" className="btn btn-secondary" onClick={handleSave} disabled={busy}>
-            Salvar imagem
+            <Trans>Salvar imagem</Trans>
           </button>
           <button type="button" className="btn btn-primary" onClick={handleShare} disabled={busy}>
-            {busy ? 'Preparando…' : 'Compartilhar'}
+            {busy ? t`Preparando…` : t`Compartilhar`}
           </button>
         </div>
       </div>

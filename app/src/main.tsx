@@ -8,6 +8,7 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './app'
+import { detectLocale, loadAndActivateCatalog } from './lib/locale'
 import { syncNow } from './lib/sync'
 import { router } from './router'
 import './styles/index.css'
@@ -42,6 +43,8 @@ if (Capacitor.isNativePlatform()) {
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Root element not found')
+
+await loadAndActivateCatalog(detectLocale())
 
 createRoot(root).render(
   <StrictMode>

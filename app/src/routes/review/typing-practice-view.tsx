@@ -1,3 +1,5 @@
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { recordWordAccuracy } from '../../lib/db'
 import type { Grade } from '../../lib/srs'
@@ -103,7 +105,7 @@ export function TypingPracticeView({
       }
     }
 
-    const acc = m > 0 ? Math.round((correct.size / m) * 100) : 100
+    const acc = m > 0 ? Math.round((correct.size / Math.max(m, n)) * 100) : 100
     setAccuracy(acc)
     setSessionHeat(words.map((_, idx) => ({ index: idx, accuracy: correct.has(idx) ? 1 : 0 })))
     setDiffWords(diffs)
@@ -129,7 +131,7 @@ export function TypingPracticeView({
       <textarea
         ref={inputRef}
         className="typing-input"
-        placeholder="Digite de memória…"
+        placeholder={t`Digite de memória…`}
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -139,16 +141,20 @@ export function TypingPracticeView({
       />
       {!submitted && (
         <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={!input.trim()}>
-          Verificar
+          <Trans>Verificar</Trans>
         </button>
       )}
       {submitted && (
         <>
           <div className="typing-accuracy">
             {accuracy === 100 ? (
-              <span className="typing-perfect">Perfeito! 🎉</span>
+              <span className="typing-perfect">
+                <Trans>Perfeito! 🎉</Trans>
+              </span>
             ) : (
-              <span className="typing-score">{accuracy}% de precisão</span>
+              <span className="typing-score">
+                <Trans>{accuracy}% de precisão</Trans>
+              </span>
             )}
           </div>
           <HeatVerse words={words} heat={sessionHeat} />

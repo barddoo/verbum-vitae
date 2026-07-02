@@ -1,7 +1,10 @@
+import { plural, t } from '@lingui/core/macro'
+import { useLingui } from '@lingui/react'
+import { Trans } from '@lingui/react/macro'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { Check, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
+import { DEFAULT_TRANSLATION, getBooks, getTranslationLabels, TRANSLATIONS, type Translation } from 'shared/bible'
 import { PageMeta } from '../components/page-meta'
 import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
@@ -29,9 +32,9 @@ function SourcePicker({ current, onChange }: { current: SourceOption; onChange: 
   )
 }
 
-const loadingSpinner = <div className="loading">Carregando…</div>
-
 export function AddVersesToCollectionPage() {
+  const { i18n } = useLingui()
+  const locale = i18n.locale
   const { slug } = useParams({ from: '/collections/$slug/add' })
   const navigate = useNavigate()
 
@@ -183,19 +186,23 @@ export function AddVersesToCollectionPage() {
   }
 
   const isNonBibleSectioned = !isBible && source.type === 'creed'
+  const books = getBooks(locale)
+  const translationLabels = getTranslationLabels(locale)
 
   return (
     <>
       <PageMeta
-        title="Adicionar Versículos · Verbum Vitae"
-        description="Adicione versículos da Bíblia a uma coleção para memorização organizada por temas."
+        title={t`Adicionar Versículos · Verbum Vitae`}
+        description={t`Adicione versículos da Bíblia a uma coleção para memorização organizada por temas.`}
         path={`/collections/${slug}/add`}
       />
       <div className="page browse-page">
         <Link to="/collections/$slug" params={{ slug }} className="back-btn">
-          ← {collectionName || 'Coleção'}
+          ← {collectionName || t`Coleção`}
         </Link>
-        <h3 className="add-verses-title">Adicionar versículos</h3>
+        <h3 className="add-verses-title">
+          <Trans>Adicionar versículos</Trans>
+        </h3>
 
         <SourcePicker current={source} onChange={handleSourceChange} />
 
@@ -203,17 +210,17 @@ export function AddVersesToCollectionPage() {
           {isBible && (
             <div className="translate-picker">
               <select
-                aria-label="Selecionar tradução"
+                aria-label={t`Selecionar tradução`}
                 value={translation}
                 onChange={(e) => {
-                  const t = e.target.value as Translation
-                  cachedSet('translation', t)
-                  setTranslation(t)
+                  const tx = e.target.value as Translation
+                  cachedSet('translation', tx)
+                  setTranslation(tx)
                 }}
               >
-                {TRANSLATIONS.map((t) => (
-                  <option key={t} value={t}>
-                    {TRANSLATION_LABELS[t]}
+                {TRANSLATIONS.map((tx) => (
+                  <option key={tx} value={tx}>
+                    {translationLabels[tx]}
                   </option>
                 ))}
               </select>
@@ -231,18 +238,18 @@ export function AddVersesToCollectionPage() {
                   </button>
                 ))
               }
-              return BOOKS.map((name, i) => {
+              return books.map((name, i) => {
                 const items: React.ReactNode[] = []
                 if (i === 0)
                   items.push(
                     <div key="at-label" className="book-section-label">
-                      Antigo Testamento
+                      <Trans>Antigo Testamento</Trans>
                     </div>,
                   )
                 if (i === 39)
                   items.push(
                     <div key="nt-label" className="book-section-label">
-                      Novo Testamento
+                      <Trans>Novo Testamento</Trans>
                     </div>,
                   )
                 items.push(
@@ -257,9 +264,9 @@ export function AddVersesToCollectionPage() {
         ) : chapter === null ? (
           <div className="chapter-view">
             <button type="button" className="back-btn" onClick={() => setBookIndex(null)}>
-              ← Voltar
+              <Trans>← Voltar</Trans>
             </button>
-            <h3>{isBible ? BOOKS[bookIndex!] : source.name}</h3>
+            <h3>{isBible ? books[bookIndex!] : source.name}</h3>
             <div className="chapter-grid">
               {Array.from({ length: chapterCount }, (_, i) => i + 1).map((c) => (
                 <button type="button" key={c} className="chapter-item" onClick={() => setChapter(c)}>
@@ -271,57 +278,63 @@ export function AddVersesToCollectionPage() {
         ) : (
           <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
             <button type="button" className="back-btn" onClick={() => (isBible ? setChapter(null) : setBookIndex(null))}>
-              ← {isBible ? BOOKS[bookIndex!] : source.name}
+              ← {isBible ? books[bookIndex!] : source.name}
             </button>
             <div className="verse-header">
               {selectionMode ? (
                 <>
                   <span className="select-mode-label">
                     {selectedVerses.size > 0
-                      ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
-                      : 'Toque para selecionar'}
+                      ? plural(selectedVerses.size, { one: '# selecionado', other: '# selecionados' })
+                      : t`Toque para selecionar`}
                   </span>
-                  <button type="button" className="select-mode-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
+                  <button type="button" className="select-mode-exit" aria-label={t`Sair do modo seleção`} onClick={exitSelectionMode}>
                     <X size={16} aria-hidden />
                   </button>
                 </>
               ) : (
                 <>
-                  <h3>{isBible ? `${BOOKS[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
-                  <p className="verse-hint">Segure para selecionar</p>
+                  <h3>{isBible ? `${books[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
+                  <p className="verse-hint">
+                    <Trans>Segure para selecionar</Trans>
+                  </p>
                 </>
               )}
             </div>
-            {loadingVerses
-              ? loadingSpinner
-              : verses.map((text, i) => {
-                  const v = i + 1
-                  const exist = isExisting(v)
-                  const sel = selectedVerses.has(v)
-                  const label = isBible ? v : `${source.itemLabel} ${v}`
-                  return (
-                    <button
-                      type="button"
-                      key={i}
-                      className={`verse-row ${exist ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                      onPointerDown={(e) => longPress.handlePointerDown(v, e)}
-                      onPointerMove={longPress.handlePointerMove}
-                      onPointerUp={() => longPress.handlePointerUp(v)}
-                      onPointerCancel={longPress.handlePointerCancel}
-                      disabled={exist}
-                    >
-                      <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>
-                        {selectionMode ? sel ? <Check size={10} aria-hidden /> : '' : label}
+            {loadingVerses ? (
+              <div className="loading">
+                <Trans>Carregando…</Trans>
+              </div>
+            ) : (
+              verses.map((text, i) => {
+                const v = i + 1
+                const exist = isExisting(v)
+                const sel = selectedVerses.has(v)
+                const label = isBible ? v : `${source.itemLabel} ${v}`
+                return (
+                  <button
+                    type="button"
+                    key={i}
+                    className={`verse-row ${exist ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
+                    onPointerDown={(e) => longPress.handlePointerDown(v, e)}
+                    onPointerMove={longPress.handlePointerMove}
+                    onPointerUp={() => longPress.handlePointerUp(v)}
+                    onPointerCancel={longPress.handlePointerCancel}
+                    disabled={exist}
+                  >
+                    <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>
+                      {selectionMode ? sel ? <Check size={10} aria-hidden /> : '' : label}
+                    </span>
+                    <span className="verse-text">{text}</span>
+                    {exist && (
+                      <span className="memorized-badge">
+                        <Check size={10} aria-hidden /> <Trans>Na coleção</Trans>
                       </span>
-                      <span className="verse-text">{text}</span>
-                      {exist && (
-                        <span className="memorized-badge">
-                          <Check size={10} aria-hidden /> Na coleção
-                        </span>
-                      )}
-                    </button>
-                  )
-                })}
+                    )}
+                  </button>
+                )
+              })
+            )}
           </div>
         )}
       </div>
@@ -331,13 +344,13 @@ export function AddVersesToCollectionPage() {
           previewText={previewText}
           onClear={exitSelectionMode}
           onMemorize={handleAdd}
-          actionLabel="Adicionar à coleção"
+          actionLabel={t`Adicionar à coleção`}
         />
       )}
       {done && (
         <div className="selection-bar selection-bar-done">
           <span>
-            <Check size={14} aria-hidden /> Adicionado à coleção!
+            <Check size={14} aria-hidden /> <Trans>Adicionado à coleção!</Trans>
           </span>
         </div>
       )}
