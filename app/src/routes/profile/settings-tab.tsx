@@ -1,7 +1,6 @@
-import { i18n } from '@lingui/core'
 import { Trans } from '@lingui/react/macro'
 import { useEffect, useState } from 'react'
-import { DEFAULT_TRANSLATION, getTranslationLabels, TRANSLATIONS, type Translation } from 'shared/bible'
+import { DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import type { LeaderboardResponse } from 'shared/types'
 import { ThemeToggle } from '../../components/theme-toggle'
 import { useAuth } from '../../lib/auth'
@@ -55,7 +54,7 @@ export function SettingsTab({ onClearProgress }: Props) {
     onClearProgress()
   }
 
-  const translationLabels = getTranslationLabels(i18n.locale)
+  const translationLabels = TRANSLATION_LABELS
 
   return (
     <div className="settings-tab">

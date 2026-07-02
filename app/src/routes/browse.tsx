@@ -4,7 +4,7 @@ import { Trans } from '@lingui/react/macro'
 import { useSearch } from '@tanstack/react-router'
 import { Check, X } from 'lucide-react'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BOOKS, DEFAULT_TRANSLATION, getBooks, getTranslationLabels, TRANSLATIONS, type Translation } from 'shared/bible'
+import { BOOKS, DEFAULT_TRANSLATION, getBooks, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { PageMeta } from '../components/page-meta'
 import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
@@ -330,7 +330,7 @@ export function BrowsePage() {
     )
   }
 
-  const translationLabels = getTranslationLabels(locale)
+  const translationLabels = TRANSLATION_LABELS
 
   return (
     <>

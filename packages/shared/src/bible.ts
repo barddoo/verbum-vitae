@@ -152,21 +152,6 @@ export const TRANSLATION_LABELS: Record<string, string> = {
   web: 'World English Bible',
 }
 
-export const TRANSLATION_LABELS_EN: Record<string, string> = {
-  ara: 'Revised and Updated Almeida',
-  acf: 'Faithful Corrected Almeida',
-  nvi: 'New International Version',
-  a21: 'Almeida 21st Century',
-  nvt: 'New Transforming Version',
-  naa: 'New Updated Almeida',
-  kjv: 'King James Version',
-  web: 'World English Bible',
-}
-
-export function getTranslationLabels(locale: string): Record<string, string> {
-  return locale === 'en' ? TRANSLATION_LABELS_EN : TRANSLATION_LABELS
-}
-
 export const BOOKS_EN = [
   'Genesis',
   'Exodus',
