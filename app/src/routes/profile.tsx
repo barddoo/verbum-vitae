@@ -8,9 +8,9 @@ import { PageMeta } from '../components/page-meta'
 import { useAuth } from '../lib/auth'
 import { db } from '../lib/db'
 import { computeStreak } from '../lib/stats'
-import { StreakCalendar } from './profile/streak-calendar'
 import { RankingTab } from './profile/ranking-tab'
 import { SettingsTab } from './profile/settings-tab'
+import { StreakCalendar } from './profile/streak-calendar'
 
 type Tab = 'progresso' | 'configuracoes' | 'ranking'
 
@@ -30,8 +30,12 @@ export function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { loadStats() }, [])
-  useEffect(() => { if (editing) inputRef.current?.focus() }, [editing])
+  useEffect(() => {
+    loadStats()
+  }, [])
+  useEffect(() => {
+    if (editing) inputRef.current?.focus()
+  }, [editing])
 
   async function loadStats() {
     const all = await db.progress.toArray()
@@ -107,7 +111,10 @@ export function ProfilePage() {
                   type="button"
                   className="profile-edit-btn"
                   aria-label={t`Editar nome de exibição`}
-                  onClick={() => { setNameInput(user.displayName ?? ''); setEditing(true) }}
+                  onClick={() => {
+                    setNameInput(user.displayName ?? '')
+                    setEditing(true)
+                  }}
                 >
                   ✏️
                 </button>
@@ -146,20 +153,28 @@ export function ProfilePage() {
           <div className="stats-grid">
             <div className="stat-card">
               <span className="stat-value">{progress.total}</span>
-              <span className="stat-label"><Trans>Versículos</Trans></span>
+              <span className="stat-label">
+                <Trans>Versículos</Trans>
+              </span>
             </div>
             <div className="stat-card">
               <span className="stat-value">{progress.streak}</span>
-              <span className="stat-label"><Trans>Sequência</Trans></span>
+              <span className="stat-label">
+                <Trans>Sequência</Trans>
+              </span>
             </div>
             <div className="stat-card">
               <span className="stat-value">{progress.reviewsToday}</span>
-              <span className="stat-label"><Trans>Hoje</Trans></span>
+              <span className="stat-label">
+                <Trans>Hoje</Trans>
+              </span>
             </div>
           </div>
           <StreakCalendar reviewDays={reviewDays} locale={i18n.locale} />
           <div className="stats-breakdown">
-            <h3><Trans>Por estágio</Trans></h3>
+            <h3>
+              <Trans>Por estágio</Trans>
+            </h3>
             {Object.entries(progress.byState).map(([stateNum, count]) => (
               <div key={stateNum} className="breakdown-row">
                 <span className="breakdown-label">{stateNames[Number(stateNum)] ?? t`Novo`}</span>
@@ -172,7 +187,11 @@ export function ProfilePage() {
           </div>
           {progress.total === 0 && (
             <div className="stats-empty">
-              <Trans>Nenhum versículo estudado ainda.<br />Comece a revisar para ver seu progresso aqui.</Trans>
+              <Trans>
+                Nenhum versículo estudado ainda.
+                <br />
+                Comece a revisar para ver seu progresso aqui.
+              </Trans>
             </div>
           )}
           <MemorizedVersesTab />

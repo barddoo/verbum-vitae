@@ -91,7 +91,7 @@ export function SettingsTab({ onClearProgress }: Props) {
           <span className="settings-row-label">
             <Trans>Idioma</Trans>
           </span>
-          <div className="settings-locale-toggle" role="group" aria-label={t`Selecionar idioma`}>
+          <fieldset className="settings-locale-toggle" aria-label={t`Selecionar idioma`}>
             <button
               type="button"
               className={`settings-locale-btn${locale === 'pt-BR' ? ' active' : ''}`}
@@ -108,7 +108,7 @@ export function SettingsTab({ onClearProgress }: Props) {
             >
               EN
             </button>
-          </div>
+          </fieldset>
         </div>
       </section>
 
