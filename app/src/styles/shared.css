@@ -65,6 +65,17 @@
   background: var(--gold-dim);
 }
 
+.btn-danger-outline {
+  background: transparent;
+  color: var(--rubric);
+  border-color: var(--rubric-dim);
+}
+
+.btn-danger-outline:hover {
+  background: var(--rubric-dim);
+  color: var(--rubric);
+}
+
 .btn-large {
   padding: 0.9375rem 2rem;
   font-size: 0.95rem;

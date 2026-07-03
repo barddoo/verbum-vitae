@@ -289,19 +289,6 @@
   line-height: 1.6;
 }
 
-.memorized-badge {
-  font-family: var(--font-body);
-  font-size: 0.65rem;
-  color: var(--sage);
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.05rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
 .added-check {
   color: var(--sage);
   font-size: 0.95rem;

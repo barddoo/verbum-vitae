@@ -98,15 +98,14 @@
 }
 
 /* STATS GRID */
-
-.stats-grid {
+.profile-page .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
   margin-bottom: 1.125rem;
 }
 
-.stat-card {
+.profile-page .stat-card {
   background: var(--leather);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -117,14 +116,15 @@
   gap: 0.25rem;
 }
 
-.stat-value {
+.profile-page .stat-value {
   font-family: var(--font-mono);
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--parchment);
   font-variant-numeric: tabular-nums;
 }
-.stat-label {
+
+.profile-page .stat-label {
   font-family: var(--font-body);
   font-size: 0.7rem;
   color: var(--aged);
@@ -453,17 +453,6 @@
 .settings-confirm-actions {
   display: flex;
   gap: 0.5rem;
-}
-
-/* Keep danger button styles used by settings */
-.btn-danger-outline {
-  background: transparent;
-  color: var(--rubric);
-  border-color: var(--rubric-dim);
-}
-.btn-danger-outline:hover {
-  background: var(--rubric-dim);
-  color: var(--rubric);
 }
 
 /* RANKING TAB — carried from stats.css */

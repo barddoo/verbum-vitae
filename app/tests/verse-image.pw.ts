@@ -3,6 +3,10 @@ import { expect, test, type Page } from '@playwright/test'
 test.describe('verse image modal', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('vv-locale', 'pt-BR'))
+  })
+
   async function navigateToChapter(page: Page) {
     await page.goto('/browse')
     await page.locator('.welcome-cta').click({ force: true }).catch(() => {})

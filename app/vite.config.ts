@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { lingui } from '@lingui/vite-plugin'
+import { linguiMacroSwcPlugin } from '@lingui/swc-plugin/options'
 import reactSWC from '@vitejs/plugin-react-swc'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -13,7 +14,7 @@ export default defineConfig({
   },
   plugins: [
     reactSWC({
-      plugins: [['@lingui/swc-plugin', {}]],
+      plugins: [linguiMacroSwcPlugin()],
     }),
     lingui(),
     VitePWA({

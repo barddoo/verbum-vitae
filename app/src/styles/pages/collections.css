@@ -812,11 +812,3 @@
   font-weight: 600;
   color: var(--ink);
 }
-
-/* ──────────────────────────────────────────────
-   COLLECTION CARD — USER ACCENT
-   ────────────────────────────────────────────── */
-
-.collection-card-user {
-  position: relative;
-}

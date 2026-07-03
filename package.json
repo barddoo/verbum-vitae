@@ -24,7 +24,7 @@
     "test:unit:watch": "vitest"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.0",
+    "@biomejs/biome": "^2.5.2",
     "jsdom": "^29.1.1",
     "vitest": "^4.1.9"
   }

@@ -1,5 +1,5 @@
 import { db, type SyncLog } from './db'
-import { parseCardJson } from './srs'
+import { createEmptyCard, parseCardJson } from './srs'
 import { cachedGet } from './storage'
 import { api } from './worker'
 
@@ -293,4 +293,42 @@ export async function logProgressChange(entry: Omit<SyncLog, 'id' | 'userId' | '
     synced: 0,
     createdAt: Date.now(),
   })
+}
+
+export async function createAndLogProgress(keys: string[], translation: string): Promise<string[]> {
+  const existing = await Promise.all(keys.map((key) => db.progress.where({ verseId: key, translation }).first()))
+  const toAdd = keys.filter((_, i) => !existing[i])
+  if (toAdd.length === 0) return []
+  const entries = toAdd.map((key) => {
+    const card = createEmptyCard()
+    return {
+      verseId: key,
+      translation,
+      cardJson: JSON.stringify(card),
+      state: 0,
+      dueDate: card.due.getTime(),
+      streak: 0,
+      updatedAt: Date.now(),
+    }
+  })
+  await db.progress.bulkAdd(entries)
+  for (const p of entries) {
+    const card = JSON.parse(p.cardJson)
+    logProgressChange({
+      tableName: 'progress',
+      rowId: p.verseId,
+      operation: 'create',
+      data: JSON.stringify({
+        verseId: p.verseId,
+        translation,
+        cardJson: p.cardJson,
+        state: p.state,
+        dueDate: p.dueDate,
+        streak: p.streak,
+        nextReview: new Date(card.due).toISOString(),
+        lastReview: new Date().toISOString(),
+      }),
+    })
+  }
+  return toAdd
 }

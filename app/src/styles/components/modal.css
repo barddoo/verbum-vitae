@@ -24,6 +24,8 @@
   position: relative;
   box-shadow: 0 0.5rem 2.5rem rgba(0, 0, 0, 0.4);
   animation: modalUp 0.25s ease;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
 }
 
 .modal-close {

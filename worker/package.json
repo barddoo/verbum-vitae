@@ -10,15 +10,15 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.8.0",
-    "hono": "^4.12.22",
+    "hono": "^4.12.27",
     "shared": "workspace:*",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260523.1",
+    "@cloudflare/workers-types": "^5.20260703.1",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2",
     "typescript": "^6.0.3",
-    "wrangler": "^4.94.0"
+    "wrangler": "^4.107.0"
   }
 }

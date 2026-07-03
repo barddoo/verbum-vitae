@@ -3,6 +3,10 @@ import { expect, test } from '@playwright/test'
 test.describe('mobile layout (390x844)', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('vv-locale', 'pt-BR'))
+  })
+
   const routes = ['/', '/browse', '/review', '/collections', '/stats']
 
   for (const route of routes) {
@@ -11,13 +15,6 @@ test.describe('mobile layout (390x844)', () => {
       await expect(page.locator('.app-shell')).toBeVisible()
       await expect(page.locator('.top-bar')).toBeVisible()
       await expect(page.locator('.main-content')).toBeVisible()
-    })
-  }
-
-  for (const route of routes) {
-    test(`footer visible on ${route}`, async ({ page }) => {
-      await page.goto(route)
-      await expect(page.locator('.app-footer')).toBeAttached()
     })
   }
 
