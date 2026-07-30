@@ -28,6 +28,7 @@ const CollectionDetailPage = lazy(() => import('./routes/collections').then((m) 
 const AddVersesToCollectionPage = lazy(() =>
   import('./routes/collections.$slug.add').then((m) => ({ default: m.AddVersesToCollectionPage })),
 )
+const PrivacyPolicyPage = lazy(() => import('./routes/privacy-policy').then((m) => ({ default: m.PrivacyPolicyPage })))
 
 type Modal = 'auth' | 'donate' | 'help' | 'welcome'
 
@@ -142,7 +143,9 @@ function RootLayout() {
             🔺 &mdash;{' '}
             <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
               código aberto
-            </a>
+            </a>{' '}
+            &mdash;{' '}
+            <Link to="/privacidade">Privacidade</Link>
           </div>
           <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
             ₿ Doar
@@ -246,6 +249,12 @@ const addVersesRoute = createRoute({
   component: AddVersesToCollectionPage,
 })
 
+const privacyPolicyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/privacidade',
+  component: PrivacyPolicyPage,
+})
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   browseRoute,
@@ -254,6 +263,7 @@ const routeTree = rootRoute.addChildren([
   collectionDetailRoute,
   addVersesRoute,
   statsRoute,
+  privacyPolicyRoute,
 ])
 
 export const router = createRouter({ routeTree })
