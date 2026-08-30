@@ -1,4 +1,4 @@
-import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
@@ -32,6 +32,34 @@ export const progress = sqliteTable(
     updatedAt: text('updated_at').notNull(),
   },
   (table) => [uniqueIndex('idx_progress_user_verse_translation_unique').on(table.userId, table.verseId, table.translation)],
+)
+
+/**
+ * Append-only history of every grade press. `progress` keeps only the latest review per verse,
+ * so it cannot answer "how many reviews on day X" or feed an FSRS parameter optimizer.
+ */
+export const reviewLog = sqliteTable(
+  'review_log',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id),
+    verseId: text('verse_id').notNull(),
+    translation: text('translation').notNull(),
+    reviewedAt: text('reviewed_at').notNull(),
+    /** FSRS grade 1-4. `0` marks a row backfilled from `progress.last_review` — day known, grade not. */
+    rating: integer('rating').notNull(),
+    /** Card state *before* this review: 0 New, 1 Learning, 2 Review, 3 Relearning. */
+    state: integer('state').notNull().default(0),
+    scheduledDays: integer('scheduled_days').notNull().default(0),
+    createdAt: text('created_at').notNull(),
+  },
+  (table) => [
+    // Reviews are immutable, so a replayed push must land as a no-op rather than a duplicate day.
+    uniqueIndex('idx_review_log_user_verse_translation_time_unique').on(table.userId, table.verseId, table.translation, table.reviewedAt),
+    index('idx_review_log_user_reviewed_at').on(table.userId, table.reviewedAt),
+  ],
 )
 
 export const collections = sqliteTable(

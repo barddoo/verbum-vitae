@@ -49,6 +49,33 @@ export interface CollectionVerse {
   sortOrder: number
 }
 
+/**
+ * One row per grade press — the history `progress` cannot hold, since it only ever keeps the
+ * *latest* review per verse.
+ *
+ * Two things depend on this being append-only: the review calendar and "hoje" counter in
+ * `stats.tsx` (deriving them from `progress.lastReview` makes past days vanish as verses are
+ * reviewed again), and any future FSRS parameter optimization, which needs a full review log.
+ */
+export interface ReviewLog {
+  id?: number
+  verseId: string
+  translation: string
+  /** Epoch ms of the grade press. */
+  reviewedAt: number
+  /**
+   * FSRS grade: 1 Again, 2 Hard, 3 Good, 4 Easy.
+   *
+   * `0` marks a row backfilled from `progress.lastReview` by the v7 upgrade — the day is real
+   * but the grade was never recorded. Filter these out before feeding an optimizer.
+   */
+  rating: number
+  /** Card state *before* this review: 0 New, 1 Learning, 2 Review, 3 Relearning. */
+  state: number
+  /** Interval FSRS scheduled after this review, in days. */
+  scheduledDays: number
+}
+
 export interface WordStats {
   id?: number
   verseId: string
@@ -73,6 +100,7 @@ export interface SyncLog {
 export const db = new Dexie('RememberBible') as Dexie & {
   verses: EntityTable<TextItem, 'id'>
   progress: EntityTable<Progress, 'id'>
+  reviewLog: EntityTable<ReviewLog, 'id'>
   wordStats: EntityTable<WordStats, 'id'>
   collections: EntityTable<Collection, 'id'>
   collectionVerses: EntityTable<CollectionVerse, 'id'>
@@ -144,6 +172,30 @@ db.version(6)
       .modify((log) => {
         log.rowId = oldKey(log.rowId)
       })
+  })
+
+db.version(7)
+  .stores({
+    reviewLog: '++id, reviewedAt, [verseId+translation]',
+  })
+  .upgrade(async (tx) => {
+    // Seed one row per already-reviewed verse so streaks and the calendar survive the upgrade.
+    // This is exactly the (lossy) history `progress` holds today — one day per verse, no grade —
+    // so nothing regresses; real history only starts accumulating from here.
+    const progress = await tx.table('progress').toArray()
+    const seeded = progress
+      .map((p: Progress) => ({ p, reviewedAt: lastReviewedAt(p) }))
+      .filter((r): r is { p: Progress; reviewedAt: number } => r.reviewedAt !== null)
+      .map(({ p, reviewedAt }) => ({
+        verseId: p.verseId,
+        translation: p.translation,
+        reviewedAt,
+        rating: 0,
+        state: p.state,
+        scheduledDays: 0,
+      }))
+
+    if (seeded.length > 0) await tx.table('reviewLog').bulkAdd(seeded)
   })
 
 export type TextSourceType = 'bible' | 'creed' | 'catechism'
@@ -461,6 +513,27 @@ export async function getWordHeat(verseId: string, translation: string, wordCoun
     }
   }
   return result
+}
+
+/**
+ * Appends one review to the history. Never updates in place — `progress` already tracks current
+ * state; this table exists precisely to keep the rows `progress` overwrites.
+ */
+export async function recordReview(entry: Omit<ReviewLog, 'id'>) {
+  await db.reviewLog.add(entry)
+}
+
+/**
+ * Every review's timestamp, ascending. Walks the `reviewedAt` index instead of loading whole
+ * rows — the log grows without bound, and streaks and the calendar only need the days.
+ */
+export async function reviewTimestamps(): Promise<number[]> {
+  return (await db.reviewLog.orderBy('reviewedAt').keys()) as number[]
+}
+
+/** Stable identity for one review, so a replayed sync entry cannot double-count a day. */
+export function reviewLogRowId(entry: Pick<ReviewLog, 'verseId' | 'translation' | 'reviewedAt'>) {
+  return `${entry.verseId}|${entry.translation}|${entry.reviewedAt}`
 }
 
 export async function addCollectionToMemory(

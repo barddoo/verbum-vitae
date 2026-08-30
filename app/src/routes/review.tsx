@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Check } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { PageMeta } from '../components/page-meta'
-import { type CollectionVerse, db, fetchVersesBatch, type Progress, parseTextKey } from '../lib/db'
+import { type CollectionVerse, db, fetchVersesBatch, type Progress, parseTextKey, recordReview, reviewLogRowId } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
 import { getNextCard } from '../lib/scheduler'
 import { type Card, type Grade, getDueCards, parseCardJson } from '../lib/srs'
@@ -258,8 +258,26 @@ export function ReviewPage() {
     const item = items[currentIndex]
     if (!item) return
 
-    const { card, dueDate, state } = getNextCard(item.card, rating)
+    const { card, dueDate, state, log } = getNextCard(item.card, rating)
     const reviewedAt = Date.now()
+
+    const reviewEntry = {
+      verseId: item.verseId,
+      translation: item.translation,
+      reviewedAt,
+      rating: rating as number,
+      // `log.state` is the state the card was in *before* this grade, which is what an
+      // optimizer needs; `state` below is where the grade moved it to.
+      state: log.state,
+      scheduledDays: card.scheduled_days,
+    }
+    await recordReview(reviewEntry)
+    logProgressChange({
+      tableName: 'reviewLog',
+      rowId: reviewLogRowId(reviewEntry),
+      operation: 'create',
+      data: JSON.stringify({ ...reviewEntry, reviewedAt: new Date(reviewedAt).toISOString() }),
+    })
 
     await db.progress.update(item.progressId, {
       cardJson: JSON.stringify(card),

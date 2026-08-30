@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
-import { and, desc, eq, gt, inArray, isNotNull, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, sql } from 'drizzle-orm'
 import type { BatchItem } from 'drizzle-orm/batch'
 import { drizzle } from 'drizzle-orm/d1'
 import { type Context, Hono } from 'hono'
@@ -168,6 +168,36 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
             }),
         )
       }
+    } else if (entry.tableName === 'reviewLog') {
+      let parsed: Record<string, unknown>
+      try {
+        parsed = JSON.parse(entry.data)
+      } catch {
+        return c.json({ error: 'Invalid reviewLog data' }, 400)
+      }
+
+      const verseId = parsed.verseId as string
+      const translation = parsed.translation as string
+      const reviewedAt = parsed.reviewedAt as string
+      if (!verseId || !translation || !reviewedAt) continue
+
+      // Reviews are immutable history: only ever inserted, and a replay is a no-op.
+      queries.push(
+        db
+          .insert(schema.reviewLog)
+          .values({
+            id: uuidv7(),
+            userId: user.sub,
+            verseId,
+            translation,
+            reviewedAt,
+            rating: (parsed.rating as number) ?? 0,
+            state: (parsed.state as number) ?? 0,
+            scheduledDays: (parsed.scheduledDays as number) ?? 0,
+            createdAt: now,
+          })
+          .onConflictDoNothing(),
+      )
     } else if (entry.tableName === 'collection') {
       let parsed: Record<string, unknown>
       try {
@@ -265,15 +295,16 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
     await db.batch(chunk as [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]])
   }
 
-  const hasProgressEntry = entries.some((e) => e.tableName === 'progress' && e.operation !== 'delete')
-  if (hasProgressEntry) {
+  const touchedReviews = entries.some((e) => e.tableName === 'reviewLog' || (e.tableName === 'progress' && e.operation !== 'delete'))
+  if (touchedReviews) {
+    // Read from the append-only log. Distinct `DATE(progress.last_review)` counted each verse
+    // once, at its latest review only, so a day dropped out of the streak as soon as every verse
+    // reviewed that day came up again.
     const reviewDays = await db
-      .selectDistinct({ day: sql<string>`DATE(${schema.progress.lastReview})` })
-      .from(schema.progress)
-      // `state > 0` covers rows written before adds stopped stamping last_review: a card
-      // that never left New was added, not reviewed, whatever its last_review says.
-      .where(and(eq(schema.progress.userId, user.sub), isNotNull(schema.progress.lastReview), gt(schema.progress.state, 0)))
-      .orderBy(desc(sql`DATE(${schema.progress.lastReview})`))
+      .selectDistinct({ day: sql<string>`DATE(${schema.reviewLog.reviewedAt})` })
+      .from(schema.reviewLog)
+      .where(eq(schema.reviewLog.userId, user.sub))
+      .orderBy(desc(sql`DATE(${schema.reviewLog.reviewedAt})`))
 
     const streak = computeStreak(reviewDays.map((r) => r.day))
     await db.update(schema.users).set({ currentStreak: streak }).where(eq(schema.users.id, user.sub))

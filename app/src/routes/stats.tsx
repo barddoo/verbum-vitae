@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo, useState } from 'react'
 import { computeStreak } from 'shared/streak'
 import { MemorizedVersesTab } from '../components/memorized-verses-tab'
 import { PageMeta } from '../components/page-meta'
-import { db, lastReviewedAt } from '../lib/db'
+import { db, reviewTimestamps } from '../lib/db'
 import { RankingTab } from './stats/ranking-tab'
 
 type Tab = 'resumo' | 'versiculos' | 'ranking'
@@ -23,19 +23,22 @@ export function StatsPage() {
   }, [])
 
   async function loadStats() {
-    const all = await db.progress.toArray()
+    const [all, reviewedAts] = await Promise.all([db.progress.toArray(), reviewTimestamps()])
     const today = new Date().toDateString()
     const stateNames = ['Novo', 'Aprendendo', 'Revisando', 'Reaprendendo']
     const byState: Record<string, number> = {}
-    let reviewsToday = 0
-    const dayCount = new Map<string, number>()
 
     for (const p of all) {
       const state = stateNames[p.state] || 'Novo'
       byState[state] = (byState[state] || 0) + 1
+    }
 
-      const reviewedAt = lastReviewedAt(p)
-      if (reviewedAt === null) continue
+    // Counted from the append-only review log. Deriving these from `progress.lastReview` counted
+    // each verse once, at its *latest* review — so a day's tally shrank as its verses came up
+    // again, and the calendar quietly rewrote its own history.
+    let reviewsToday = 0
+    const dayCount = new Map<string, number>()
+    for (const reviewedAt of reviewedAts) {
       const dayStr = new Date(reviewedAt).toDateString()
       if (dayStr === today) reviewsToday++
       dayCount.set(dayStr, (dayCount.get(dayStr) || 0) + 1)
@@ -45,7 +48,7 @@ export function StatsPage() {
     setProgress({
       total: all.length,
       byState,
-      streak: computeStreak(all.map(lastReviewedAt)),
+      streak: computeStreak(reviewedAts),
       reviewsToday,
     })
   }

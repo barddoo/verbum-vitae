@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseTextKey, textKey, verseKey } from './db'
+import { parseTextKey, reviewLogRowId, textKey, verseKey } from './db'
 
 describe('textKey', () => {
   it('creates bible key without sourceId', () => {
@@ -84,5 +84,27 @@ describe('verseKey', () => {
   it('creates bible key with end verse', () => {
     const key = verseKey(42, 3, 16, 17)
     expect(key).toBe('b:42:3:16:17')
+  })
+})
+
+describe('reviewLogRowId', () => {
+  const entry = { verseId: 'b:42:3:16', translation: 'nvi', reviewedAt: 1756512000000 }
+
+  it('joins verse, translation and timestamp', () => {
+    expect(reviewLogRowId(entry)).toBe('b:42:3:16|nvi|1756512000000')
+  })
+
+  // The worker upserts reviews with onConflictDoNothing against a unique index on
+  // (user, verse, translation, reviewed_at). A pushed entry that replays must be a no-op.
+  it('is stable for the same review', () => {
+    expect(reviewLogRowId(entry)).toBe(reviewLogRowId({ ...entry }))
+  })
+
+  it('separates two reviews of the same verse at different times', () => {
+    expect(reviewLogRowId(entry)).not.toBe(reviewLogRowId({ ...entry, reviewedAt: entry.reviewedAt + 1 }))
+  })
+
+  it('separates the same verse in different translations', () => {
+    expect(reviewLogRowId(entry)).not.toBe(reviewLogRowId({ ...entry, translation: 'ara' }))
   })
 })

@@ -4,7 +4,7 @@ import { BookOpen, Brain, Share2, Smartphone, WifiOff, X } from 'lucide-react'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { computeStreak } from 'shared/streak'
 import { PageMeta } from '../components/page-meta'
-import { db, lastReviewedAt } from '../lib/db'
+import { db, reviewTimestamps } from '../lib/db'
 import { usePresence } from '../lib/presence-context'
 import { shareVerse } from '../lib/sharing'
 import { WelcomeModalContext } from '../router'
@@ -74,6 +74,7 @@ function useInstallGuide() {
 export function HomePage() {
   const { count: presenceCount } = usePresence()
   const allProgress = useLiveQuery(() => db.progress.toArray(), [])
+  const reviewedAts = useLiveQuery(() => reviewTimestamps(), [])
   const { show, deferredPrompt, isIOS, isAndroid, handleInstall, dismiss } = useInstallGuide()
   const { closeWelcome } = useContext(WelcomeModalContext)
 
@@ -92,9 +93,11 @@ export function HomePage() {
     return {
       dueCount: due,
       totalMemorized: allProgress.length,
-      streak: computeStreak(allProgress.map(lastReviewedAt)),
+      // From the append-only log, not `progress.lastReview`, which holds only the latest review
+      // per verse and so loses the days that make up a streak.
+      streak: computeStreak(reviewedAts ?? []),
     }
-  }, [allProgress])
+  }, [allProgress, reviewedAts])
 
   const dueCount = stats?.dueCount ?? 0
   const totalMemorized = stats?.totalMemorized ?? 0

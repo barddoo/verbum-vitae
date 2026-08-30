@@ -15,7 +15,7 @@ Three findings are load-bearing and everything else is incremental on top:
 
 Items are grouped in tiers by payoff. Tier 1 are near one-liners with outsized effect.
 
-**Status:** items 1 and 2 are shipped. Item 3 is the next one up.
+**Status:** Tier 1 (items 1, 2, 3) is shipped. Item 7 is the next one up.
 
 ---
 
@@ -58,7 +58,7 @@ memo (`review.tsx:116-158`), including the pinned-selection path. Sorts on the i
 grade site (`db.ts:485,554`, `browse.tsx:232,280`, `sync.ts:196`, `review.tsx:260`), so it
 stays in step with the card and costs no JSON parse per row.
 
-### 3. Persist review logs — new table, `app/src/lib/db.ts` + `worker/db/schema.ts`
+### 3. Persist review logs — new table, `app/src/lib/db.ts` + `worker/db/schema.ts` — ✅ DONE
 
 `getNextCard` (`app/src/lib/scheduler.ts:11`) already returns `result.log`, and
 `handleGrade` (`app/src/routes/review.tsx:255`) throws it away. There is no `reviewLog`
@@ -75,9 +75,30 @@ Three consequences:
   personalized to this user.
 - No honest per-day review counts anywhere.
 
-Add a Dexie `reviewLog` store (`++id, verseId, translation, reviewedAt, rating, state,
-elapsedDays, scheduledDays`) plus the D1 mirror and a sync-log entry, and write the FSRS
+Add a Dexie `reviewLog` store plus the D1 mirror and a sync-log entry, and write the FSRS
 `log` on every grade. This unblocks items 11 and 17 below and any future optimizer work.
+
+**What shipped:**
+
+- `ReviewLog` interface and a Dexie v7 store (`++id, reviewedAt, [verseId+translation]`) in
+  `db.ts`, with `recordReview`, `reviewTimestamps` and `reviewLogRowId` helpers.
+- `handleGrade` (`review.tsx`) appends a row per grade and queues a `reviewLog` sync entry.
+  It stores `log.state` — the state *before* the grade, which is what an optimizer needs.
+- `stats.tsx` (calendar, "hoje", streak) and `index.tsx` (streak) now read the log.
+  `reviewTimestamps()` walks the `reviewedAt` index rather than loading whole rows, since the
+  log grows without bound and both callers only need the days.
+- `review_log` table in `worker/db/schema.ts` + migration `0007_review_log.sql`; the worker's
+  `/sync/push` inserts reviews with `onConflictDoNothing`, and the server-side streak now
+  derives from `review_log` instead of `DATE(progress.last_review)`.
+- Both the Dexie v7 upgrade and the SQL migration backfill one row per already-reviewed verse
+  from `progress.lastReview`, so existing users keep their streak. Backfilled rows carry
+  `rating: 0` (day known, grade never recorded) — **filter those out before feeding an
+  optimizer.**
+
+**Deviation from the original sketch:** no `elapsedDays` column. ts-fsrs marks
+`ReviewLog.elapsed_days` deprecated for removal in 6.0.0, and `convertCsvToFsrsItems` derives
+elapsed time from consecutive review timestamps anyway, so storing it would have been a
+liability rather than an asset.
 
 ---
 
@@ -221,8 +242,11 @@ queue component and a session component.
    `check:ts`, `check` and `test:unit` (198 passing). `check:layout` could not run on this
    machine — Playwright browsers are not installed (`npx playwright install`), unrelated to
    the change.
-2. Item 3 — data model change that unblocks stats and future optimization. **Next.**
-3. Item 7 — dead code already written, just needs wiring.
+2. ~~Item 3 — data model change that unblocks stats and future optimization.~~ ✅ Done.
+   `check:ts` and `check` clean, `test:unit` 202 passing. Migration `0007` applied against the
+   local D1 and the replay no-op verified there (a second insert of the same review leaves one
+   row). Remote still needs `bun run db:migrate:remote`, which `bun run deploy` does first.
+3. Item 7 — dead code already written, just needs wiring. **Next.**
 4. Items 5, 6, 8 — deliberate practice loop, all building on existing `wordStats`.
 5. Item 4 — largest new feature, highest user-facing demand.
 6. Tier 3 as capacity allows; item 20 alongside whichever file is being touched anyway.
