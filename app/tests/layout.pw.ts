@@ -27,15 +27,21 @@ test.describe('mobile layout (390x844)', () => {
       const nav = page.locator('.bottom-nav')
       await expect(nav).toBeVisible()
       const items = nav.locator('.nav-item')
-      await expect(items).toHaveCount(6)
+      await expect(items).toHaveCount(5)
     })
   }
 
-  test('donate button visible in bottom nav', async ({ page }) => {
+  test('donate button lives in the footer, not the bottom nav', async ({ page }) => {
     await page.goto('/')
-    const donateBtn = page.locator('.bottom-nav .nav-donate')
+    await expect(page.locator('.bottom-nav .nav-donate')).toHaveCount(0)
+    const donateBtn = page.locator('.app-footer-donate')
     await expect(donateBtn).toBeVisible()
     await expect(donateBtn).toContainText('Doar')
+  })
+
+  test('privacy policy reachable from footer', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('.app-footer a[href="/privacidade"]')).toBeVisible()
   })
 
   test('donate modal opens and closes', async ({ page }) => {
@@ -44,7 +50,7 @@ test.describe('mobile layout (390x844)', () => {
     await page.locator('.welcome-cta').click({ force: true }).catch(() => {})
     await page.waitForTimeout(300)
 
-    await page.locator('.bottom-nav .nav-donate').click()
+    await page.locator('.app-footer-donate').click()
     await expect(page.locator('.donate-modal')).toBeVisible()
     await expect(page.locator('.donate-btc-addr').first()).toBeVisible()
     await page.locator('.donate-modal .modal-close').click()

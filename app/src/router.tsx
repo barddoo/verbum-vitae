@@ -129,28 +129,26 @@ function RootLayout() {
         </main>
       </div>
 
-      {isDesktop && (
-        <footer className="app-footer">
-          <div>
-            Feito por{' '}
-            <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
-              Charles Fonseca
-            </a>{' '}
-            em{' '}
-            <a href="https://www.google.com/maps?q=19°55′55.44″S+43°56′17.03″W" target="_blank" rel="noopener noreferrer">
-              Belo Horizonte
-            </a>{' '}
-            🔺 &mdash;{' '}
-            <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
-              código aberto
-            </a>{' '}
-            &mdash; <Link to="/privacidade">Privacidade</Link>
-          </div>
-          <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
-            ₿ Doar
-          </button>
-        </footer>
-      )}
+      <footer className="app-footer">
+        <div>
+          Feito por{' '}
+          <a href="https://barddoo.com" target="_blank" rel="noopener noreferrer">
+            Charles Fonseca
+          </a>{' '}
+          em{' '}
+          <a href="https://www.google.com/maps?q=19°55′55.44″S+43°56′17.03″W" target="_blank" rel="noopener noreferrer">
+            Belo Horizonte
+          </a>{' '}
+          🔺 &mdash;{' '}
+          <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
+            código aberto
+          </a>{' '}
+          &mdash; <Link to="/privacidade">Privacidade</Link>
+        </div>
+        <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
+          ₿ Doar
+        </button>
+      </footer>
 
       {!isDesktop && (
         <nav className="bottom-nav">
@@ -172,12 +170,8 @@ function RootLayout() {
           </Link>
           <Link to="/stats" className="nav-item" activeProps={{ className: 'nav-item active' }}>
             <BarChart2 size={20} strokeWidth={1.5} />
-            <span>Stats</span>
+            <span>Progresso</span>
           </Link>
-          <button type="button" className="nav-item nav-donate" onClick={() => setShowDonate(true)}>
-            <span className="nav-donate-icon">₿</span>
-            <span>Doar</span>
-          </button>
         </nav>
       )}
 

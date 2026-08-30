@@ -384,7 +384,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   min-height: 0;
-  padding-bottom: calc(5rem + var(--safe-area-inset-bottom, 0px));
+  padding-bottom: 1.25rem;
 }
 
 /* BOTTOM NAV */
@@ -455,25 +455,11 @@
   stroke: var(--gold);
 }
 
-.bottom-nav .nav-donate {
-  color: var(--gold);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.bottom-nav .nav-donate:hover {
-  background: var(--gold-dim);
-}
-
-.bottom-nav .nav-donate .nav-donate-icon {
-  font-size: 1.1rem;
-}
-
 /* FOOTER */
 
 .app-footer {
-  padding: 1.5rem 1.25rem;
+  /* bottom padding clears the fixed bottom nav on mobile; reset at desktop */
+  padding: 1.5rem 1.25rem calc(5rem + var(--safe-area-inset-bottom, 0px));
   text-align: center;
   border-top: 1px solid var(--border);
   font-family: var(--font-body);

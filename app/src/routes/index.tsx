@@ -233,7 +233,7 @@ export function HomePage() {
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(streak)}</span>
-                <span className="stat-label">Dias de Streak</span>
+                <span className="stat-label">Dias seguidos</span>
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(dueCount)}</span>
@@ -355,7 +355,7 @@ export function HomePage() {
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(streak)}</span>
-                <span className="stat-label">Dias de Streak</span>
+                <span className="stat-label">Dias seguidos</span>
               </div>
               <div className="stat-card">
                 <span className="stat-value">{nf.format(dueCount)}</span>

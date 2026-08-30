@@ -54,6 +54,10 @@
     padding-bottom: 0;
   }
 
+  .app-footer {
+    padding-bottom: 1.5rem;
+  }
+
   .top-bar {
     position: static;
     -webkit-backdrop-filter: none;

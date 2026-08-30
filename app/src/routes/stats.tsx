@@ -80,7 +80,7 @@ export function StatsPage() {
           className={`stats-tab${tab === 'versiculos' ? ' active' : ''}`}
           onClick={() => setTab('versiculos')}
         >
-          Versículos
+          Meus Versículos
         </button>
         <button
           type="button"
@@ -98,11 +98,11 @@ export function StatsPage() {
           <div className="stats-grid">
             <div className="stat-card">
               <span className="stat-value">{progress.total}</span>
-              <span className="stat-label">Versículos</span>
+              <span className="stat-label">Em aprendizado</span>
             </div>
             <div className="stat-card">
               <span className="stat-value">{progress.streak}</span>
-              <span className="stat-label">Sequência</span>
+              <span className="stat-label">Dias seguidos</span>
             </div>
             <div className="stat-card">
               <span className="stat-value">{progress.reviewsToday}</span>
