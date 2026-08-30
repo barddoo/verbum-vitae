@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Full bleed background — no rounded corners for maskable -->
+  <rect width="512" height="512" fill="#1a1a2e"/>
+  <!-- Content within safe zone: center 80% = inner 51px padding each side -->
+  <text x="256" y="285" font-size="180" text-anchor="middle" fill="#6c63ff" font-family="serif" font-weight="bold">RB</text>
+  <path d="M130 370 Q256 310 382 370 L382 415 Q256 375 130 415 Z" fill="#6c63ff" opacity="0.6"/>
+</svg>

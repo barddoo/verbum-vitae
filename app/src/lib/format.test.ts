@@ -56,4 +56,31 @@ describe('verseIdToReference', () => {
     const ref = verseIdToReference('c:apostles:0:0')
     expect(ref).toContain('Credo Apostólico')
   })
+
+  it('includes item number derived from blockIndex + 1', () => {
+    const ref = verseIdToReference('k:heidelberg:0:4:0')
+    expect(ref).toContain('5') // blockIndex=4 → displayed as 5
+  })
+
+  it('formats nicene creed reference', () => {
+    const ref = verseIdToReference('c:nicene:0:1')
+    expect(ref).toContain('Credo Niceno')
+  })
+
+  it('falls back to sourceId for unknown non-bible source', () => {
+    const ref = verseIdToReference('k:unknown-catechism:0:0')
+    expect(ref).toContain('unknown-catechism')
+  })
+
+  it('formats first book (Gênesis)', () => {
+    const ref = verseIdToReference('b:0:1:1')
+    expect(ref).toContain('Gênesis')
+    expect(ref).toContain('1:1')
+  })
+
+  it('formats last book (Apocalipse, index 65)', () => {
+    const ref = verseIdToReference('b:65:22:21')
+    expect(ref).toContain('Apocalipse')
+    expect(ref).toContain('22:21')
+  })
 })
