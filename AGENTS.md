@@ -10,7 +10,7 @@ Bun monorepo. Workspaces: `app`, `worker`, `packages/*`. **PT-BR only. PWA + Cap
 | Dev worker | `cd worker && bunx wrangler dev` (:8787) |
 | Full check | `bun run check` → runs `check:ts` then `check:biome` |
 | Typecheck | `bun run check:ts` (runs in order: shared → worker → app) |
-| Lint/fix | `bun run fix` (Biome --write --unsafe) |
+| Lint/fix | `bun run fix` (Biome --write --unsafe) 
 | Build+deploy | `bun run deploy` (builds app, wrangler deploy) |
 | DB migrate | `bun run db:migrate` |
 | DB gen | `bun run db:generate` (drizzle-kit) |
@@ -33,6 +33,8 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 - Frontend auth: React Context + localStorage JWT. No dedicated auth routes — modal overlay.
 - Cross-device sync: 30s interval + visibility/online events. Exponential backoff (max 120s).
 - Bible data: 6 PT-BR translations in `app/public/bible-{key}.json[.br]` (lazy-loaded, brotli preferred).
+- Non-bible texts in `app/public/textos/{id}.json`: Apostles Creed, Nicene Creed, Heidelberg Catechism (128 Q&A, flat single-section), Westminster Shorter Catechism. Catechism answers are clean prose — no inline footnote markers or scripture references.
+- Non-bible seeding: `seedNonBibleText` in `db.ts` uses `NON_BIBLE_SEED_VERSIONS` (keyed by `sourceId`) + `localStorage['seed_v:{sourceId}']` to detect stale data and force re-seed. **Bump the version string there whenever catechism/creed JSON content changes.**
 
 ## Conventions
 
@@ -49,6 +51,14 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 - Capacitor build: set `VITE_API_URL` to full production URL (e.g. `https://verbum-vitae.pages.dev`) in `app/.env` when building for native, since there's no local server.
 - PWA components (install button, update banner) auto-disable on native via `Capacitor.isNativePlatform()`.
 - CI/CD: configured on Cloudflare dashboard (no in-repo config).
+- Non-bible browse navigation: when `source.sectionCount === 1`, a `useEffect` in `browse.tsx` and `collections.$slug.add.tsx` auto-sets `bookIndex=0, chapter=1`, skipping the section-list step. No back button is rendered for single-section sources. `sectionCount` in `AVAILABLE_SOURCES` must match the actual number of sections in the JSON.
+
+## `user-select` conventions
+
+- `.verse-row` (browse list button): `user-select: none` — prevents accidental drag-selection on tap/swipe. **Exception:** `.verse-text` inside it overrides to `user-select: text` so the verse content is copyable.
+- `.flashcard-hint` (review prompt): `user-select: none` — UI chrome, not content.
+- Revealed flashcard text, catechism Q&A in collections: selectable by default (no override needed).
+- UI buttons, labels, stats: naturally non-selectable as `<button>` elements.
 
 ## UI rules
 

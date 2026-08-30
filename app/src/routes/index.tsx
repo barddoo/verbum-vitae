@@ -2,11 +2,11 @@ import { Link } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BookOpen, Brain, Share2, Smartphone, WifiOff, X } from 'lucide-react'
 import { useContext, useEffect, useMemo, useState } from 'react'
+import { computeStreak } from 'shared/streak'
 import { PageMeta } from '../components/page-meta'
-import { db } from '../lib/db'
+import { db, lastReviewedAt } from '../lib/db'
 import { usePresence } from '../lib/presence-context'
 import { shareVerse } from '../lib/sharing'
-import { computeStreak } from '../lib/stats'
 import { WelcomeModalContext } from '../router'
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -92,7 +92,7 @@ export function HomePage() {
     return {
       dueCount: due,
       totalMemorized: allProgress.length,
-      streak: computeStreak(allProgress.map((p) => p.dueDate)),
+      streak: computeStreak(allProgress.map(lastReviewedAt)),
     }
   }, [allProgress])
 

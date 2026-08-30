@@ -137,6 +137,13 @@ export function BrowsePage() {
   }, [translation, source, loadMemorizedVerses])
 
   useEffect(() => {
+    if (!isBible && bookIndex === null && source.sectionCount === 1) {
+      setBookIndex(0)
+      setChapter(1)
+    }
+  }, [isBible, bookIndex, source.sectionCount])
+
+  useEffect(() => {
     if (bookIndex === null || chapter === null) return
     loadChapter()
   }, [bookIndex, chapter, translation, source, loadChapter])
@@ -244,7 +251,7 @@ export function BrowsePage() {
           dueDate: p.dueDate,
           streak: p.streak,
           nextReview: new Date(card.due).toISOString(),
-          lastReview: new Date().toISOString(),
+          lastReview: null,
         }),
       })
     }
@@ -287,7 +294,7 @@ export function BrowsePage() {
           dueDate: entry.dueDate,
           streak: 0,
           nextReview: new Date(card.due).toISOString(),
-          lastReview: new Date().toISOString(),
+          lastReview: null,
         }),
       })
     }
@@ -479,9 +486,11 @@ export function BrowsePage() {
           </div>
         ) : !searchQuery || searchQuery.trim().length < 2 ? (
           <div className={`verse-view${selectionMode ? ' select-mode' : ''}`}>
-            <button type="button" className="back-btn" onClick={() => (isBible ? setChapter(null) : setBookIndex(null))}>
-              ← {isBible ? BOOKS[bookIndex!] : source.name}
-            </button>
+            {(isBible || source.sectionCount > 1) && (
+              <button type="button" className="back-btn" onClick={() => (isBible ? setChapter(null) : setBookIndex(null))}>
+                ← {isBible ? BOOKS[bookIndex!] : source.name}
+              </button>
+            )}
             <div className="verse-header">
               {selectionMode ? (
                 <>
@@ -496,7 +505,13 @@ export function BrowsePage() {
                 </>
               ) : (
                 <>
-                  <h3>{isBible ? `${BOOKS[bookIndex!]} ${chapter}` : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}</h3>
+                  <h3>
+                    {isBible
+                      ? `${BOOKS[bookIndex!]} ${chapter}`
+                      : source.sectionCount === 1
+                        ? source.name
+                        : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}
+                  </h3>
                   <p className="verse-hint">Segure para selecionar</p>
                 </>
               )}

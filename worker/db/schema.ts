@@ -23,7 +23,10 @@ export const progress = sqliteTable(
     ease: real('ease').default(2.5),
     intervalDays: integer('interval_days').default(0),
     repetitions: integer('repetitions').default(0),
+    /** FSRS card state: 0 New, 1 Learning, 2 Review, 3 Relearning. */
+    state: integer('state').notNull().default(0),
     nextReview: text('next_review'),
+    /** Null until the verse is actually reviewed — adding a verse does not set it. */
     lastReview: text('last_review'),
     createdAt: text('created_at').notNull(),
     updatedAt: text('updated_at').notNull(),

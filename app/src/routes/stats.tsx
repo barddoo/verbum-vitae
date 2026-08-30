@@ -1,8 +1,8 @@
 import { memo, useEffect, useMemo, useState } from 'react'
+import { computeStreak } from 'shared/streak'
 import { MemorizedVersesTab } from '../components/memorized-verses-tab'
 import { PageMeta } from '../components/page-meta'
-import { db } from '../lib/db'
-import { computeStreak } from '../lib/stats'
+import { db, lastReviewedAt } from '../lib/db'
 import { RankingTab } from './stats/ranking-tab'
 
 type Tab = 'resumo' | 'versiculos' | 'ranking'
@@ -33,8 +33,11 @@ export function StatsPage() {
     for (const p of all) {
       const state = stateNames[p.state] || 'Novo'
       byState[state] = (byState[state] || 0) + 1
-      if (new Date(p.updatedAt).toDateString() === today) reviewsToday++
-      const dayStr = new Date(p.updatedAt).toDateString()
+
+      const reviewedAt = lastReviewedAt(p)
+      if (reviewedAt === null) continue
+      const dayStr = new Date(reviewedAt).toDateString()
+      if (dayStr === today) reviewsToday++
       dayCount.set(dayStr, (dayCount.get(dayStr) || 0) + 1)
     }
 
@@ -42,7 +45,7 @@ export function StatsPage() {
     setProgress({
       total: all.length,
       byState,
-      streak: computeStreak(all.map((p) => p.updatedAt)),
+      streak: computeStreak(all.map(lastReviewedAt)),
       reviewsToday,
     })
   }

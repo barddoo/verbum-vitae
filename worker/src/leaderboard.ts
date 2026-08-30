@@ -30,44 +30,17 @@ async function getUser(c: Context<LeaderboardEnv>) {
   }
 }
 
-export function computeStreak(isoDates: (string | null)[]): number {
-  const days = [...new Set(isoDates.filter(Boolean).map((d) => new Date(d!).toDateString()))].sort(
-    (a, b) => new Date(b).getTime() - new Date(a).getTime(),
-  )
-
-  if (days.length === 0) return 0
-
-  const today = new Date().toDateString()
-  const yesterday = new Date(Date.now() - 86400000).toDateString()
-
-  if (!days.includes(today) && !days.includes(yesterday)) return 0
-
-  const startDay = days.includes(today) ? today : yesterday
-  let streak = 0
-  let expected = new Date(startDay).getTime()
-
-  for (const dayStr of days) {
-    const dayTime = new Date(dayStr).getTime()
-    if (dayTime === expected) {
-      streak++
-      expected -= 86400000
-    } else if (dayTime < expected) {
-      break
-    }
-  }
-
-  return streak
-}
-
 leaderboardApp.get('/', async (c) => {
   const user = await getUser(c)
   if (!user) return c.json({ error: 'Não autenticado' }, 401)
 
+  // `state = 2` is FSRS Review: the card graduated out of Learning, so it is genuinely
+  // memorized rather than merely seen once. Relearning (3) has lapsed and does not count.
   const top50Query = `
     SELECT
       p.user_id,
       COALESCE(u.display_name, 'Usuário ' || SUBSTR(u.id, 1, 6)) AS display_name,
-      COUNT(CASE WHEN p.repetitions >= 1 THEN 1 END) AS memorized_count,
+      COUNT(CASE WHEN p.state = 2 THEN 1 END) AS memorized_count,
       SUM(p.repetitions) AS total_repetitions,
       u.current_streak
     FROM progress p
@@ -101,7 +74,7 @@ leaderboardApp.get('/', async (c) => {
     const userStatsQuery = `
       SELECT
         COALESCE(u.display_name, 'Usuário ' || SUBSTR(u.id, 1, 6)) AS display_name,
-        COUNT(CASE WHEN p.repetitions >= 1 THEN 1 END) AS memorized_count,
+        COUNT(CASE WHEN p.state = 2 THEN 1 END) AS memorized_count,
         SUM(p.repetitions) AS total_repetitions,
         u.current_streak
       FROM progress p
@@ -113,11 +86,16 @@ leaderboardApp.get('/', async (c) => {
     const userRow = await c.env.DB.prepare(userStatsQuery).bind(user.sub).first<LeaderboardRow>()
 
     if (userRow) {
+      // Must mirror the top-50 population, hidden users included — otherwise they
+      // silently inflate the rank shown to everyone below them.
       const rankQuery = `
         SELECT COUNT(*) AS users_above
         FROM (
-          SELECT user_id, COUNT(CASE WHEN repetitions >= 1 THEN 1 END) AS mc, SUM(repetitions) AS tr
-          FROM progress GROUP BY user_id
+          SELECT p.user_id, COUNT(CASE WHEN p.state = 2 THEN 1 END) AS mc, SUM(p.repetitions) AS tr
+          FROM progress p
+          JOIN users u ON u.id = p.user_id
+          WHERE u.hide_from_leaderboard = 0
+          GROUP BY p.user_id
         )
         WHERE mc > ? OR (mc = ? AND tr > ?)
       `
@@ -136,7 +114,9 @@ leaderboardApp.get('/', async (c) => {
     }
   }
 
-  c.header('Cache-Control', 'public, max-age=60, s-maxage=60')
+  // Per-user payload (isCurrentUser flags, own rank) — never let a shared cache reuse it.
+  c.header('Cache-Control', 'private, max-age=60')
+  c.header('Vary', 'Authorization')
   return c.json({ entries, currentUserEntry, currentUserHidden })
 })
 

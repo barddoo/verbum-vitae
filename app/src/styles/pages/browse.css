@@ -287,6 +287,8 @@
 .verse-text {
   flex: 1;
   line-height: 1.6;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .memorized-badge {

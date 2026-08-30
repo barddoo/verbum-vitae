@@ -1,13 +1,13 @@
 import { zValidator } from '@hono/zod-validator'
-import { and, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm'
+import { and, desc, eq, gt, inArray, isNotNull, sql } from 'drizzle-orm'
 import type { BatchItem } from 'drizzle-orm/batch'
 import { drizzle } from 'drizzle-orm/d1'
 import { type Context, Hono } from 'hono'
 import { verify } from 'hono/jwt'
+import { computeStreak } from 'shared/streak'
 import { uuidv7 } from 'shared/uuid'
 import { z } from 'zod'
 import * as schema from '../db/schema'
-import { computeStreak } from './leaderboard'
 
 const PULL_LIMIT = 200
 
@@ -34,19 +34,22 @@ export function extractCardFields(cardJson: unknown): {
   ease: number
   intervalDays: number
   repetitions: number
+  state: number
 } {
   let ease = 2.5
   let intervalDays = 0
   let repetitions = 0
+  let state = 0
   try {
     const card = JSON.parse(cardJson as string)
     if (typeof card.difficulty === 'number') ease = card.difficulty
     if (typeof card.scheduled_days === 'number') intervalDays = card.scheduled_days
     if (typeof card.reps === 'number') repetitions = card.reps
+    if (typeof card.state === 'number') state = card.state
   } catch {
     /* use defaults */
   }
-  return { ease, intervalDays, repetitions }
+  return { ease, intervalDays, repetitions, state }
 }
 
 const pushSchema = z.object({
@@ -117,9 +120,10 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
       const verseId = parsed.verseId as string
       const translation = parsed.translation as string
       const cardJson = (parsed.cardJson as string) || ''
-      const { ease, intervalDays, repetitions } = extractCardFields(parsed.cardJson)
+      const { ease, intervalDays, repetitions, state } = extractCardFields(parsed.cardJson)
       const nextReview = (parsed.nextReview as string) || now
-      const lastReview = (parsed.lastReview as string) || now
+      // Null on a plain add — only an actual review stamps this, and only reviews feed the streak.
+      const lastReview = (parsed.lastReview as string | null) ?? null
 
       if (entry.operation === 'delete') {
         queries.push(
@@ -142,6 +146,7 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
               ease,
               intervalDays,
               repetitions,
+              state,
               nextReview,
               lastReview,
               createdAt: now,
@@ -149,7 +154,17 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
             })
             .onConflictDoUpdate({
               target: [schema.progress.userId, schema.progress.verseId, schema.progress.translation],
-              set: { cardJson, ease, intervalDays, repetitions, nextReview, lastReview, updatedAt: now },
+              set: {
+                cardJson,
+                ease,
+                intervalDays,
+                repetitions,
+                state,
+                nextReview,
+                // A re-add of an existing verse must not erase the review history already recorded.
+                lastReview: sql`COALESCE(excluded.last_review, ${schema.progress.lastReview})`,
+                updatedAt: now,
+              },
             }),
         )
       }
@@ -255,7 +270,9 @@ syncApp.post('/push', zValidator('json', pushSchema), async (c) => {
     const reviewDays = await db
       .selectDistinct({ day: sql<string>`DATE(${schema.progress.lastReview})` })
       .from(schema.progress)
-      .where(and(eq(schema.progress.userId, user.sub), isNotNull(schema.progress.lastReview)))
+      // `state > 0` covers rows written before adds stopped stamping last_review: a card
+      // that never left New was added, not reviewed, whatever its last_review says.
+      .where(and(eq(schema.progress.userId, user.sub), isNotNull(schema.progress.lastReview), gt(schema.progress.state, 0)))
       .orderBy(desc(sql`DATE(${schema.progress.lastReview})`))
 
     const streak = computeStreak(reviewDays.map((r) => r.day))

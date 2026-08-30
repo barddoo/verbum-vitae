@@ -253,13 +253,15 @@ export function ReviewPage() {
     if (!item) return
 
     const { card, dueDate, state } = getNextCard(item.card, rating)
+    const reviewedAt = Date.now()
 
     await db.progress.update(item.progressId, {
       cardJson: JSON.stringify(card),
       dueDate,
       state,
       streak: rating > 1 ? item.card.reps + 1 : 0,
-      updatedAt: Date.now(),
+      lastReview: reviewedAt,
+      updatedAt: reviewedAt,
     })
 
     logProgressChange({
@@ -274,7 +276,7 @@ export function ReviewPage() {
         dueDate,
         streak: rating > 1 ? item.card.reps + 1 : 0,
         nextReview: new Date(dueDate).toISOString(),
-        lastReview: new Date().toISOString(),
+        lastReview: new Date(reviewedAt).toISOString(),
       }),
     })
 

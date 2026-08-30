@@ -14,7 +14,20 @@ export interface Progress {
   state: number
   dueDate: number
   streak: number
+  /** When this verse was last reviewed — mirrors the server's `last_review`. Unset until the first review, and on rows written before it existed. */
+  lastReview?: number
   updatedAt: number
+}
+
+/**
+ * When this verse was last reviewed, or null if it never was.
+ *
+ * Rows written before `lastReview` existed fall back to `updatedAt`, but only once the card
+ * has left the New state — a card still in New was added, not reviewed, whatever its `updatedAt` says.
+ */
+export function lastReviewedAt(p: Progress): number | null {
+  if (p.lastReview !== undefined) return p.lastReview
+  return p.state > 0 ? p.updatedAt : null
 }
 
 export interface Collection {
@@ -321,9 +334,24 @@ interface CatechismJSON {
 
 type NonBibleJSON = CreedJSON | CatechismJSON
 
+// Bump version string to force re-seed after JSON content changes
+const NON_BIBLE_SEED_VERSIONS: Record<string, string> = {
+  heidelberg: '2026-08-30',
+}
+
 async function seedNonBibleText(sourceType: TextSourceType, sourceId: string) {
-  const count = await db.verses.where({ sourceType, sourceId }).count()
-  if (count > 0) return
+  const expectedVersion = NON_BIBLE_SEED_VERSIONS[sourceId]
+  if (expectedVersion) {
+    const stored = localStorage.getItem(`seed_v:${sourceId}`)
+    if (stored !== expectedVersion) {
+      await db.verses.where('[sourceType+sourceId+translation]').equals([sourceType, sourceId, sourceId]).delete()
+    } else {
+      return
+    }
+  } else {
+    const count = await db.verses.where('[sourceType+sourceId+translation]').equals([sourceType, sourceId, sourceId]).count()
+    if (count > 0) return
+  }
 
   const res = await fetch(`/textos/${sourceId}.json`)
   if (!res.ok) return
@@ -368,6 +396,9 @@ async function seedNonBibleText(sourceType: TextSourceType, sourceId: string) {
   for (let i = 0; i < items.length; i += chunkSize) {
     await db.verses.bulkAdd(items.slice(i, i + chunkSize))
   }
+
+  const version = NON_BIBLE_SEED_VERSIONS[sourceId]
+  if (version) localStorage.setItem(`seed_v:${sourceId}`, version)
 }
 
 export async function getCollectionProgress(collectionId: number, _translation: string) {
@@ -479,7 +510,7 @@ export async function addCollectionToMemory(
         dueDate: p.dueDate,
         streak: p.streak,
         nextReview: new Date(card.due).toISOString(),
-        lastReview: new Date().toISOString(),
+        lastReview: null,
       }),
     })
   }
@@ -548,7 +579,7 @@ export async function addCollectionAsBlock(
         dueDate: p.dueDate,
         streak: p.streak,
         nextReview: new Date(card.due).toISOString(),
-        lastReview: new Date().toISOString(),
+        lastReview: null,
       }),
     })
   }
