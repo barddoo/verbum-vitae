@@ -22,7 +22,7 @@ export const TEXT_SOURCES: TextSourceMetadata[] = [
   { type: 'bible', id: 'bible', name: 'Bíblia', sectionLabel: 'Livro', itemLabel: 'Versículo' },
   { type: 'creed', id: 'apostles', name: 'Credo Apostólico', sectionLabel: 'Seção', itemLabel: 'Art.' },
   { type: 'creed', id: 'nicene', name: 'Credo Niceno', sectionLabel: 'Seção', itemLabel: 'Art.' },
-  { type: 'catechism', id: 'heidelberg', name: 'Catecismo de Heidelberg', sectionLabel: 'Domingo', itemLabel: 'Perg.' },
+  { type: 'catechism', id: 'heidelberg', name: 'Catecismo de Heidelberg', sectionLabel: 'Parte', itemLabel: 'Perg.' },
   { type: 'catechism', id: 'westminster', name: 'Breve Catecismo de Westminster', sectionLabel: 'Parte', itemLabel: 'Perg.' },
 ]
 

@@ -3,6 +3,7 @@ export function SelectionBar({
   previewText,
   onClear,
   onMemorize,
+  onMemorizeAsBlock,
   onShareImage,
   actionLabel,
 }: {
@@ -10,6 +11,7 @@ export function SelectionBar({
   previewText: string
   onClear: () => void
   onMemorize: () => void
+  onMemorizeAsBlock?: () => void
   onShareImage?: () => void
   actionLabel?: string
 }) {
@@ -33,6 +35,11 @@ export function SelectionBar({
         {onShareImage && (
           <button type="button" className="btn btn-sm btn-secondary" onClick={onShareImage}>
             Imagem
+          </button>
+        )}
+        {onMemorizeAsBlock && (
+          <button type="button" className="btn btn-sm btn-secondary" onClick={onMemorizeAsBlock}>
+            Como bloco
           </button>
         )}
         <button type="button" className="btn btn-sm btn-primary" onClick={onMemorize}>

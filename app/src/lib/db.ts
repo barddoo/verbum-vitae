@@ -487,6 +487,75 @@ export async function addCollectionToMemory(
   return toAdd.length
 }
 
+export async function addCollectionAsBlock(
+  collectionId: number,
+  translation: string,
+  logChange: (entry: Omit<SyncLog, 'id' | 'userId' | 'synced' | 'createdAt'>) => void,
+): Promise<number> {
+  const [cv, { createEmptyCard }] = await Promise.all([db.collectionVerses.where({ collectionId }).sortBy('sortOrder'), import('./srs')])
+
+  const chapterGroups = new Map<string, { book: number; chapter: number; verses: number[] }>()
+  for (const c of cv) {
+    const p = parseTextKey(c.verseId)
+    if (p.sourceType !== 'bible') continue
+    const gk = `${p.sectionIndex}:${p.blockIndex}`
+    if (!chapterGroups.has(gk)) {
+      chapterGroups.set(gk, { book: p.sectionIndex, chapter: p.blockIndex, verses: [] })
+    }
+    chapterGroups.get(gk)!.verses.push(p.itemIndex)
+  }
+
+  const toAdd: Progress[] = []
+  await db.transaction('r', db.progress, async () => {
+    for (const group of chapterGroups.values()) {
+      if (group.verses.length < 2) continue
+      const minV = Math.min(...group.verses)
+      const maxV = Math.max(...group.verses)
+      const blockId = textKey('bible', '', group.book, group.chapter, minV, maxV)
+      const existing = await db.progress.where({ verseId: blockId, translation }).first()
+      if (!existing) {
+        const card = createEmptyCard()
+        toAdd.push({
+          verseId: blockId,
+          translation,
+          cardJson: JSON.stringify(card),
+          state: 0,
+          dueDate: card.due.getTime(),
+          streak: 0,
+          updatedAt: Date.now(),
+        })
+      }
+    }
+  })
+
+  if (toAdd.length === 0) return 0
+
+  await db.transaction('rw', db.progress, async () => {
+    await db.progress.bulkAdd(toAdd)
+  })
+
+  for (const p of toAdd) {
+    const card = JSON.parse(p.cardJson)
+    logChange({
+      tableName: 'progress',
+      rowId: p.verseId,
+      operation: 'create',
+      data: JSON.stringify({
+        verseId: p.verseId,
+        translation: p.translation,
+        cardJson: p.cardJson,
+        state: p.state,
+        dueDate: p.dueDate,
+        streak: p.streak,
+        nextReview: new Date(card.due).toISOString(),
+        lastReview: new Date().toISOString(),
+      }),
+    })
+  }
+
+  return toAdd.length
+}
+
 function getUserId(): string {
   try {
     const token = localStorage.getItem('auth_token')

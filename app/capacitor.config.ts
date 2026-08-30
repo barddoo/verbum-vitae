@@ -8,7 +8,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 import { KeyboardResize, KeyboardStyle } from '@capacitor/keyboard'
 
 const config: CapacitorConfig = {
-  appId: 'com.verbumvitae.app',
+  appId: 'com.vvitae.app',
   appName: 'Verbum Vitae',
   webDir: 'dist',
   server: {

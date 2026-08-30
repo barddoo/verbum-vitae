@@ -144,8 +144,7 @@ function RootLayout() {
             <a href="https://github.com/barddoo/verbum-vitae" target="_blank" rel="noopener noreferrer">
               código aberto
             </a>{' '}
-            &mdash;{' '}
-            <Link to="/privacidade">Privacidade</Link>
+            &mdash; <Link to="/privacidade">Privacidade</Link>
           </div>
           <button type="button" className="app-footer-donate" onClick={() => setShowDonate(true)}>
             ₿ Doar

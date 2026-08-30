@@ -33,9 +33,9 @@ export const AVAILABLE_SOURCES: SourceOption[] = [
     type: 'catechism',
     id: 'heidelberg',
     name: 'Catecismo de Heidelberg',
-    sectionLabel: 'Domingo',
+    sectionLabel: 'Parte',
     itemLabel: 'Perg.',
-    sectionCount: 52,
+    sectionCount: 1,
   },
   {
     type: 'catechism',

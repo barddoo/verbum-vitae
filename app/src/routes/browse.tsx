@@ -255,6 +255,48 @@ export function BrowsePage() {
     setTimeout(() => setJustAdded(new Set()), 2000)
   }
 
+  async function memorizeSelectedAsBlock() {
+    if (!isBible || bookIndex === null || chapter === null || selectedVerses.size < 2) return
+    const sorted = [...selectedVerses].sort((a, b) => a - b)
+    const minV = sorted[0]
+    const maxV = sorted[sorted.length - 1]
+    const blockId = textKey('bible', '', bookIndex, chapter, minV, maxV)
+    const existing = await db.progress.where({ verseId: blockId, translation: translationForSource }).first()
+    if (!existing) {
+      const { createEmptyCard } = await import('../lib/srs')
+      const card = createEmptyCard()
+      const entry = {
+        verseId: blockId,
+        translation: translationForSource,
+        cardJson: JSON.stringify(card),
+        state: 0,
+        dueDate: card.due.getTime(),
+        streak: 0,
+        updatedAt: Date.now(),
+      }
+      await db.progress.add(entry)
+      logProgressChange({
+        tableName: 'progress',
+        rowId: blockId,
+        operation: 'create',
+        data: JSON.stringify({
+          verseId: blockId,
+          translation: translationForSource,
+          cardJson: entry.cardJson,
+          state: 0,
+          dueDate: entry.dueDate,
+          streak: 0,
+          nextReview: new Date(card.due).toISOString(),
+          lastReview: new Date().toISOString(),
+        }),
+      })
+    }
+    setJustAdded(new Set([blockId]))
+    exitSelectionMode()
+    await loadMemorizedVerses()
+    setTimeout(() => setJustAdded(new Set()), 2000)
+  }
+
   const filteredBooks = useMemo(() => {
     if (!isBible) {
       return Array.from({ length: source.sectionCount }, (_, i) => ({ name: `${source.sectionLabel} ${i + 1}`, idx: i }))
@@ -501,6 +543,7 @@ export function BrowsePage() {
         previewText={previewText}
         onClear={exitSelectionMode}
         onMemorize={memorizeSelected}
+        onMemorizeAsBlock={isBible && selectedVerses.size >= 2 ? memorizeSelectedAsBlock : undefined}
         onShareImage={imageVerses.length > 0 ? () => setShowImageModal(true) : undefined}
       />
       {showImageModal && (

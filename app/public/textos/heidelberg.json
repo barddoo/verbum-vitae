@@ -2,765 +2,523 @@
   "type": "catechism",
   "id": "heidelberg",
   "name": "Catecismo de Heidelberg",
-  "sectionLabel": "Domingo",
+  "sectionLabel": "Parte",
   "itemLabel": "Pergunta",
   "sections": [
     {
-      "name": "Domingo 1",
+      "name": "Catecismo de Heidelberg",
       "items": [
+        {
+          "q": "Qual é o seu único fundamento, na vida e na morte?",
+          "a": "O meu único fundamento é meu fiel Salvador Jesus Cristo. A Ele pertenço, em corpo e alma, na vida e na morte, e não pertenço a mim mesmo. Com seu precioso sangue Ele pagou por todos os meus pecados e me libertou de todo o domínio do diabo. Agora Ele me protege de tal maneira que, sem a vontade do meu Pai do céu, não perderei nem um fio de cabelo. Além disto, tudo coopera para o meu bem. Por isso, pelo Espírito Santo, Ele também me garante a vida eterna e me torna disposto a viver para Ele, daqui em diante, de todo o coração."
+        },
         {
           "q": "O que você deve saber para viver e morrer neste fundamento?",
-          "a": "Primeiro: como são grandes meus pecados e minha miséria (1). Segundo: como sou salvo de meus pecados e de minha miséria (2). Terceiro: como devo ser grato a Deus por tal salvação (3). (1) Mt 9:12; Jo 9:41; Rm 3:10; 1Jo 1:9,10. (2) Lc 24:46,47; Jo 17:3; At 4:12; At 10:43; 1Co 6:11; Tt 3:3-7. (3) Sl 50:14,15; Sl 116:12,13; Mt 5:16; Rm 6:12,13; Ef 5:10; 2Tm 2:15; 1Pe 2:9,12. Veja também Mt 11:28-30; Ef 5:8."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 2",
-      "items": [
+          "a": "Primeiro: como são grandes meus pecados e minha miséria. Segundo: como sou salvo de meus pecados e de minha miséria. Terceiro: como devo ser grato a Deus por tal salvação."
+        },
         {
           "q": "Como você conhece sua miséria?",
-          "a": "Pela lei de Deus (1). (1) Rm 3:20."
+          "a": "Pela lei de Deus."
         },
         {
           "q": "O que a lei de Deus exige de nós?",
-          "a": "Isto Cristo nos ensina num resumo, em Mateus 22:37-40: \"Amarás o Senhor teu Deus de todo o teu coração, de toda a tua alma e de todo o teu entendimento. \" Este é o grande e primeiro mandamento. O segundo, semelhante a este, é: Amarás o teu próximo como a ti mesmo. Destes dois mandamentos dependem toda a lei e os profetas\" (1). (1) Lv 19:18; Dt 6:5; Mc 12:30,31; Lc 10:27."
+          "a": "Isto Cristo nos ensina num resumo, em Mateus 22:37-40:\"Amarás o Senhor teu Deus de todo o teu coração, de toda a tua alma e de todo o teu entendimento\". Este é o grande e primeiro mandamento. O segundo, semelhante a este, é: Amarás o teu próximo como a ti mesmo. Destes dois mandamentos dependem toda a lei e os profetas\"."
         },
         {
           "q": "Você pode observar esta lei perfeitamente?",
-          "a": "Não, não posso (1) , porque por natureza sou inclinado a odiar a Deus e a meu próximo (2). (1) Rm 3:10,20,23; 1Jo 1:8,10. (2) Gn 6:5; Gn 8:21; Jr 17:9; Rm 7:23; Rm 8:7; Ef 2:3; Tt 3:3."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 3",
-      "items": [
+          "a": "Não, não posso, porque por natureza sou inclinado a odiar a Deus e a meu próximo."
+        },
         {
           "q": "Mas Deus criou o homem tão mau e perverso?",
-          "a": "Não, Deus criou o homem bom (1) e à sua imagem (2) , isto é, em verdadeira justiça e santidade, para conhecer corretamente a Deus seu Criador, amá-Lo de todo o coração e viver com Ele em eterna felicidade, para louvá-Lo e glorificá-Lo (3). (1) Gn 1:31. (2) Gn 1:26,27. (3) 2Co 3:18; Ef 4:24; Cl 3:10."
+          "a": "Não, Deus criou o homem bom e à sua imagem, isto é, em verdadeira justiça e santidade, para conhecer corretamente a Deus seu Criador, amá-Lo de todo o coração e viver com Ele em eterna felicidade, para louvá-Lo e glorificá-Lo."
         },
         {
           "q": "De onde vem, então, esta natureza corrompida do homem?",
-          "a": "Da queda e desobediência de nossos primeiros pais, Adão e Eva, no paraíso (1). Ali, nossa natureza tornou-se tão envenenada, que todos nós somos concebidos e nascidos em pecado (2). (1) Gn 3; Rm 5:12,18,19. (2) Sl 51:5; Jo 3:6."
+          "a": "Da queda e desobediência de nossos primeiros pais, Adão e Eva, no paraíso. Ali, nossa natureza tornou-se tão envenenada, que todos nós somos concebidos e nascidos em pecado."
         },
         {
           "q": "Mas nós somos tão corrompidos que não podemos fazer bem algum e que somos inclinados a todo mal?",
-          "a": "Somos sim (l) , se não nascermos de novo pelo Espírito de Deus (2). (1) Gn 6:5; Gn 8:21; Jó 14:4; Jo 15:14,16,35; Is 53:6; Tt 3:3. (2) Jo 3:3,5; 1Co 12:3; 2Co 3:5."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 4",
-      "items": [
+          "a": "Somos sim, se não nascermos de novo pelo Espírito de Deus."
+        },
         {
           "q": "Então, Deus exige do homem, em sua lei, o que este não pode cumprir. Isto não é injusto?",
-          "a": "Não, pois Deus criou o homem de tal maneira que este pudesse cumprir a lei (1). O homem, porém, sob instigação do diabo e por sua própria rebeldia, privou a si mesmo e a todos os seus descendentes destes dons (2). (1) Gn 1:27; Ef 4:24. (2) Gn 3:4-6; Rm 5:12; 1Tm 2:13,14."
+          "a": "Não, pois Deus criou o homem de tal maneira que este pudesse cumprir a lei. O homem, porém, sob instigação do diabo e por sua própria rebeldia, privou a si mesmo e a todos os seus descendentes destes dons."
         },
         {
           "q": "Deus deixa sem castigo esta desobediência e rebeldia?",
-          "a": "Não, não deixa, porque Ele se ira terrivelmente tanto contra os pecados em que nascemos como contra os que cometemos, e quer castigá-los por justo julgamento, agora, nesta vida, e na futura (1). Ele mesmo declarou: \"Maldito todo aquele que não permanece em todas as coisas escritas no livro da lei, para praticá-las\" (Gálatas 3:10)(2). (1) Gn 2:17; Êx 20:5; Êx 34:7; Sl 5:5; Na 1:2; Rm 1:18; Rm 5:12; Ef 5:6; Hb 9:27. (2) Dt 27:26."
+          "a": "Não, não deixa, porque Ele se ira terrivelmente tanto contra os pecados em que nascemos como contra os que cometemos, e quer castigá-los por justo julgamento, agora, nesta vida, e na futura. Ele mesmo declarou:\"Maldito todo aquele que não permanece em todas as coisas escritas no livro da lei, para praticá-las\" (Gálatas 3:10)."
         },
         {
           "q": "Mas Deus não é também misericordioso?",
-          "a": "Deus na verdade é misericordioso(1), mas também e justo (2). Por isso, sua justiça exige que o pecado, cometido contra a suprema majestade de Deus, seja castigado também com a pena máxima, quer dizer, com o castigo eterno em corpo e alma (3). (1) Êx 20:6; Êx 34:6,7. (2) Êx 20:5; Êx 23:7; Êx 34:7; Sl 7:9. (3) Na 1:2,3; 2Ts 1:9."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 5",
-      "items": [
+          "a": "Deus na verdade é misericordioso, mas também é justo. Por isso, sua justiça exige que o pecado, cometido contra a suprema majestade de Deus, seja castigado também com a pena máxima, quer dizer, com o castigo eterno em corpo e alma."
+        },
         {
           "q": "Então, conforme o justo julgamento de Deus, merecemos castigo, nesta vida e na futura. Como podemos escapar deste castigo e, de novo, ser aceitos por Deus em graça?",
-          "a": "Deus quer que sua justiça seja cumprida (1). Por isso, nós mesmos devemos satisfazer essa justiça, ou um outro por nós (2). (1) Gn 2:17; Êx 20:5; Êx 23:7; Ez 18:4; Hb 10:30. (2) Mt 5:26; Rm 8:3,4."
+          "a": "Deus quer que sua justiça seja cumprida. Por isso, nós mesmos devemos satisfazer essa justiça, ou um outro por nós."
         },
         {
           "q": "Nós mesmos podemos satisfazer essa justiça?",
-          "a": "De maneira alguma. Pelo contrário, aumentamos, a cada dia, a nossa dívida com Deus(1). (1) Jó 4:18,19; Jó 9:2,3; Jó 15:16; Sl 130:3; Mt 6:12; Mt 16:26; Mt 18:25."
+          "a": "De maneira alguma. Pelo contrário, aumentamos, a cada dia, a nossa dívida com Deus."
         },
         {
           "q": "Será que uma criatura, sendo apenas criatura, pode pagar por nós?",
-          "a": "Não, não pode. Primeiro: porque Deus não quer castigar uma outra criatura pela dívida do homem(1). Segundo: porque tal criatura não poderia suportar o peso da ira eterna de Deus contra o pecado e dela livrar outros (2). (1) Gn 3:17; Ez 18:4. (2) Sl 130:3; Na 1:6."
+          "a": "Não, não pode. Primeiro: porque Deus não quer castigar uma outra criatura pela dívida do homem."
         },
         {
           "q": "Que tipo de Mediador e Salvador, então, devemos buscar?",
-          "a": "O Mediador deve ser verdadeiro(1) homem e homem justo (2) , contudo, mais poderoso que todas as criaturas; portanto, alguém que é, ao mesmo tempo, verdadeiro Deus (3). (1) 1Co 15:21. (2) Hb 7:26. (3) Is 7:14; Is 9:6; Jr 23:6; Lc 11:22; Rm 8:3,4."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 6",
-      "items": [
+          "a": "O Mediador deve ser verdadeiro homem e homem justo, contudo, mais poderoso que todas as criaturas; portanto, alguém que é, ao mesmo tempo, verdadeiro Deus."
+        },
         {
           "q": "Por que o Mediador deve ser verdadeiro homem e homem justo?",
-          "a": "Deve ser verdadeiro homem, porque a justiça de Deus exige que o homem pague o pecado do homem (1). Deve ser homem justo, porque alguém que tem seus próprios pecados, não pode pagar por outros (2). (1) Is 53:3-5; Jr 33:15; Ez 18:4,20; Rm 5:12-15; 1Co 15:21; Hb 2:14-16. (2) Sl 49:7; Hb 7:26,27; 1Pe 3:18."
+          "a": "Deve ser verdadeiro homem, porque a justiça de Deus exige que o homem pague o pecado do homem. Deve ser homem justo, porque alguém que tem seus próprios pecados, não pode pagar por outros."
         },
         {
           "q": "Por que o Mediador deve ser, ao mesmo tempo, verdadeiro Deus?",
-          "a": "Porque, somente sendo verdadeiro Deus(1), Ele pode suportar (2) , como homem, o peso da ira (3) de Deus, e conquistar e restituir, para nós, a justiça e a vida (4). (1) Is 9:6; Rm 1:4; Hb 1:3. (2) Is 53:4,11. (3) Dt 4:24; Sl 130:3; Na 1:6. (4) Is 53:5,11; Is 54:8; Jo 3:16; At 20:28; 1Pe 3:18."
+          "a": "Porque, somente sendo verdadeiro Deus, Ele pode suportar, como homem, o peso da ira de Deus, e conquistar e restituir, para nós, a justiça e a vida."
         },
         {
-          "q": "Mas quem é esse Mediador que, ao mesmo tempo, é verdadeiro Deus (1) e verdadeiro (2) homem e homem justo (3) ?",
-          "a": "Nosso Senhor Jesus Cristo (4) , que nos foi dado para completa salvação e justiça (5). (1) Jr 23:6; Mt 3:1; Rm 8:3; Gl 4:4; 1Jo 5:20. (2) Lc 1:42; Lc 2:6,7; Rm 1:3; Fp 2:7; Hb 2:14,17; Hb 4:15. (3) Is 53:9,11; Jr 23:5; Lc 1:35; Jo 8:46; Hb 4:15; Heb 7:26; 1Pe 1:19; 1Pe 2:22; 1Pe 3:18. (4) Mt 1:23; Lc 2:11; Jo 1:1,14; Jo 14:6; Rm 9:5; 1Tm 2:5; 1Tm 3:16; Hb 2:9. (5) 1Co 1:30; 2Co 5:21."
+          "q": "Mas quem é esse Mediador que, ao mesmo tempo, é verdadeiro Deus e verdadeiro homem e homem justo?",
+          "a": "Nosso Senhor Jesus Cristo, que nos foi dado para completa salvação e justiça."
         },
         {
           "q": "Como você sabe isto?",
-          "a": "Pelo santo Evangelho, que o próprio Deus, de início, revelou no paraíso(1). Depois mandou anunciá-lo pelos santos patriarcas (2) e profetas (3) e, de antemão, o representou através dos sacrifícios e das outras cerimônias do Antigo Testamento. (4) Finalmente, o cumpriu por seu único Filho (5). (1) Gn 3:15. (2) Gn 12:3; Gn 22:18; Gn 26:4; Gn 49:10. (3) Is 42:1-4; Is 43:25; Is 49:6; Is 53; Jr 23:5,6; Jr 31:32,33; Mq 7:18-20; Jo 5:46; At 3:22-24; At 10:43; Rm 1:2; Hb 1:1. (4) Cl 2:17; Hb 10:1,7. (5) Rm 10:4; Gl 3:24; Gl 4:4,5; Cl 2:17."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 7",
-      "items": [
+          "a": "Pelo santo Evangelho, que o próprio Deus, de início, revelou no paraíso. Depois mandou anunciá-lo pelos santos patriarcas e profetas e, de antemão, o representou através dos sacrifícios e das outras cerimônias do Antigo Testamento. Finalmente, o cumpriu por seu único Filho."
+        },
         {
           "q": "Todos os homens, então, tornam-se salvos por Cristo, assim como pereceram em Adão?",
-          "a": "Não(1), somente aqueles que pela verdadeira fé são unidos a Cristo e aceitam todos os seus benefícios (2). (1) Mt 7:14; Mt 22:14. (2) Sl 2:12; Mc 16:16; Jo 1:12,13; Jo 3:16,18,36; Rm 3:22; Rm 11:20; Hb 4:2,3; Hb 5:9; Hb 10:39; Hb 11:6."
+          "a": "Não, somente aqueles que pela verdadeira fé são unidos a Cristo e aceitam todos os seus benefícios."
         },
         {
           "q": "O que é a verdadeira fé?",
-          "a": "A verdadeira fé é o conhecimento e a certeza de que é verdade tudo o que Deus nos revelou em sua Palavra(1). É também a plena confiança (2) de que Deus concedeu, por pura graça, não só a outros, mas também a mim, a remissão dos pecados, a justiça eterna e a salvação (3) , somente pelos méritos de Cristo (4). O Espírito Santo (5) opera esta fé em meu coração, por meio do Evangelho (6). (1) Rm 4:20,21; Hb 11:1,3; Tg 1:6. (2) Sl 9:10; Rm 4:16-21; Rm 5:1; Rm 10:10; Ef 3:12; Hb 4:16. (3) Hc 2:4; At 10:43; Rm 1:17; Gl 3:11; Hb 10:10,38. (4) Lc 1:77,78; Jo 20:31; At 10:43; Rm 3:24; Rm 5:19; Gl 2:16. (5) Mt 16:17; Jo 3:5; Jo 6:29; At 16:14; 2Co 4:13; Ef 2:8; Fp 1:29. (6) Mc 16:15; At 10:44; At 16:14; Rm 1:16; Rm 10:17; 1Co 1:21."
+          "a": "A verdadeira fé é o conhecimento e a certeza de que é verdade tudo o que Deus nos revelou em sua Palavra. É também a plena confiança de que Deus concedeu, por pura graça, não só a outros, mas também a mim, a remissão dos pecados, a justiça eterna e a salvação, somente pelos méritos de Cristo. O Espírito Santo opera esta fé em meu coração, por meio do Evangelho."
         },
         {
           "q": "Em que um cristão deve crer?",
-          "a": "Em tudo o que nos é prometido no Evangelho. O Credo Apostólico, resumo de nossa universal e indubitável fé cristã, nos ensina isto(1). (1) Mt 28:19; Mc 1:15; Jo 20:31."
+          "a": "Em tudo o que nos é prometido no Evangelho. O Credo Apostólico, resumo de nossa universal e indubitável fé cristã, nos ensina isto."
         },
         {
           "q": "O que dizem os artigos deste Credo?",
           "a": "1) Creio em Deus Pai, Todo-Poderoso, Criador do céu e da terra; 2) e em Jesus Cristo, seu único Filho, nosso Senhor; 3) que foi concebido pelo Espírito Santo, nasceu da virgem Maria; 4) padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado, desceu ao inferno; 5) no terceiro dia ressurgiu dos mortos; 6) subiu ao céu e esta sentado à direita de Deus Pai Todo-Poderoso; 7) donde há de vir a julgar os vivos e os mortos. 8) Creio no Espírito Santo; 9) na santa igreja universal de Cristo, a comunhão dos santos; 10) na remissão dos pecados; 11) na ressurreição da carne 12) e na vida eterna."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 8",
-      "items": [
+        },
         {
           "q": "Como se divide este Credo?",
           "a": "Em três partes. A primeira trata de Deus Pai e da nossa criação. A segunda de Deus Filho e da nossa salvação. A terceira de Deus Espírito Santo e da nossa santificação."
         },
         {
-          "q": "Por que você fala de três Pessoas: Pai, Filho e Espírito Santo, visto que há um só Deus (1) ?",
-          "a": "Porque Deus se revelou, em sua Palavra, de tal maneira que estas três Pessoas distintas são o único, verdadeiro e eterno Deus (2). (1) Dt 6:4; Is 44:6; Is 45:5; 1Co 8:4,6; Ef 4:5,6. (2) Gn 1:2,3; Is 61:1; Mt 3:16,17; Mt 28:19; Lc 1:5; Lc 4:18; Jo 14:26; Jo 15:26; At 2:32,33; 2Co 13:13; Gl 4:6; Ef 2:18; Tt 3:4-6. DEUS PAI E NOSSA CRIAÇÃO"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 9",
-      "items": [
+          "q": "Por que você fala de três Pessoas: Pai, Filho e Espírito Santo, visto que há um só Deus?",
+          "a": "Porque Deus se revelou, em sua Palavra, de tal maneira que estas três Pessoas distintas são o único, verdadeiro e eterno Deus."
+        },
         {
-          "q": "Em que você crê quando diz: \"Creio em Deus Pai, Todo-Poderoso, Criador do céu e da terra\"?",
-          "a": "Creio que o eterno Pai de nosso Senhor Jesus Cristo criou, do nada, o céu, a terra e tudo o que neles há(1) e ainda os sustenta e governa por seu eterno conselho e providência (2). Ele é também meu Deus e meu Pai, por causa de seu Filho Cristo (3). NEle confio de tal maneira, que não duvido que dará tudo o que for necessário para meu corpo e minha alma (4) ; e que Ele transformará em bem todo mal que me enviar, nesta vida conturbada (5). Tudo isto Ele pode fazer como Deus todo-poderoso (6) e quer fazer como Pai fiel (7). (1) Gn 1:1; Gn 2:3; Êx 20:11; Jó 33:4; Jó 38:4-11; Sl 33:6; Is 40:26; At 4:24; At 14:15. (2) Sl 104:2-5,27-30; Sl 115:3; Mt 10:29,30; Rm 11:36; Ef 1:11. (3) Jo 1:12; Rm 8:15; Gl 4:5-7; Ef 1:5. (4) Sl 55:22; Mt 6:25,26; Lc 12:22-24. (5) Rm 8:28. (6) Rm 8:37-39; Rm 10:12; Ap 1:8. (7) Mt 6:32,33; Mt 7:9-11."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 10",
-      "items": [
+          "q": "Em que você crê quando diz:\"Creio em Deus Pai, Todo-Poderoso, Criador do céu e da terra\"?",
+          "a": "Creio que o eterno Pai de nosso Senhor Jesus Cristo criou, do nada, o céu, a terra e tudo o que neles há e ainda os sustenta e governa por seu eterno conselho e providência. Ele é também meu Deus e meu Pai, por causa de seu Filho Cristo. NEle confio de tal maneira, que não duvido que dará tudo o que for necessário para meu corpo e minha alma; e que Ele transformará em bem todo mal que me enviar, nesta vida conturbada. Tudo isto Ele pode fazer como Deus todo-poderoso e quer fazer como Pai fiel."
+        },
         {
           "q": "O que é a providência de Deus?",
-          "a": "É a força Todo-Poderoso e presente (1) , com que Deus, pela sua mão, sustenta e governa o céu, a terra e todas as criaturas (2). Assim, ervas e plantas, chuva e seca (3) , anos frutíferos e infrutíferos, comida e bebida, saúde e doença, riqueza e pobreza e todas as coisas (4) não nos sobrevêm por acaso, mas de sua mão paternal (5). (1) Sl 94:9,10; Is 29:15,16; Jr 23:23,24; Ez 8:12; Mt 17:27; At 17:25-28. (2) Hb 1:3. (3) Jr 5:24; At 14:17. (4) Pv 22:2; Jo 9:3. (5) Pv 16:33; Mt 10:29."
+          "a": "É a força Todo-Poderoso e presente, com que Deus, pela sua mão, sustenta e governa o céu, a terra e todas as criaturas. Assim, ervas e plantas, chuva e seca, anos frutíferos e infrutíferos, comida e bebida, saúde e doença, riqueza e pobreza e todas as coisas não nos sobrevêm por acaso, mas de sua mão paternal."
         },
         {
           "q": "Para que serve saber da criação e da providência de Deus?",
-          "a": "Para que tenhamos paciência(1) em toda adversidade e mostremos gratidão (2) em toda prosperidade e para que, quanto ao futuro, tenhamos a firme confiança em nosso fiel Deus e Pai, de que criatura alguma nos pode separar do amor dEle (3). Porque todas as criaturas estão na mão de Deus, de tal maneira que sem a vontade dEle não podem agir nem se mover (4). (1) Jó 1:21,22; Sl 39:9; Rm 5:3,4; Tg 1:3. (2) Dt 8:10; 1Ts 5:18. (3) Sl 55:22; Rm 5: 4,5; Rm 8:38,39. (4) Jó 1:12; Jó 2:6; Pv 21:1; At 17:25-28. DEUS FILHO E NOSSA SALVAÇÃO"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 11",
-      "items": [
-        {
-          "q": "O nome \"Jesus\" significa \"Salvador\". Por que o Filho de Deus tem este nome?",
-          "a": "Porque Ele nos salva de todos os nossos pecados(1) e porque, em ninguém mais, devemos buscar ou podemos encontrar salvação (2). (1) Mt 1:21; Hb 7:25. (2) Is 43:11; Jo 15:4,5; At 4:11,12; 1Tm 2:5; 1Jo 5:11,12."
+          "a": "Para que tenhamos paciência em toda adversidade e mostremos gratidão em toda prosperidade e para que, quanto ao futuro, tenhamos a firme confiança em nosso fiel Deus e Pai, de que criatura alguma nos pode separar do amor dEle. Porque todas as criaturas estão na mão de Deus, de tal maneira que sem a vontade dEle não podem agir nem se mover."
         },
         {
-          "q": "Será que aqueles que buscam, o bem e a salvação nos assim chamados \"santos\", ou em si mesmos ou em qualquer lugar, realmente crêem no único Salvador?",
-          "a": "Não, não crêem, pois na prática negam o único Salvador Jesus, ainda que falem tanto dEle(1). Pois das duas, uma: ou Jesus não é o perfeito Salvador, ou aqueles que O aceitam como Salvador com verdadeira fé, encontram nEle tudo o que é necessário para a salvação (2). (1) 1Co 1:13,30,31; Gl 5:4. (2) Is 9:7; Jo 1:16; Cl 1:19,20; Cl 2:10; Hb 12:2; 1Jo 1:7."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 12",
-      "items": [
-        {
-          "q": "O nome \"Cristo\" significa \"Ungido\". Por que Jesus tem também este nome?",
-          "a": "Porque Ele foi ordenado por Deus Pai e ungido(1) com o Espírito Santo para ser nosso supremo Profeta e Mestre, nosso único Sumo Sacerdote e nosso eterno Rei. Como Profeta Ele nos revelou plenamente o plano de Deus para nossa salvaçao (2) ; como Sumo Sacerdote Ele nos resgatou pelo único sacrifício de seu corpo (3) e, continuamente, intercede por nós junto ao Pai (4) ; como Rei Ele nos governa por sua Palavra e Espírito e nos protege e guarda na salvação (5) que Ele conquistou para nós. (1) Sl 45:7; Is 61:1; Lc 4:18; At 10:38; Hb 1:9. (2) Dt 18:15; Is 55:4; Mt 11:27; Jo 1:18; Jo 15:15; At 3:22. (3) Sl 110:4; Hb 7:21; Hb 9:12,14,28; Hb 10:12,14. (4) Rm 8:34; Hb 7:25; Hb 9:24; 1Jo 2:1. (5) Sl 2:6; Zc 9:9; Mt 21:5; Mt 28:18; Lc 1:33; Jo 10:28; Ap 12:10,11."
+          "q": "O nome\"Jesus\" significa\"Salvador\". Por que o Filho de Deus tem este nome?",
+          "a": "Porque Ele nos salva de todos os nossos pecados e porque, em ninguém mais, devemos buscar ou podemos encontrar salvação."
         },
         {
-          "q": "Por que você e chamado cristão (1) ?",
-          "a": "Porque pela fé sou membro de Cristo e, por isso, também sou ungido (2) para ser profeta, sacerdote e rei. Como profeta confesso o nome dEle (3) ; Como sacerdote ofereço minha vida a Ele como sacrifício vivo de gratidão (4) ; e como rei combato (5) , nesta vida, o pecado e o diabo, de livre consciência, e depois, na vida eterna, vou reinar com Ele sobre todas as criaturas (6). (1) At 11:26. (2) Is 59:21; Jl 2:28; At 2:17; 1Co 6:15; 1Jo 2:27. (3) Mt 10:32,33; Rm 10:10. (4) Êx 19:6; Rm 12:1; 1Pe 2:5; Ap 1:6; Ap 5:8,10. (5) Rm 6:12,13; Gl 5:16,17; Ef 6:11; 1Tm 1:18,19; 1Pe 2:9,11. (6) 2Tm 2:12; Ap 22:5."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 13",
-      "items": [
-        {
-          "q": "Por que Cristo é chamado \"o único Filho de Deus\", se nós também somos filhos de Deus?",
-          "a": "Porque só Cristo é, por natureza, o Filho eterno de Deus(1). Nós, porém, somos filhos adotivos de Deus (2) , pela graça, por causa de Cristo. (1) Jó 1:14,18; Jo 3:16; Rm 8:32; Hb 1:1,2; 1Jo 4:9. (2) Jo 1:12; Rm 8:15-17; Gl 4:6; Ef 1:5,6"
+          "q": "Será que aqueles que buscam, o bem e a salvação nos assim chamados\"santos\", ou em si mesmos ou em qualquer lugar, realmente crêem no único Salvador?",
+          "a": "Não, não crêem, pois na prática negam o único Salvador Jesus, ainda que falem tanto dEle. Pois das duas, uma: ou Jesus não é o perfeito Salvador, ou aqueles que O aceitam como Salvador com verdadeira fé, encontram nEle tudo o que é necessário para a salvação."
         },
         {
-          "q": "Por que você chama Cristo \"nosso Senhor\"?",
-          "a": "Porque Ele nos comprou e resgatou, corpo e alma, dos nossos pecados e de todo o domínio do diabo, não com ouro ou prata, mas com seu precioso sangue. Assim pertencemos a Ele(1). (1) Jo 20:28; 1Co 6:20; 1Co 7:23; Ef 1:7; 1Tm 2:6; 1Pe 1:18,19; 1Pe 2:9."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 14",
-      "items": [
+          "q": "O nome\"Cristo\" significa\"Ungido\". Por que Jesus tem também este nome?",
+          "a": "Porque Ele foi ordenado por Deus Pai e ungido com o Espírito Santo para ser nosso supremo Profeta e Mestre, nosso único Sumo Sacerdote e nosso eterno Rei."
+        },
         {
-          "q": "O que você entende, quando diz que Cristo \"foi concebido pelo Espírito Santo e nasceu da virgem Maria\"?",
-          "a": "Entendo que o eterno Filho de Deus, que é e permanece verdadeiro e eterno Deus(1), tornou-se verdadeiro homem (2) , da carne e do sangue da virgem Maria (3) , por obra do Espírito Santo. Assim Ele é, de fato, o descendente de Davi (4) igual a seus irmãos em tudo, mas sem pecado (5). (1) Mt 1:23; Mt 3:17; Mt 16:16; Mt 17:5; Mc 1:11; Jo 1:1 Jo 17:3,5; Jo 20:28; Rm 1:3,4; Rm 9:5; Fp 2:6; Cl 1:15,16; Tt 2:13; Hb 1:3; 1Jo 5:20. (2) Mt 1:18,20; Lc 1:35. (3) Lc 1:31,42,43; Jo 1:14; Gl 4:4. (4) 2Sm 7:12; Sl 132:11; Mt 1:1; Lc 1:32; At 2:30,31; Rm 1:3. (5) Fp 2:7; Hb 2:14,17; Hb 4:15; Hb 7:26,27."
+          "q": "Por que você é chamado cristão?",
+          "a": "Porque pela fé sou membro de Cristo e, por isso, também sou ungido para ser profeta, sacerdote e rei. Como profeta confesso o nome dEle; Como sacerdote ofereço minha vida a Ele como sacrifício vivo de gratidão; e como rei combato, nesta vida, o pecado e o diabo, de livre consciência, e depois, na vida eterna, vou reinar com Ele sobre todas as criaturas."
+        },
+        {
+          "q": "Por que Cristo é chamado\"o único Filho de Deus\", se nós também somos filhos de Deus?",
+          "a": "Porque só Cristo é, por natureza, o Filho eterno de Deus. Nós, porém, somos filhos adotivos de Deus, pela graça, por causa de Cristo."
+        },
+        {
+          "q": "Por que você chama Cristo\"nosso Senhor\"?",
+          "a": "Porque Ele nos comprou e resgatou, corpo e alma, dos nossos pecados e de todo o domínio do diabo, não com ouro ou prata, mas com seu precioso sangue. Assim pertencemos a Ele."
+        },
+        {
+          "q": "O que você entende, quando diz que Cristo\"foi concebido pelo Espírito Santo e nasceu da virgem Maria\"?",
+          "a": "Entendo que o eterno Filho de Deus, que é e permanece verdadeiro e eterno Deus, tornou-se verdadeiro homem, da carne e do sangue da virgem Maria, por obra do Espírito Santo. Assim Ele é, de fato, o descendente de Davi igual a seus irmãos em tudo, mas sem pecado."
         },
         {
           "q": "Que importância tem para você Cristo ter sido concebido e nascido sem pecado?",
-          "a": "Que Ele e nosso Mediador(1) e com sua inocência e perfeita santidade, cobre diante de Deus meu pecado (2) no qual fui concebido e nascido. (1) Hb 2:16-18; Hb 7:26,27. (2) Sl 32:1; Is 53:11; Rm 8:3,4; 1Co 1:30,31; Gl 4:4,5; 1Pe 1:18,19; 1Pe 3:18."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 15",
-      "items": [
-        {
-          "q": "Por que Ele padeceu \"sob Pôncio Pilatos\"?",
-          "a": "Cristo, embora julgado inocente, foi condenado pelo juiz oficial (1) , para que nos libertasse do severo juízo de Deus que devia cair sobre nós (2). (1) Mt 27:24; Lc 23:13-15; Jo 18:38; Jo 19:4; Jo 19:11. (2) Is 53:4,5; 2Co 5:21; Gl 3:13."
+          "a": "Que Ele e nosso Mediador e com sua inocência e perfeita santidade, cobre diante de Deus meu pecado no qual fui concebido e nascido."
         },
         {
-          "q": "Cristo \"foi crucificado\". Isto tem mais sentido do que morrer de outra maneira?",
-          "a": "Tem sim, porque pela crucificação tenho certeza de que Ele tomou sobre si (1) a maldição que pesava sobre mim. Pois a morte da cruz era maldita por Deus (2). (1) Gl 3:13. (2) Dt 21:23."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 16",
-      "items": [
+          "q": "Por que Ele padeceu\"sob Pôncio Pilatos\"?",
+          "a": "Cristo, embora julgado inocente, foi condenado pelo juiz oficial, para que nos libertasse do severo juízo de Deus que devia cair sobre nós."
+        },
+        {
+          "q": "Cristo\"foi crucificado\". Isto tem mais sentido do que morrer de outra maneira?",
+          "a": "Tem sim, porque pela crucificação tenho certeza de que Ele tomou sobre si a maldição que pesava sobre mim. Pois a morte da cruz era maldita por Deus."
+        },
         {
           "q": "Por que Cristo devia sofrer a morte?",
-          "a": "Porque a justiça e a verdade de Deus(1) exigiam a morte do Filho de Deus; não houve outro meio de pagar nossos pecados (2). (1) Gn 2:17. (2) Rm 8:3,4; Fp 2:8; Hb 2:9,14,15."
+          "a": "Porque a justiça e a verdade de Deus exigiam a morte do Filho de Deus; não houve outro meio de pagar nossos pecados."
         },
         {
-          "q": "Por que Ele foi \"sepultado\"?",
-          "a": "Para dar testemunho de que estava realmente morto(1). (1) Mt 27:59,60; Lc 23:53; Jo 19:40-42; At 13:29; 1Co 15:3,4."
+          "q": "Por que Ele foi\"sepultado\"?",
+          "a": "Para dar testemunho de que estava realmente morto."
         },
         {
           "q": "Se Cristo morreu por nós, por que devemos nós morrer também?",
-          "a": "Nossa morte não é para pagar nossos pecados(1), mas somente significa que morremos para o pecado e que passamos para a vida eterna (2). (1) Mc 8:37. (2) Jo 5:24; Rm 7:24,25; Fp 1:23."
+          "a": "Nossa morte não é para pagar nossos pecados, mas somente significa que morremos para o pecado e que passamos para a vida eterna."
         },
         {
           "q": "Que importância tem, para nós, o sacrifício e a morte de Cristo na cruz?",
-          "a": "Pelo poder de Cristo, nosso velho homem é crucificado, morto e sepultado com Ele(1), para que os maus desejos da carne não mais nos dominem (2) , mas que nos ofereçamos a Ele, como sacrifício de gratidão (3). (1) Rm 6:6. (2) Rm 6:8,11,12. (3) Rm 12:1."
+          "a": "Pelo poder de Cristo, nosso velho homem é crucificado, morto e sepultado com Ele, para que os maus desejos da carne não mais nos dominem, mas que nos ofereçamos a Ele, como sacrifício de gratidão."
         },
         {
-          "q": "Por que se acrescenta: \"desceu ao inferno\"?",
-          "a": "Porque meu Senhor Jesus Cristo sofreu, principalmente na cruz inexprimíveis angústias, dores e terrores(1). Por isso, até nas minhas mais duras tentações, tenho a certeza de que Ele me libertou da angústia e do tormento do inferno (2). (1) Mt 26:38; Mt 27:46; Hb 5:7. (2) Is 53:5."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 17",
-      "items": [
+          "q": "Por que se acrescenta:\"desceu ao inferno\"?",
+          "a": "Porque meu Senhor Jesus Cristo sofreu, principalmente na cruz inexprimíveis angústias, dores e terrores. Por isso, até nas minhas mais duras tentações, tenho a certeza de que Ele me libertou da angústia e do tormento do inferno."
+        },
         {
           "q": "Que importância tem, para nós, a ressurreição de Cristo?",
-          "a": "Primeiro: pela ressurreição, Ele venceu a morte, para que nós pudéssemos participar da justiça, que Ele conquistou por sua morte (1). Segundo: nos também, por seu poder, somos ressuscitados para a nova vida (2). Terceiro: a ressurreição de Cristo é uma garantia de nossa ressurreição em glória (3). (1) Rm 4:25; 1Co 15:16-18; 1Pe 1:3. (2) Rm 6:4; Cl 3:1-3; Ef 2:4-6; (3) Rm 8:11; 1Co 15:20-22."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 18",
-      "items": [
-        {
-          "q": "O que você quer dizer com as palavras: \"subiu ao céu\"?",
-          "a": "Que Cristo, à vista de seus discípulos, foi elevado da terra ao céu(1) e lá esta para nosso bem (2) , até que volte para julgar os vivos e os mortos (3). (1) Mt 16:19; Lc 24:51; At 1:9. (2) Rm 8:34; Ef 4:10; Cl 3:1; Hb 4:14; Hb 7:24,25; Hb 9:24. (3) Mt 24:30; At 1:11."
+          "a": "Primeiro: pela ressurreição, Ele venceu a morte, para que nós pudéssemos participar da justiça, que Ele conquistou por sua morte. Segundo: nos também, por seu poder, somos ressuscitados para a nova vida. Terceiro: a ressurreição de Cristo é uma garantia de nossa ressurreição em glória."
         },
         {
-          "q": "Cristo, então, não está conosco até o fim do mundo, como nos prometeu(1)?",
-          "a": "Cristo é verdadeiro homem e verdadeiro Deus. Segundo sua natureza humana não está agora na terra (2) , mas segundo sua divindade, majestade, graça e Espirito jamais se afasta de nós (3). (1) Mt 28:20. (2) Mt 26:11; Jo 16:28; Jo 17:11; At 3:21; Hb 8:4. (3) Mt 28:20; Jo 14:16-18; Jo 16:13; Ef 4:8."
+          "q": "O que você quer dizer com as palavras:\"subiu ao céu\"?",
+          "a": "Que Cristo, à vista de seus discípulos, foi elevado da terra ao céu e lá esta para nosso bem, até que volte para julgar os vivos e os mortos."
+        },
+        {
+          "q": "Cristo, então, não está conosco até o fim do mundo, como nos prometeu?",
+          "a": "Cristo é verdadeiro homem e verdadeiro Deus. Segundo sua natureza humana não está agora na terra, mas segundo sua divindade, majestade, graça e Espirito jamais se afasta de nós."
         },
         {
           "q": "Mas se a natureza humana não está em todo lugar onde a natureza divina está, as duas naturezas de Cristo não são separadas uma da outra?",
-          "a": "De maneira nenhuma; a natureza divina de Cristo não pode ser limitada e está presente em todo lugar. Por isso, podemos concluir que a natureza divina dEle está na sua natureza humana e permanece pessoalmente unida a ela, embora também esteja fora dela (2). (1) Is 66:1; Jr 23:23,24; At 7:49; At 17:27,28. (2) Mt 28:6; Jo 3:13; Jo 11:15; Cl 2:8."
+          "a": "De maneira nenhuma; a natureza divina de Cristo não pode ser limitada e está presente em todo lugar. Por isso, podemos concluir que a natureza divina dEle está na sua natureza humana e permanece pessoalmente unida a ela, embora também esteja fora dela."
         },
         {
           "q": "Que importância tem, para nós, a ascensão de Cristo?",
-          "a": "Primeiro: Ele é, no céu, nosso Advogado junto a seu Pai(1). Segundo: em Cristo temos nossa carne no céu, como garantia segura de que Ele, como nosso Cabeça, também nos levará para si, como seus membros (2). Terceiro: Ele nos envia seu Espírito, como garantia (3) , pelo poder do Espírito buscamos as coisas que são do alto, onde Cristo está sentado a direita de Deus, e não as coisas que são da terra (4). (1) Rm 8:34; 1Jo 2:1. (2) Jo 14:2,3; Jo 17:24; Ef 2:6. (3) Jo 14:16; Jo 16:7; At 2:33; 2Co 1:22; 2Co 5:5. (4) Fp 3:20; Cl 3:1."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 19",
-      "items": [
+          "a": "Primeiro: Ele é, no céu, nosso Advogado junto a seu Pai. Segundo: em Cristo temos nossa carne no céu, como garantia segura de que Ele, como nosso Cabeça, também nos levará para si, como seus membros. Terceiro: Ele nos envia seu Espírito, como garantia, pelo poder do Espírito buscamos as coisas que são do alto, onde Cristo está sentado a direita de Deus, e não as coisas que são da terra."
+        },
         {
-          "q": "Por que se acrescenta: \"e está sentado à direita de Deus\"?",
-          "a": "Porque Cristo subiu ao céu para mani festar-se, lá mesmo, como o Cabeça de sua igreja cristã(1) e para governar tudo em nome de seu Pai (2). (1) Ef 1:20-23; Cl 1:18. (2) Mt 28:18; Jo 5:22."
+          "q": "Por que se acrescenta:\"e está sentado à direita de Deus\"?",
+          "a": "Porque Cristo subiu ao céu para mani festar-se, lá mesmo, como o Cabeça de sua igreja cristã e para governar tudo em nome de seu Pai."
         },
         {
           "q": "Que importância tem, para nós, essa glória de Cristo, nosso Cabeça?",
-          "a": "Primeiro: por seu Espírito Santo, Ele derrama sobre nós, seus membros, os dons celestiais(1). Segundo: Ele nos defende e protege, por seu poder, contra todos os inimigos (2). (1) At 2:33; Ef 4:8,10-12. (2) Sl 2:9; Sl 110:1,2; Jo 10:28; Ef 4:8; Ap 12:5."
+          "a": "Primeiro: por seu Espírito Santo, Ele derrama sobre nós, seus membros, os dons celestiais. Segundo: Ele nos defende e protege, por seu poder, contra todos os inimigos."
         },
         {
-          "q": "Que consolo traz a você a volta de Cristo \"para julgar os vivos e os mortos\"?",
-          "a": "Que, em toda miséria e perseguição, espero, de cabeça erguida, o Juiz que vem do céu, a saber: o Cristo que antes se apresentou em meu lugar ao tribunal de Deus e tirou de mim toda a maldição (1). Ele lançará, na condenação eterna, todos os seus e meus inimigos (2) , mas Ele me levará para si mesmo, com todos os eleitos na alegria e glória celestiais (3). (1) Lc 21:28; Rm 8:23,24; Fp 3:20; 1Ts 4:16; Tt 2:13. (2) Mt 25:41-43; 2Ts 1:6,8,9. (3) Mt 25:34-36; 2Ts 1:7,10. DEUS ESPÍRITO SANTO E NOSSA SANTIFICAÇÃO"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 20",
-      "items": [
+          "q": "Que consolo traz a você a volta de Cristo\"para julgar os vivos e os mortos\"?",
+          "a": "Que, em toda miséria e perseguição, espero, de cabeça erguida, o Juiz que vem do céu, a saber: o Cristo que antes se apresentou em meu lugar ao tribunal de Deus e tirou de mim toda a maldição."
+        },
         {
           "q": "O que você crê sobre o Espírito Santo?",
-          "a": "Primeiro: creio que Ele é verdadeiro e eterno Deus com o Pai e o Filho (1). Segundo: que Ele foi dado também a mim (2). Por uma verdadeira fé, Ele me torna participante de Cristo e de todos os seus benefícios (3). Ele me fortalece (4) e fica comigo para sempre (4). (1) Gn 1:2; At 5:3,4; 1Co 2:10; 1Co 3:16; 1Co 6:19. (2) Mt 28:19; 2Co 1:21,22 Gl 3:14; Gl 4:6; Ef 1:13. (3) Jo 16:14; 1Co 2:12; 1Pe 1:2. (4) Jo 15:26; At 9:31. (5) Jo 14:16,17; 1Pe 4:14."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 21",
-      "items": [
-        {
-          "q": "O que você crê sobre \"a santa igreja universal de Cristo\"?",
-          "a": "Creio que o Filho de Deus (1) reúne, protege e conserva (2) , dentre todo o gênero humano (3) , sua comunidade (4) eleita para a vida eterna (5). Isto Ele fez por seu Espírito e sua Palavra (6) , na unidade da verdadeira fe (7) , desde o princípio do mundo até o fim (8). Creio que sou membro vivo (9) dessa igreja, agora e para semprel0). (1) Jo 10:11; Ef 4:11-13; Ef 5:25,26. (2) Sl 129:4,5; Mt 16:18; Jo 10:16,28. (3) Gn 26:4; Is 49:6; Rm 10:12,13; Ap 5:9. (4) Sl 111:1; At 20:28; Hb 12:22,23. (5) Rm 8:29,30; Ef 1:10-14; 1Pe 2:9. (6) Is 59:21; Rm 1:16; Rm 10:14-17; Ef 5:26. (7) Jo 17:21; At 2:42; Ef 4:3-6; 1Tm 3:15. (8) Is 59:21; 1Cor 11:26 (9) Rm 8:10; 1Jo 3:14,19-21. (10) Sl 23:6; Jo 10:28; Rm 8:35-39; 1Co 1:8,9; 1Pe 1:5; 1Jo 2:19."
+          "a": "Primeiro: creio que Ele é verdadeiro e eterno Deus com o Pai e o Filho. Segundo: que Ele foi dado também a mim. Por uma verdadeira fé, Ele me torna participante de Cristo e de todos os seus benefícios. Ele me fortalece e fica comigo para sempre."
         },
         {
-          "q": "Como você entende as palavras: \"a comunhão dos santos\"?",
-          "a": "Primeiro: entendo que todos os crentes, juntos e cada um por si, têm, como membros, comunhão com Cristo, o Senhor, e todos os seus ricos dons (1). Segundo: que todos devem sentir-se obrigados a usar seus dons com vontade e alegria para o bem dos outros membros (2). (1) Rm 8:32; 1Co 6:17; 1Co 12:12,13; 1Jo 1:3. (2) 1Co 12:21; 1Co 13:1-7; Fp 2:2-5."
+          "q": "O que você crê sobre\"a santa igreja universal de Cristo\"?",
+          "a": "Creio que o Filho de Deus reúne, protege e conserva, dentre todo o gênero humano, sua comunidade eleita para a vida eterna. Isto Ele fez por seu Espírito e sua Palavra, na unidade da verdadeira fe, desde o princípio do mundo até o fim. Creio que sou membro vivo dessa igreja, agora e para semprel0)."
         },
         {
-          "q": "O que você crê sobre \"a remissão dos pecados\"?",
-          "a": "Creio que Deus, por causa da satisfação em Cristo, jamais quer lembrar-se de meus pecados (1) e de minha natureza pecaminosa (2) , que devo combater durante toda a minha vida. Mas Ele me dá a justiça de Cristo (3) , pela graça, e assim nunca mais serei condenado por Deus (4). (1) Sl 103:3,10,12; Jr 31:34; Mq 7:19; 2Co 5:19. (2) Rm 7:23-25. (3) 2Co 5:21; 1Jo 1:7; 1Jo 2:1,2. (4) Jo 3:18; Jo 5:24."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 22",
-      "items": [
-        {
-          "q": "Que consolo traz a você \"a ressurreição da carne\"?",
-          "a": "Meu consolo é que depois desta vida minha alma será imediatamente elevada para Cristo, seu Cabeça (1). E que também esta minha carne, ressuscitada pelo poder de Cristo, será unida novamente à minha alma e se tornará semelhante ao corpo glorioso de Cristo (2). (1) Lc 16:22; Lc 20:37,38; Lc 23:43; Fp 1:21,23; Ap 14:13. (2) Jó 19:25-27; 1Co 15:53,54; Fp 3:21; 1Jo 3:2."
+          "q": "Como você entende as palavras:\"a comunhão dos santos\"?",
+          "a": "Primeiro: entendo que todos os crentes, juntos e cada um por si, têm, como membros, comunhão com Cristo, o Senhor, e todos os seus ricos dons. Segundo: que todos devem sentir-se obrigados a usar seus dons com vontade e alegria para o bem dos outros membros."
         },
         {
-          "q": "Que consolo traz a você o artigo sobre a vida eterna ?",
-          "a": "Meu consolo é que, como já percebo no meu coração o início da alegria eterna (1) , depois desta vida terei a salvação perfeita. Esta salvação nenhum olho jamais viu, nenhum ouvido ouviu e jamais surgiu no coração de alguém. Então louvarei a Deus eternamente (2). (1) Jo 17 3; 2Co 5:2,3. (2) Jo 17:24; 1Co 2:9. A JUSTIFICAÇÃO"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 23",
-      "items": [
+          "q": "O que você crê sobre\"a remissão dos pecados\"?",
+          "a": "Creio que Deus, por causa da satisfação em Cristo, jamais quer lembrar-se de meus pecados e de minha natureza pecaminosa, que devo combater durante toda a minha vida. Mas Ele me dá a justiça de Cristo, pela graça, e assim nunca mais serei condenado por Deus."
+        },
+        {
+          "q": "Que consolo traz a você\"a ressurreição da carne\"?",
+          "a": "Meu consolo é que depois desta vida minha alma será imediatamente elevada para Cristo, seu Cabeça. E que também esta minha carne, ressuscitada pelo poder de Cristo, será unida novamente à minha alma e se tornará semelhante ao corpo glorioso de Cristo."
+        },
+        {
+          "q": "Que consolo traz a você o artigo sobre a vida eterna?",
+          "a": "Meu consolo é que, como já percebo no meu coração o início da alegria eterna, depois desta vida terei a salvação perfeita. Esta salvação nenhum olho jamais viu, nenhum ouvido ouviu e jamais surgiu no coração de alguém. Então louvarei a Deus eternamente."
+        },
         {
           "q": "Mas que proveito tem sua fé no Evangelho?",
-          "a": "O proveito é que sou justo perante Deus, em Cristo, e herdeiro da vida eterna (1). (1) Hc 2:4; Jo 3:36; Rm 1:17."
+          "a": "O proveito é que sou justo perante Deus, em Cristo, e herdeiro da vida eterna."
         },
         {
           "q": "Como você é justo perante Deus?",
-          "a": "Somente por verdadeira fé em Jesus Cristo (1). Mesmo que minha consciência me acuse de ter pecado gravemente contra todos os mandamentos de Deus, e de não ter guardado nenhum deles, e de ser ainda inclinado a todo mal (2) , todavia Deus me dá, sem nenhum mérito meu, por pura graça (3) , a perfeita satisfação, a justiça e a santidade de Cristo (4). Deus me trata (5) como se eu nunca tivesse cometido pecado algum ou jamais tivesse sido pecador; e, como se pessoalmente eu tivesse cumprido toda a obediência que Cristo cumpriu por mim (6). Este benefício é meu somente se eu o aceitar por fé, de todo o coração (7). (1) Rm 3:21-26; Rm 5:1,2; Gl 2:16; Ef 2:8,9; Fp 3:9. (2) Rm 3:9; Rm 7:23. (3) Dt 9:6; Ez 36:22; Rm 3:24; Rm 7:23-25; Ef 2:8; Tt 3:5. (4) 1Jo 2:1,2. (5) Rm 4:4-8; 2Co 5:19. (6) 2Co 5:21. (7) Jo 3:18; Rm 3:22."
+          "a": "Somente por verdadeira fé em Jesus Cristo."
         },
         {
           "q": "Por que você diz que é justo somente pela fé?",
-          "a": "Eu o digo não porque sou agradável a Deus graças ao valor da minha fé, mas porque somente a satisfação por Cristo e a justiça e santidade dEle me justificam perante Deus (1). Somente pela fé posso aceitar e possuir esta justificação (2). (1) 1Co 1:30; 1Co 2:2. (2) 1Jo 5:10."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 24",
-      "items": [
+          "a": "Eu o digo não porque sou agradável a Deus graças ao valor da minha fé, mas porque somente a satisfação por Cristo e a justiça e santidade dEle me justificam perante Deus. Somente pela fé posso aceitar e possuir esta justificação."
+        },
         {
           "q": "Mas por que nossas boas obras não nos podem justificar perante Deus, pelo menos em parte?",
-          "a": "Porque a justiça que pode subsistir perante o juízo de Deus deve ser absolutamente perfeita e completamente conforme a lei de Deus (1). Entretanto, nesta vida, todas as nossas obras, até as melhores, são imperfeitas e manchadas por pecados (2). (1) Dt 27:26; Gl 3:10. (2) Is 64:6."
+          "a": "Porque a justiça que pode subsistir perante o juízo de Deus deve ser absolutamente perfeita e completamente conforme a lei de Deus. Entretanto, nesta vida, todas as nossas obras, até as melhores, são imperfeitas e manchadas por pecados."
         },
         {
           "q": "Nossas boas obras, então, não têm mérito? Deus não promete recompensá-las, nesta vida e na futura?",
-          "a": "Essa recompensa não nos é dada por mérito, mas por graça (1). (1) Lc 17:10."
+          "a": "Essa recompensa não nos é dada por mérito, mas por graça."
         },
         {
           "q": "Mas essa doutrina não faz com que os homens se tornem descuidosos e ímpios?",
-          "a": "Não, pois é impossível que aqueles que estão implantados em Cristo, por verdadeira fé, deixem de produzir frutos de gratidão (1). (1) Mt 7:18; Jo 15:5. A PALAVRA E OS SACRAMENTOS"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 25",
-      "items": [
+          "a": "Não, pois é impossível que aqueles que estão implantados em Cristo, por verdadeira fé, deixem de produzir frutos de gratidão."
+        },
         {
           "q": "Visto que somente a fé nos faz participar de Cristo e de todos os seus benefícios, de onde vem esta fé?",
-          "a": "Vem do Espírito Santo (1) que a produz em nossos corações pela pregação do Evangelho (2) , e a fortalece pelo uso dos sacramentos (3). (1) Jo 3:5; 1Co 2:12; 1Co 12:3; Ef 1:17, 18; Ef 2:8; Fp 1:29. (2) At 16:14; Rm 10:17; 1Pe 1:23. (3) Mt 28:19."
+          "a": "Vem do Espírito Santo que a produz em nossos corações pela pregação do Evangelho, e a fortalece pelo uso dos sacramentos."
         },
         {
           "q": "Que são sacramentos?",
-          "a": "São visíveis e santos sinais e selos. Deus os instituiu para nos fazer compreender melhor e para garantir a promessa do Evangelho, pelo uso deles. Essa promessa é que Deus nos dá, de graça, o perdão dos pecados e a vida eterna, por causa do único sacrifício de Cristo na cruz (1). (1) Gn 17:11; Lv 6:25; Dt 30:6; Is 6:6,7; Is 54:9; Ez 20:12; Rm 4:11; Hb 9:7,9; Hb 9:24."
+          "a": "São visíveis e santos sinais e selos. Deus os instituiu para nos fazer compreender melhor e para garantir a promessa do Evangelho, pelo uso deles. Essa promessa é que Deus nos dá, de graça, o perdão dos pecados e a vida eterna, por causa do único sacrifício de Cristo na cruz."
         },
         {
-          "q": "Então, tanto a Palavra como os sacramentos têm a finalidade de apontar nossa fé para o sacrifício de Jesus Cristo na cruz, como o único fundamento de nossa salvação (1) ?",
-          "a": "Sim, pois o Espírito Santo ensina no Evangelho e confirma pelos sacramentos que toda a nossa salvação está baseada no único sacrifício de Cristo na cruz. (1) Rm 6:3; Gl 3:27."
+          "q": "Então, tanto a Palavra como os sacramentos têm a finalidade de apontar nossa fé para o sacrifício de Jesus Cristo na cruz, como o único fundamento de nossa salvação?",
+          "a": "Sim, pois o Espírito Santo ensina no Evangelho e confirma pelos sacramentos que toda a nossa salvação está baseada no único sacrifício de Cristo na cruz."
         },
         {
           "q": "Quantos sacramentos Cristo instituiu na nova aliança?",
-          "a": "Dois: o santo batismo e a santa ceia. O SANTO BATISMO"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 26",
-      "items": [
+          "a": "Dois: o santo batismo e a santa ceia."
+        },
         {
           "q": "Como o batismo ensina e garante a você que o único sacrifício de Cristo na cruz é para seu bem?",
-          "a": "Cristo instituiu essa lavagem com água (1) e acrescentou a promessa de lavar, com seu sangue e Espírito, a impureza da minha alma (isto é, todos os meus pecados) (2) tão certo como por fora fico limpo com a água que tira a sujeira do corpo. (1) Mt 28:19. (2) Mt 3:11; Mc 1:4; Mc 16:16; Lc 3:3; Jo 1:33; At 2:38; Rm 6:3,4; 1Pe 3:21."
+          "a": "Cristo instituiu essa lavagem com água e acrescentou a promessa de lavar, com seu sangue e Espírito, a impureza da minha alma (isto é, todos os meus pecados) tão certo como por fora fico limpo com a água que tira a sujeira do corpo."
         },
         {
           "q": "O que significa ser lavado com o sangue e o Espírito de Cristo?",
-          "a": "Significa receber perdão dos pecados, pela graça de Deus, por causa do sangue de Cristo, que Ele derramou por nós, em seu sacrifício na cruz (1). Significa também ser renovado pelo Espírito Santo e santificado para ser membro de Cristo. Assim morremos mais e mais para o pecado e levamos uma vida santa e irrepreensível (2). (1) Ez 36:25; Zc 13:1; Hb 12:24; 1Pe 1:2; Ap 1:5; Ap 7:14. (2) Ez 36:26,27; Jo 1:33; Jo 3:5; Rm 6:4; 1Co 6:11; 1Co 12:13; Cl 2:11,12."
+          "a": "Significa receber perdão dos pecados, pela graça de Deus, por causa do sangue de Cristo, que Ele derramou por nós, em seu sacrifício na cruz. Significa também ser renovado pelo Espírito Santo e santificado para ser membro de Cristo. Assim morremos mais e mais para o pecado e levamos uma vida santa e irrepreensível."
         },
         {
           "q": "Onde Cristo prometeu lavar-nos com seu sangue e seu Espírito, tão certo como somos lavados com a água do batismo?",
-          "a": "Na instituição do batismo, onde Ele diz: \"Ide, portanto, fazei discípulos de todas as nações, batizando-os em nome do Pai e do Filho e do Espírito Santo\" (Mateus 28:19). \"Quem crer e for batizado será salvo; quem, porem, não crer será condenado\" (Marcos 16:16). Esta promessa se repete também onde a Escritura chama o batismo de \"lavagem da regeneração\" (Tito 3:5) e de \"purificação dos pecados\" (Atos 22:16)."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 27",
-      "items": [
-        {
-          "q": "Então, a própria água do batismo é a purificação dos pecados?",
-          "a": "Não (1) , pois somente o sangue de Jesus Cristo e o Espírito Santo nos purificam de todos os pecados (2). (1) Mt 3:11; Ef 5:26; 1Pe 3:21. (2) 1Co 6:11; 1Jo 1:7."
+          "a": "Na instituição do batismo, onde Ele diz:\"Ide, portanto, fazei discípulos de todas as nações, batizando-os em nome do Pai e do Filho e do Espírito Santo\" (Mateus 28:19).\"Quem crer e for batizado será salvo; quem, porem, não crer será condenado\" (Marcos 16:16). Esta promessa se repete também onde a Escritura chama o batismo de\"lavagem da regeneração\" (Tito 3:5) e de\"purificação dos pecados\" (Atos 22:16)."
         },
         {
-          "q": "Por que, então, o Espírito Santo chama o batismo \"lavagem da regeneração\" e \"purificação dos pecados\"?",
-          "a": "É por motivo muito sério que Deus fala assim. Ele nos quer ensinar que nossos pecados são tirados pelo sangue e Espírito de Cristo assim como a sujeira do corpo é tirada por água (1). E, ainda mais, Ele nos quer assegurar por este divino sinal e garantia que somos lavados espiritualmente dos nossos pecados tão realmente como nosso corpo fica limpo com água (2). (1) 1Co 6:11; Ap 1:5; Ap 7:14. (2) Mt 16:16; Gl 3:27."
+          "q": "Então, a própria água do batismo é a purificação dos pecados?",
+          "a": "Não, pois somente o sangue de Jesus Cristo e o Espírito Santo nos purificam de todos os pecados."
+        },
+        {
+          "q": "Por que, então, o Espírito Santo chama o batismo\"lavagem da regeneração\" e\"purificação dos pecados\"?",
+          "a": "É por motivo muito sério que Deus fala assim. Ele nos quer ensinar que nossos pecados são tirados pelo sangue e Espírito de Cristo assim como a sujeira do corpo é tirada por água. E, ainda mais, Ele nos quer assegurar por este divino sinal e garantia que somos lavados espiritualmente dos nossos pecados tão realmente como nosso corpo fica limpo com água."
         },
         {
           "q": "As crianças pequenas devem ser batizadas?",
-          "a": "Devem, sim, porque tanto as crianças como os adultos pertencem à aliança de Deus e à sua igreja (1). Também a elas como aos adultos são prometidos, no sangue de Cristo, a salvação do pecado e o Espírito Santo que produz a fé (2). Por isso, as crianças, pelo batismo como sinal da aliança, devem ser incorporadas à igreja cristã e distinguidas dos filhos dos incrédulos (3). Na época do Antigo Testamento se fazia isto pela circuncisão (4). No Novo Testamento foi instituído o batismo, no lugar da circuncisão (5). (1) Gn 17:7. (2) Sl 22:10; Is 44:1-3; Mt 19:14; At 2:39. (3) At 10:47. (4) Gn 17:14. (5) Cl 2:11,12. A SANTA CEIA"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 28",
-      "items": [
+          "a": "Devem, sim, porque tanto as crianças como os adultos pertencem à aliança de Deus e à sua igreja. Também a elas como aos adultos são prometidos, no sangue de Cristo, a salvação do pecado e o Espírito Santo que produz a fé."
+        },
         {
           "q": "Como a santa ceia ensina e garante que você tem parte no único sacrifício de Cristo na cruz e em todos os seus benefícios?",
-          "a": "Da seguinte maneira: Cristo me mandou, assim como a todos os fiéis, comer do pão partido e beber do cálice, em sua memória. E Ele acrescentou esta promessa: Primeiro, que, por mim, seu corpo foi sacrificado na cruz e que, por mim, seu sangue foi derramado, tão certo como vejo com meus olhos que o pão do Senhor é partido para mim e o cálice me é dado. Segundo, que Ele mesmo alimenta e sacia minha alma para a vida eterna com seu corpo crucificado e seu sangue derramado, tão certo como recebo da mão do ministro e tomo com minha boca o pão e o cálice do Senhor. Eles são sinais seguros do corpo e do sangue de Cristo (1). (1) Mt 26:26-28; Mc 14:22-24; Lc 22:19,20; 1Co 10:16,17; 1Co 11:23-25."
+          "a": "Da seguinte maneira: Cristo me mandou, assim como a todos os fiéis, comer do pão partido e beber do cálice, em sua memória. E Ele acrescentou esta promessa: Primeiro, que, por mim, seu corpo foi sacrificado na cruz e que, por mim, seu sangue foi derramado, tão certo como vejo com meus olhos que o pão do Senhor é partido para mim e o cálice me é dado. Segundo, que Ele mesmo alimenta e sacia minha alma para a vida eterna com seu corpo crucificado e seu sangue derramado, tão certo como recebo da mão do ministro e tomo com minha boca o pão e o cálice do Senhor. Eles são sinais seguros do corpo e do sangue de Cristo."
         },
         {
           "q": "O que significa comer o corpo cruci ficado de Cristo e beber seu sangue derramado?",
-          "a": "Significa aceitar com verdadeira fé todo o sofrimento e morte de Cristo e assim receber o perdão dos pecados e a vida eterna (1). Significa também ser unido cada vez mais ao santo corpo de Cristo (2) , pelo Espírito Santo que habita tanto nEle como em nós. Assim somos carne de sua carne e osso de seus ossos (3) mesmo que Cristo esteja no céu (4) e nós na terra; e vivemos eternamente e somos governados por um só Espírito, como os membros do nosso corpo o são por uma só alma (5). (1) Jo 6:35,40,47-54. (2) Jo 6:55,56. (3) Jo 14:23; 1Co 6:15,17,19; Ef 3:16,17; Ef 5:29,30; 1Jo 3:24; 1Jo 4:13. (4) At 1:9,11; At 3:21; 1Co 11:26; Cl 3:1. (5) Jo 6:57; Jo 15:1-6; Ef 4:15,16."
+          "a": "Significa aceitar com verdadeira fé todo o sofrimento e morte de Cristo e assim receber o perdão dos pecados e a vida eterna. Significa também ser unido cada vez mais ao santo corpo de Cristo, pelo Espírito Santo que habita tanto nEle como em nós. Assim somos carne de sua carne e osso de seus ossos mesmo que Cristo esteja no céu e nós na terra; e vivemos eternamente e somos governados por um só Espírito, como os membros do nosso corpo o são por uma só alma."
         },
         {
           "q": "Onde Cristo prometeu alimentar e saciar os fieis com seu corpo e seu sangue, tão certo como eles comem do pão partido e bebem do cálice?",
-          "a": "Nas palavras da instituição da ceia, que são :\"O Senhor Jesus, na noite em que foi traído, tomou o pão; e, tendo dado graças, o partiu e disse: Isto é o meu corpo que é dado por vós; fazei isto em memória de mim. Por semelhante modo, depois de haver ceado, tomou também o cálice, dizendo: Este cálice é a nova aliança no meu sangue; fazei isto, todas as vezes que o beberdes, em memória de mim. Porque todas as vezes que comerdes este pão e beberdes o cálice, anunciais a morte do Senhor, até que ele venha\" (1Coríntios 11:23-2 (6). O apóstolo Paulo já se tinha referido a esta promessa, dizendo: \"Porventura o cálice da bênção que abençoamos, não é a comunhão do sangue de Cristo? O pão que partimos, não é a comunhão do corpo de Cristo? Porque nós, embora muitos, somos unicamente um pão, um só corpo; porque todos participamos do único pão\" (1Coríntios 10:16,1) (7). (1) Mt 26:26-28; Mc 14:22-24; Lc 22-19,20."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 29",
-      "items": [
-        {
-          "q": "Pão e vinho, então, se transformam no próprio corpo e sangue de Cristo?",
-          "a": "Não (1). Neste ponto há igualdade entre o batismo e a ceia. A água do batismo não se transforma no sangue de Cristo, nem tira os pecados. Ela é somente um sinal divino e uma garantia disto (2). Igualmente o pão da santa ceia não se transforma no próprio corpo de Cristo (3) , mesmo que seja chamado \"corpo de Cristo\", conforme a natureza e o uso dos sacramentos (4). (1) Mt 26:29. (2) Ef 5:26; Tt 3:5. (3) 1Co 10:16; 1Co 11:26. (4) Gn 17:10,11; Êx 12: 11,13; Êx 12:26,27; Êx 13:9; Êx 24:8; At 22:16; 1Co 10:1-4; 1Pe 3:21."
+          "a": "Nas palavras da instituição da ceia, que são:\"O Senhor Jesus, na noite em que foi traído, tomou o pão; e, tendo dado graças, o partiu e disse: Isto é o meu corpo que é dado por vós; fazei isto em memória de mim. Por semelhante modo, depois de haver ceado, tomou também o cálice, dizendo: Este cálice é a nova aliança no meu sangue; fazei isto, todas as vezes que o beberdes, em memória de mim. Porque todas as vezes que comerdes este pão e beberdes o cálice, anunciais a morte do Senhor, até que ele venha\" (1Coríntios 11:23-2. O apóstolo Paulo já se tinha referido a esta promessa, dizendo:\"Porventura o cálice da bênção que abençoamos, não é a comunhão do sangue de Cristo? O pão que partimos, não é a comunhão do corpo de Cristo? Porque nós, embora muitos, somos unicamente um pão, um só corpo; porque todos participamos do único pão\" (1Coríntios 10:16,1)."
         },
         {
-          "q": "Por que, então, Cristo chama o pão \"seu corpo\" e o cálice \"seu sangue\" ou \"a nova aliança em seu sangue\", e por que Paulo fala sobre \"a comunhão do corpo e do sangue de Cristo\"?",
-          "a": "É por motivo muito sério que Cristo fala assim. Ele nos quer ensinar que seu corpo crucificado e seu sangue derramado são o verdadeiro alimento e bebida de nossas almas para a vida eterna, assim como pão e vinho mantêm a vida temporária (1). E, ainda mais, Ele nos quer assegurar por estes visíveis sinais e garantias,primeiro: que participamos de seu corpo e sangue, pela obra do Espírito Santo, tão realmente como recebemos com nossa própria boca estes santos sinais, em memória dEle (2) ;e segundo: que todo o seu sofrimento e obediência são nossos, tão certo, como se nós mesmos tivéssemos sofrido e pago por nossos pecados. (1) Jo 6:51,53-55. (2) 1Co 10:16."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 30",
-      "items": [
+          "q": "Pão e vinho, então, se transformam no próprio corpo e sangue de Cristo?",
+          "a": "Não. Neste ponto há igualdade entre o batismo e a ceia. A água do batismo não se transforma no sangue de Cristo, nem tira os pecados. Ela é somente um sinal divino e uma garantia disto. Igualmente o pão da santa ceia não se transforma no próprio corpo de Cristo, mesmo que seja chamado\"corpo de Cristo\", conforme a natureza e o uso dos sacramentos."
+        },
+        {
+          "q": "Por que, então, Cristo chama o pão\"seu corpo\" e o cálice\"seu sangue\" ou\"a nova aliança em seu sangue\", e por que Paulo fala sobre\"a comunhão do corpo e do sangue de Cristo\"?",
+          "a": "É por motivo muito sério que Cristo fala assim. Ele nos quer ensinar que seu corpo crucificado e seu sangue derramado são o verdadeiro alimento e bebida de nossas almas para a vida eterna, assim como pão e vinho mantêm a vida temporária. E, ainda mais, Ele nos quer assegurar por estes visíveis sinais e garantias,primeiro: que participamos de seu corpo e sangue, pela obra do Espírito Santo, tão realmente como recebemos com nossa própria boca estes santos sinais, em memória dEle;e segundo: que todo o seu sofrimento e obediência são nossos, tão certo, como se nós mesmos tivéssemos sofrido e pago por nossos pecados."
+        },
         {
           "q": "Que diferença há entre a ceia do Senhor e a missa do papa?",
-          "a": "A ceia do Senhor nos testemunha que temos completo perdão de todos os nossos pecados, pelo único sacrifício de Jesus Cristo, que Ele mesmo, uma única vez, realizou na cruz (1) ; e também que, pelo Espírito Santo, somos incorporados a Cristo, que agora, com seu verdadeiro corpo, não está na terra mas no céu, à direita do Pai (3) e lá quer ser adorado por nós (4). A missa, porem, ensina que Cristo deve ser sacrificado todo dia, pelos sacerdotes na missa, em favor dos vivos e dos mortos, e que estes, sem a missa, não tem perdão dos pecados pelo sofrimento de Cristo; e também, que Cristo está corporalmente presente sob a forma de pão e vinho e, por isso, neles deve ser adorado. A missa, então, no fundo, não é outra coisa senão a negação do único sacrifício e sofrimento de Cristo e uma idolatria abominável (5). (1) Mt 26:28; Lc 22:19,20; Jo 19:30; Hb 7:26,27; Hb 9:12; Hb 9:25-28; Hb 10:10,12,14. (2) 1Co 6:17; 1Co 10:16,17. (3) Jo 20:17; Cl 3:1; Hb 1:3; Hb 8:1,2. (4) At 7:55,56; Fp 3:20; Cl 3:1; 1Ts 1:10. (5) Hb 9:26; Hb 10:12,14."
+          "a": "A ceia do Senhor nos testemunha que temos completo perdão de todos os nossos pecados, pelo único sacrifício de Jesus Cristo, que Ele mesmo, uma única vez, realizou na cruz; e também que, pelo Espírito Santo, somos incorporados a Cristo, que agora, com seu verdadeiro corpo, não está na terra mas no céu, à direita do Pai e lá quer ser adorado por nós. A missa, porem, ensina que Cristo deve ser sacrificado todo dia, pelos sacerdotes na missa, em favor dos vivos e dos mortos, e que estes, sem a missa, não tem perdão dos pecados pelo sofrimento de Cristo; e também, que Cristo está corporalmente presente sob a forma de pão e vinho e, por isso, neles deve ser adorado. A missa, então, no fundo, não é outra coisa senão a negação do único sacrifício e sofrimento de Cristo e uma idolatria abominável."
         },
         {
           "q": "Quem deve vir a santa ceia?",
-          "a": "Aqueles que se aborrecem de si mesmos por causa dos seus pecados, mas confiam que estes lhes foram perdoados por amor de Cristo e que, também, as demais fraquezas são cobertas por seu sofrimento e sua morte; e que desejam, cada vez mais, fortalecer a fé e corrigir-se na vida. Mas os pecadores impenitentes e os hipócritas comem e bebem para sua própria condenação (1). (1) 1Co 10:19-22; 1Co 11:28,29."
+          "a": "Aqueles que se aborrecem de si mesmos por causa dos seus pecados, mas confiam que estes lhes foram perdoados por amor de Cristo e que, também, as demais fraquezas são cobertas por seu sofrimento e sua morte; e que desejam, cada vez mais, fortalecer a fé e corrigir-se na vida. Mas os pecadores impenitentes e os hipócritas comem e bebem para sua própria condenação."
         },
         {
           "q": "Podem vir a essa ceia também aqueles que, por sua confissão e vida, se mostram incrédulos e ímpios?",
-          "a": "Não, porque assim é profanada a aliança de Deus e é provocada sua ira sobre toda a congregação (1). Por isso, a igreja cristã tem a obrigação, conforme o mandamento de Cristo e de seus apóstolos, de excluir tais pessoas, pelas chaves do reino dos céus, até que demonstrem arrependimento. (1) Sl 50:16; Is 1:11-15; Is 66:3; Jr 7:21-23; 1Co 11:20,34."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 31",
-      "items": [
+          "a": "Não, porque assim é profanada a aliança de Deus e é provocada sua ira sobre toda a congregação. Por isso, a igreja cristã tem a obrigação, conforme o mandamento de Cristo e de seus apóstolos, de excluir tais pessoas, pelas chaves do reino dos céus, até que demonstrem arrependimento."
+        },
         {
           "q": "Que são as chaves do reino dos céus?",
-          "a": "A pregação do santo Evangelho e a disciplina cristã. É por estes dois meios que o reino dos céus se abre para aqueles que crêem e se fecha para aqueles que não crêem (1). (1) Mt 16:18,19; Mt 18:15-18."
+          "a": "A pregação do santo Evangelho e a disciplina cristã. É por estes dois meios que o reino dos céus se abre para aqueles que crêem e se fecha para aqueles que não crêem."
         },
         {
           "q": "Como se abre e se fecha o reino dos céus pela pregação do santo Evangelho?",
-          "a": "Conforme o mandamento de Cristo, se proclama e testifica aos crentes, a todos juntos e a cada um deles, que todos os seus pecados realmente lhes são perdoados por Deus, pelo mérito de Cristo, sempre que aceitam a promessa do Evangelho com verdadeira fé. Mas a todos os incrédulos e hipócritas se proclama e testifica que a ira de Deus e a condenação permanecem sobre eles, enquanto não se converterem (1). Segundo este testemunho do Evangelho Deus julgará todos, nesta vida e na futura. (1) Mt 16:19; Jo 20:21-23."
+          "a": "Conforme o mandamento de Cristo, se proclama e testifica aos crentes, a todos juntos e a cada um deles, que todos os seus pecados realmente lhes são perdoados por Deus, pelo mérito de Cristo, sempre que aceitam a promessa do Evangelho com verdadeira fé. Mas a todos os incrédulos e hipócritas se proclama e testifica que a ira de Deus e a condenação permanecem sobre eles, enquanto não se converterem. Segundo este testemunho do Evangelho Deus julgará todos, nesta vida e na futura."
         },
         {
           "q": "Como se fecha e se abre o reino dos céus pela disciplina cristã?",
-          "a": "Conforme o mandamento de Cristo, aqueles que, com o nome de cristãos, se comportam na doutrina ou na vida como não-cristãos, são fraternalmente advertidos, repetidas vezes. Se não querem abandonar seus erros ou maldades, são denunciados à igreja e aos que, pela igreja, foram ordenados para este fim. Se não dão atenção nem a admoestação destes, não são mais admitidos aos sacramentos e, assim, excluídos da congregação de Cristo, e, pelo próprio Deus, do reino de Cristo. Eles voltam a ser recebidos como membros de Cristo e da sua igreja, quando realmente prometem e demonstram verdadeiro arrependimento (1). (1) Mt 18:15-18; 1Co 5:3-5,11; 2Co 2:6-8; 2Ts 3:14,15; 1Tm 5:20; 2Jo :10,11. PART 3: NOSSA GRATIDÃO"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 32",
-      "items": [
+          "a": "Conforme o mandamento de Cristo, aqueles que, com o nome de cristãos, se comportam na doutrina ou na vida como não-cristãos, são fraternalmente advertidos, repetidas vezes. Se não querem abandonar seus erros ou maldades, são denunciados à igreja e aos que, pela igreja, foram ordenados para este fim. Se não dão atenção nem a admoestação destes, não são mais admitidos aos sacramentos e, assim, excluídos da congregação de Cristo, e, pelo próprio Deus, do reino de Cristo. Eles voltam a ser recebidos como membros de Cristo e da sua igreja, quando realmente prometem e demonstram verdadeiro arrependimento."
+        },
         {
           "q": "Visto que fomos libertados de nossa miséria, por Cristo, sem mérito algum de nossa parte, somente pela graça, por que ainda devemos fazer boas obras?",
-          "a": "Primeiro: porque Cristo não somente nos comprou e libertou com seu sangue, mas também nos renova, à sua imagem, por seu Espírito Santo, para que mostremos, com toda a nossa vida, que somos gratos a Deus por seus benefícios (1) , e para que Ele seja louvado por nós (2). Segundo: para que, pelos frutos da fé, tenhamos a certeza de que nossa fé é verdadeira (3) e para que ganhemos nosso próximo para Cristo, pela vida cristã que levamos (4). (1) Rm 6:13; Rm 12:1,2; 1Co 6:20; 1Pe 2:5,9. (2) Mt 5:16; 1Pe 2:12. (3) Mt 7:17,18; Gl 5:6,22; 2Pe 1:10. (4) Mt 5:16; Rm 14:18,19; 1Pe 3:1,2."
+          "a": "Primeiro: porque Cristo não somente nos comprou e libertou com seu sangue, mas também nos renova, à sua imagem, por seu Espírito Santo, para que mostremos, com toda a nossa vida, que somos gratos a Deus por seus benefícios, e para que Ele seja louvado por nós. Segundo: para que, pelos frutos da fé, tenhamos a certeza de que nossa fé é verdadeira e para que ganhemos nosso próximo para Cristo, pela vida cristã que levamos."
         },
         {
           "q": "Não podem ser salvos, então, aqueles que continuam vivendo sem Deus e sem gratidão e não se convertem a Ele?",
-          "a": "De maneira alguma, porque a Escritura diz que nenhum impuro, idólatra, adúltero, ladrão, avarento, bêbado, maldizente, assaltante ou semelhante herdará o reino de Deus (1). (1) 1Co 6:9,10; Ef 5:5,6; 1Jo 3:14,15."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 33",
-      "items": [
+          "a": "De maneira alguma, porque a Escritura diz que nenhum impuro, idólatra, adúltero, ladrão, avarento, bêbado, maldizente, assaltante ou semelhante herdará o reino de Deus."
+        },
         {
           "q": "Quantas partes há na verdadeira conversão do homem?",
-          "a": "Duas: a morte do velho homem e o nascimento do novo homem (1). (1) Rm 6:4-6; 1Co 5:7; 2Co 7:10; Ef 4:22-24; Cl 3:5-10."
+          "a": "Duas: a morte do velho homem e o nascimento do novo homem."
         },
         {
           "q": "O que é a morte do velho homem?",
-          "a": "É a profunda tristeza por causa dos pecados e a vontade de odiá-los e evitá-los, cada vez mais (1). (1) Jl 2:13; Rm 8:13."
+          "a": "É a profunda tristeza por causa dos pecados e a vontade de odiá-los e evitá-los, cada vez mais."
         },
         {
           "q": "O que é o nascimento do novo homem?",
-          "a": "É a alegria sincera em Deus, por Cristo (1) , e o forte desejo de viver conforme a vontade de Deus em todas as boas obras (2). (1) Is 57:15; Rm 5:1,2; Rm 14:17. (2) Rm 6:10,11; Gl 2:19,20."
+          "a": "É a alegria sincera em Deus, por Cristo, e o forte desejo de viver conforme a vontade de Deus em todas as boas obras."
         },
         {
           "q": "Que são boas obras?",
-          "a": "São somente aquelas que são feitas com verdadeira fé (1) conforme a lei de Deus (2) e para sua glória (5) ; não são aquelas que se baseiam em nossa própria opinião ou em tradições humanas (4). (1) Rm 14:23. (2) Lv 18:4; 1Sm 15:22; Ef 2:10. (3) 1Co 10:31. (4) Is 29:13,14; Ez 20:18,19; Mt 15:7-9. OS DEZ MANDAMENTOS"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 34",
-      "items": [
+          "a": "São somente aquelas que são feitas com verdadeira fé conforme a lei de Deus e para sua glória; não são aquelas que se baseiam em nossa própria opinião ou em tradições humanas."
+        },
         {
           "q": "Que diz a lei do SENHOR?",
-          "a": "Deus falou todas estas palavras (Êxodo 20:1-17; Deuteronômio 5:6-2 (1) : \"Eu sou o SENHOR teu Deus, que te tirei da terra do Egito, da casa da servidão. \" Primeiro mandamento: \"Não terás outros deuses diante de mim. \" Segundo mandamento: \"Não farás para ti imagem de escultura, nem semelhança alguma do que há em cima nos céus, nem em baixo na terra, nem nas águas debaixo da terra. Não as adorarás, nem lhes darás culto; porque eu sou o SENHOR teu Deus, Deus zeloso, que visito a iniqüidade dos pais nos filhos até a terceira e quarta geração daqueles que me aborrecem, e faço misericórdia até mil gerações daqueles que me amam e guardam os meus mandamentos. \" Terceiro mandamento: \"Não tomarás o nome do SENHOR teu Deus em vão, porque o SENHOR não terá por inocente o que tomar seu nome em vão. \" Quarto mandamento: \"Lembra-te do dia de descanso, para o santificar. Seis dias trabalharás, e farás toda a tua obra. Mas o sétimo dia é o sábado do SENHOR teu Deus; não farás nenhum trabalho, nem tu, nem teu filho, nem tua filha, nem o teu servo, nem a tua serva, nem o teu animal, nem o forasteiro das tuas portas para dentro; porque em seis dias fez o SENHOR os céus e a terra, o mar e tudo o que neles há, e ao sétimo dia descansou: por isso o SENHOR abençoou o dia de sábado, e o santificou. \" Quinto mandamento: \"Honra a teu pai e a tua mãe, para que se prolonguem os teus dias na terra que o SENHOR teu Deus te dá. \" Sexto mandamento: \"Não matarás. \" Sétimo mandamento: \"Não adulterarás. \" Oitavo mandamento: \"Não furtarás. \" Nono mandamento: \"Não dirás falso testemunho contra o teu próximo. \" Décimo mandamento: \"Não cobiçarás a casa do teu próximo. Não cobiçarás a mulher do teu próximo, nem o seu servo, nem a sua serva, nem o seu boi, nem o seu jumento, nem coisa alguma que pertença ao teu próximo\"."
+          "a": "Deus falou todas estas palavras (Êxodo 20:1-17; Deuteronômio 5:6-2:"
         },
         {
           "q": "Como se dividem estes Dez Mandamentos?",
-          "a": "Em duas partes (1). A primeira nos ensina, em quatro mandamentos, como devemos viver diante de Deus; a segunda nos ensina, em seis mandamentos, as nossas obrigações para com nosso próximo (2). (1) Êx 31:18; Dt 4:13; Dt 10:3,4. (2) Mt 22:37-40."
+          "a": "Em duas partes. A primeira nos ensina, em quatro mandamentos, como devemos viver diante de Deus; a segunda nos ensina, em seis mandamentos, as nossas obrigações para com nosso próximo."
         },
         {
           "q": "O que Deus ordena no primeiro mandamento?",
-          "a": "Primeiro: para não perder minha salvação, devo evitar e fugir de toda idolatria (1) , feitiçaria, adivinhação e superstição (2). Também não posso invocar os santos ou outras criaturas (3). Segundo: devo reconhecer devidamente o único e verdadeiro Deus (4) , confiar somente nEle (5) , me submeter somente a Ele (6) com toda humildade (7) e paciência. Devo amar (8) , temer (9) e honrar (10) a Deus de todo o coração, e esperar todo o bem somente dEle (11). Em resumo, devo renunciar a todas as criaturas e não fazer a menor coisa contra a vontade de Deus (12). (1) 1Co 6:10; 1Co 10:7,14; 1Jo 5:21. (2) Lv 19:31; Dt 18:9-12. (3) Mt 4:10; Ap 19:10; Ap 22:8,9. (4) Jo 17:3. (5) Jr 17:5,7. (6) Rm 5:3-5; 1Co 10:10; Fp 2:14; Cl 1:11; Hb 10:36. (7) 1Pe 5:5. (8) Dt 6:5; Mt 22:37,38. (9) Dt 6:2; Sl 111:10; Pv 1:7; Pv 9:10; Mt 10:28. (10) Dt 10:20; Mt 4:10. (11) Sl 104:27-30; Is 45:7; Tg 1:17. (12) Mt 5:29,30; Mt 10:37-39; At 5:29."
+          "a": "Primeiro: para não perder minha salvação, devo evitar e fugir de toda idolatria, feitiçaria, adivinhação e superstição. Também não posso invocar os santos ou outras criaturas. Segundo: devo reconhecer devidamente o único e verdadeiro Deus, confiar somente nEle, me submeter somente a Ele com toda humildade e paciência. Devo amar, temer e honrar a Deus de todo o coração, e esperar todo o bem somente dEle. Em resumo, devo renunciar a todas as criaturas e não fazer a menor coisa contra a vontade de Deus."
         },
         {
           "q": "Que é idolatria?",
-          "a": "Idolatria é inventar ou ter alguma coisa em que se deposite confiança, em lugar ou ao lado do único e verdadeiro Deus, que se revelou em sua Palavra (1). (1) 1Cr 16:26; Is 44:16,17; Jo 5:23; Gl 4:8; Ef 2:12; Ef 5:5; Fp 3:19; 1Jo 2:23; 2Jo :9."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 35",
-      "items": [
+          "a": "Idolatria é inventar ou ter alguma coisa em que se deposite confiança, em lugar ou ao lado do único e verdadeiro Deus, que se revelou em sua Palavra."
+        },
         {
           "q": "O que Deus exige no segundo mandamento?",
-          "a": "Não podemos, de maneira alguma, representar Deus por imagem ou figura (1). Devemos adorá-Lo somente da maneira que Ele ordenou em sua palavra (2). (1) Dt 4:15,16; Is 40:18,19,25; At 17:29; Rm 1:23-25. (2) Dt 12:30-32; lSm 15:23; Mt 15:9."
+          "a": "Não podemos, de maneira alguma, representar Deus por imagem ou figura. Devemos adorá-Lo somente da maneira que Ele ordenou em sua palavra."
         },
         {
           "q": "Não se pode fazer imagem alguma?",
-          "a": "Não se pode nem deve fazer nenhuma imagem de Deus. As criaturas podem ser representadas, mas Deus nos proíbe fazer ou ter imagens delas para adorá-las ou para servir a Deus por meio delas (1). (1) Êx 34:13,14,17; Dt 12:3,4; Dt 16:22; 2Rs 18:4 Is 40:25."
+          "a": "Não se pode nem deve fazer nenhuma imagem de Deus. As criaturas podem ser representadas, mas Deus nos proíbe fazer ou ter imagens delas para adorá-las ou para servir a Deus por meio delas."
         },
         {
-          "q": "Mas não podem ser toleradas as imagens nas igrejas como &#8216;livros para ignorantes&#8217;?",
-          "a": "Não, porque não devemos ser mais sábios do que Deus. Ele não quer ensinar a seu povo por meio de ídolos mudos (1) , mas pela pregação viva de sua Palavra (2). (1) Jr 10:5,8; Hc 2:18,19. (2) Rm 10:14-17; 2Tm 3:16,17; 2Pe 1:19."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 36",
-      "items": [
+          "q": "Mas não podem ser toleradas as imagens",
+          "a": "nas igrejas como ‘livros para ignorantes’? R. Não, porque não devemos ser mais sábios do que Deus. Ele não quer ensinar a seu povo por meio de ídolos mudos, mas pela pregação viva de sua Palavra."
+        },
         {
           "q": "O que Deus exige no terceiro mandamento?",
-          "a": "Não devemos blasfemar ou profanar o santo nome de Deus por maldições (1) ou juramentos falsos (2) nem por juramentos desnecessários (3). Também não devemos tomar parte em pecados tão horríveis, ficando calados quando os ouvimos (4). Em resumo, devemos usar o santo nome de Deus somente com temor e reverencia (5) a fim de que Ele, por nós, seja devidamente confessado (6) , invocado (7) e glorificado por todas as nossas palavras e obras (8). (1) Lv 24:15,16. (2) Lv 19:12. (3) Mt 5:37; Tg 5:12. (4) Lv 5:1; Pv 29:24. (5) Is 45:23; Jr 4:2. (6) Mt 10:32; Rm 10:9,10. (7) Sl 50:15; 1Tm 2:8. (8) Rm 2:24; Cl 3:17; lTm 6:1."
+          "a": "Não devemos blasfemar ou profanar o santo nome de Deus por maldições ou juramentos falsos nem por juramentos desnecessários. Também não devemos tomar parte em pecados tão horríveis, ficando calados quando os ouvimos. Em resumo, devemos usar o santo nome de Deus somente com temor e reverencia a fim de que Ele, por nós, seja devidamente confessado, invocado e glorificado por todas as nossas palavras e obras."
         },
         {
           "q": "Será que blasfemar o nome de Deus por juramentos e maldições é um pecado tão grande, que Deus se ira também contra aqueles que não se esforçam para impedir e proibir tal coisa?",
-          "a": "Claro que sim, pois não há pecado maior ou que mais provoque a ira de Deus do que blasfemar seu nome. Por isso, Ele mandava castigar este pecado com a pena da morte (1). (1) Lv 24:16; Ef 5:11."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 37",
-      "items": [
+          "a": "Claro que sim, pois não há pecado maior ou que mais provoque a ira de Deus do que blasfemar seu nome. Por isso, Ele mandava castigar este pecado com a pena da morte."
+        },
         {
           "q": "Mas não podemos nós, de modo piedoso, fazer juramento em nome de Deus?",
-          "a": "Podemos sim, quando as autoridades o exigirem ou quando for preciso, para manter e promover a fidelidade e a verdade, para a glória de Deus e o bem-estar do próximo. Por tal juramento está baseado na Palavra de Deus (1) e era praticado, com razão, pelos santos do Antigo e Novo Testamento (2). (1) Dt 6:13; Dt 10:20; Hb 6:16. (2) Gn 21:24; Gn 31:53; 1Sm 24:22,23; 2Sm 3:35; 1Rs 1:29,30; Rm 1:9; Rm 9:1; 2Co 1:23."
+          "a": "Podemos sim, quando as autoridades o exigirem ou quando for preciso, para manter e promover a fidelidade e a verdade, para a glória de Deus e o bem-estar do próximo. Por tal juramento está baseado na Palavra de Deus e era praticado, com razão, pelos santos do Antigo e Novo Testamento."
         },
         {
           "q": "Podemos jurar também pelos santos ou por outras criaturas?",
-          "a": "Não, porque o juramento legítimo é uma invocação a Deus, para que Ele, o único que conhece os corações, testemunhe a verdade e nos castigue, se jurarmos falsamente. (1) Tal honra não pertence a criatura alguma (2). (1) Rm 9:1; 2Co 1:23. (2) Mt 5:34-36; Tg 5:12."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 38",
-      "items": [
+          "a": "Não, porque o juramento legítimo é uma invocação a Deus, para que Ele, o único que conhece os corações, testemunhe a verdade e nos castigue, se jurarmos falsamente. Tal honra não pertence a criatura alguma."
+        },
         {
           "q": "O que Deus ordena no quarto mandamento?",
-          "a": "Primeiro: o ministério do Evangelho e as escolas cristãs devem ser mantidos (1) , e eu devo reunir-me fielmente com o povo de Deus, especialmente no dia de descanso (2) , para conhecer a palavra de Deus (3) , para participar dos sacramentos (4) , para invocar publicamente ao Senhor Deus (5) e para praticar a caridade cristã para com os necessitados (6). Segundo: eu devo, todos os dias da minha vida, desistir das más obras, deixando o Senhor operar em mim, por seu Espírito. Assim começo nesta vida o descanso eterno (7). (1) 1Co 9:13,14; 1Tm 3:15; 2Tm 2:2; 2Tm 3:14,15; Tt 1:5. (2) Lv 23:3; Sl 40:9,10; Sl 122:1; At 2:42,46. (3) 1Co 14:1,3; lTm 4:13; Ap 1:3. (4) At 20:7; 1Co 11:33. (5) 1Co 14:16; 1Tm 2:1-4. (6) Dt 15:11; 1Co 16:1,2; 1Tm 5:16. (7) Hb 4:9,10."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 39",
-      "items": [
+          "a": "Primeiro: o ministério do Evangelho e as escolas cristãs devem ser mantidos, e eu devo reunir-me fielmente com o povo de Deus, especialmente no dia de descanso, para conhecer a palavra de Deus, para participar dos sacramentos, para invocar publicamente ao Senhor Deus e para praticar a caridade cristã para com os necessitados. Segundo: eu devo, todos os dias da minha vida, desistir das más obras, deixando o Senhor operar em mim, por seu Espírito. Assim começo nesta vida o descanso eterno."
+        },
         {
           "q": "O que Deus exige no quinto mandamento?",
-          "a": "Devo prestar toda honra, amor e fidelidade a meu pai e a minha mãe e a todos os meus superiores; devo submeter-me à sua boa instrução e disciplina com a devida obediência (1) , e também ter paciência com seus defeitos (2) ; porque Deus nos quer governar pelas mãos deles (3). (1) Êx 21:17; Pv 1:8; Pv 4:1; Pv 15:20; Pv 20:20; Rm 13:1; Ef 5:22; Ef 6:1,2,5; Cl 3:18,20,22. (2) Pv 23:22; 1Pe 2:18. (3) Mt 22:21; Rm 13:2,4; Ef 6:4; Cl 3:20."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 40",
-      "items": [
+          "a": "Devo prestar toda honra, amor e fidelidade a meu pai e a minha mãe e a todos os meus superiores; devo submeter-me à sua boa instrução e disciplina com a devida obediência, e também ter paciência com seus defeitos; porque Deus nos quer governar pelas mãos deles."
+        },
         {
           "q": "O que Deus exige no sexto mandamento?",
-          "a": "Eu não devo desonrar, odiar, ofender ou matar meu proximo (1) , por mim mesmo ou através de outros. Isto não posso fazer, nem por pensamentos, palavras, ou gestos e muito menos por atos. Mas devo abandonar todo desejo de vingança (2) , não fazer mal a mim mesmo ou, de propósito, colocar-me em perigo (3). Por isso as autoridades dispõem das armas para impedir homicídios (4). (1) Gn 9:6; Mt 5:21,22; Mt 26:52. (2) Mt 5:25; Mt 18:35; Rm 12:19; Ef 4:26. (3) Mt 4:7; Cl 2:23. (4) Gn 9:6; Êx 21:14; Rm 13:4."
+          "a": "Eu não devo desonrar, odiar, ofender ou matar meu proximo, por mim mesmo ou através de outros. Isto não posso fazer, nem por pensamentos, palavras, ou gestos e muito menos por atos. Mas devo abandonar todo desejo de vingança, não fazer mal a mim mesmo ou, de propósito, colocar-me em perigo."
         },
         {
           "q": "Este mandamento trata somente de matar?",
-          "a": "Não, proibindo o homicídio, Deus nos ensina que Ele detesta a raiz do homicídio, a saber: a inveja (1) , o ódio (2) , a ira (3) e o desejo de vingança. Ele considera tudo isto homicídio (4). (1) Sl 37:8; Pv 14:30; Rm 1:29. (2) 1Jo 2:9-11. (3) Tg 1:20; Gl 5:19-21. (4) 1Jo 3:15."
+          "a": "Não, proibindo o homicídio, Deus nos ensina que Ele detesta a raiz do homicídio, a saber: a inveja, o ódio, a ira e o desejo de vingança. Ele considera tudo isto homicídio."
         },
         {
           "q": "Mas é suficiente não matar nosso próximo?",
-          "a": "Não, porque Deus, condenando a inveja, o ódio e a ira, manda que amemos nosso próximo como a nós mesmos (1) e mostremos paciência, paz, mansidão, misericórdia e gentileza para com ele (2). Devemos evitar seu prejuízo, tanto quanto possível (3) , e fazer bem até aos nossos inimigos (4). (1) Mt 7:12; Mt 22:39; Rm 12:10. (2) Mt 5:5,7; Lc 6:36; Rm 12:18; Gl 6;1,2; Ef 4:1-3; Cl 3:12; 1Pe 3:8. (3) Êx 23:5. (4) Mt 5:44,45; Rm 12:20,21."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 41",
-      "items": [
+          "a": "Não, porque Deus, condenando a inveja, o ódio e a ira, manda que amemos nosso próximo como a nós mesmos e mostremos paciência, paz, mansidão, misericórdia e gentileza para com ele. Devemos evitar seu prejuízo, tanto quanto possível, e fazer bem até aos nossos inimigos."
+        },
         {
           "q": "O que o sétimo mandamento nos ensina?",
-          "a": "Toda impureza sexual é amaldiçoada por Deus (1). Por isso, devemos detestá-la profundamente e viver de maneira pura e disciplinada (2) , sejamos casados ou solteiros (3). (1) Lv 18:27-29. (2) 1Ts 4:3-5. (3) Ml 2:16; Mt 19:9; 1Co 7:10,11; Hb 13:4."
+          "a": "Toda impureza sexual é amaldiçoada por Deus. Por isso, devemos detestá-la profundamente e viver de maneira pura e disciplinada, sejamos casados ou solteiros."
         },
         {
           "q": "Mas Deus, neste mandamento, proíbe somente adultério e outros pecados vergonhosos?",
-          "a": "Não, pois como nosso corpo e nossa alma são o templo do Espírito Santo, Deus quer que os conservemos puros e santos (1). Por isso, Ele proíbe todos os atos, gestos, palavras (2) , pensamentos e desejos (3) impuros e tudo o que possa atrair o homem para tais pecados (4). (1) 1Co 6:18-20. (2) Dt 22:20-29; Ef 5:3,4. (3) Mt 5:27,28. (4) 1Co 15:33; Ef 5:18."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 42",
-      "items": [
+          "a": "Não, pois como nosso corpo e nossa alma são o templo do Espírito Santo, Deus quer que os conservemos puros e santos. Por isso, Ele proíbe todos os atos, gestos, palavras, pensamentos e desejos impuros e tudo o que possa atrair o homem para tais pecados."
+        },
         {
           "q": "O que Deus proíbe no oitavo mandamento?",
-          "a": "Deus não somente proíbe o furto (1) e o roubo (2) que as autoridades castigam, mas também classifica como roubo todos os maus propósitos e as práticas maliciosas, através dos quais tentamos nos apropriar dos bens do próximo (3) , seja por força, seja por aparência de direito, a saber: falsificação de peso, de medida, de mercadoria e de moeda (4) , seja por juros exorbitantes ou por qualquer outro meio, proibido por Deus (5). Também proíbe toda avareza (6) bem como todo abuso e desperdício de suas dádivas (7). (1) 1Co 6:10. (2) Lv 19:13. (3) Lc 3:14; 1Co 5:10. (4) Dt 25:13-15; Pv 11:1; Pv 16:11; Ez 45:9-12. (5) Sl 15:5; Lc 6:35. (6) 1Co 6:10. (7) Pv 21:20; Pv 23:20,21."
+          "a": "Deus não somente proíbe o furto e o roubo que as autoridades castigam, mas também classifica como roubo todos os maus propósitos e as práticas maliciosas, através dos quais tentamos nos apropriar dos bens do próximo, seja por força, seja por aparência de direito, a saber: falsificação de peso, de medida, de mercadoria e de moeda, seja por juros exorbitantes ou por qualquer outro meio, proibido por Deus. Também proíbe toda avareza bem como todo abuso e desperdício de suas dádivas."
         },
         {
           "q": "Mas o que Deus ordena neste mandamento?",
-          "a": "Devo promover tanto quanto possível, o bem do meu próximo e tratá-lo como quero que outros me tratem (1). Além disto, devo fazer fielmente meu trabalho para que possa ajudar ao necessitado (2). (1) Mt 7:12. (2) Ef 4:28."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 43",
-      "items": [
+          "a": "Devo promover tanto quanto possível, o bem do meu próximo e tratá-lo como quero que outros me tratem. Além disto, devo fazer fielmente meu trabalho para que possa ajudar ao necessitado."
+        },
         {
           "q": "O que Deus exige no nono mandamento?",
-          "a": "Jamais posso dar falso testemunho contra meu próximo (1) , nem torcer suas palavras (2) ou ser mexeriqueiro ou caluniador (3). Também não posso ajudar a condenar alguém levianamente, sem o ter ouvido (4). Mas devo evitar toda mentira e engano, obras próprias do diabo (5) , para Deus não ficar aborrecido comigo (6). Em julgamentos e em qualquer outra ocasião, devo amar a verdade, falar a verdade e confessá-la francamente (7). Também devo defender e promover, tanto quanto puder, a honra e a boa reputação de meu próximo (8). (1) Pv 19:5,9; Pv 21:28. (2) Sl 50:19,20. (3) Sl 15:3; Rm 1:30. (4) Mt 7:1,2; Lc 6:37. (5) Jo 8:44. (6) Pv 12:22. (7) 1Co 13:6; Ef 4:25. (8) 1Pe 4:8."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 44",
-      "items": [
+          "a": "Jamais posso dar falso testemunho contra meu próximo, nem torcer suas palavras ou ser mexeriqueiro ou caluniador. Também não posso ajudar a condenar alguém levianamente, sem o ter ouvido. Mas devo evitar toda mentira e engano, obras próprias do diabo, para Deus não ficar aborrecido comigo. Em julgamentos e em qualquer outra ocasião, devo amar a verdade, falar a verdade e confessá-la francamente. Também devo defender e promover, tanto quanto puder, a honra e a boa reputação de meu próximo."
+        },
         {
           "q": "O que Deus exige no décimo mandamento?",
-          "a": "Jamais pode surgir em nosso coração o menor desejo ou pensamento contra qualquer mandamento de Deus. Pelo contrário, devemos sempre, de todo o coração odiar todos os pecados e amar toda justiça (1). (1) Rm 7:7."
+          "a": "Jamais pode surgir em nosso coração o menor desejo ou pensamento contra qualquer mandamento de Deus. Pelo contrário, devemos sempre, de todo o coração odiar todos os pecados e amar toda justiça."
         },
         {
           "q": "Mas aqueles que se converteram a Deus, podem guardar perfeitamente estes mandamentos?",
-          "a": "Não, não podem, porque nesta vida até os mais santos deles apenas começam a guardar os mandamentos (1). Entretanto, começam, com sério propósito, a viver não somente conforme alguns, mas conforme todos os mandamentos de Deus (2). (1) Ec 7:20; Rm 7:14,15; 1Co 13:9; 1Jo 1:8,10. (2) Sl 1:2; Rm 7:22; 1Jo 2:3."
+          "a": "Não, não podem, porque nesta vida até os mais santos deles apenas começam a guardar os mandamentos. Entretanto, começam, com sério propósito, a viver não somente conforme alguns, mas conforme todos os mandamentos de Deus."
         },
         {
           "q": "Para que, então, manda Deus pregar os Dez Mandamentos tão rigorosamente, já que ninguém pode guardá-los nesta vida?",
-          "a": "Primeiro: para que, durante toda a vida, conheçamos cada vez melhor nossa natureza pecaminosa (1) e, por isso, ainda mais desejemos buscar, em Cristo, o perdão dos pecados e a justiça (2). Segundo: para que sempre sejamos zelosos e oremos a Deus pela graça do Espírito Santo, a fim de que sejamos cada vez mais renovados segundo a imagem de Deus até que, depois desta vida, alcancemos o objetivo, a saber: a perfeição (3). (1) Sl 32:5; Rm 3:20; 1Jo 1:9. (2) Mt 5:6; Rm 7:24,25. (3) 1Co 9:24; Fp 3:12-14. A ORAÇÃO"
-        }
-      ]
-    },
-    {
-      "name": "Domingo 45",
-      "items": [
+          "a": "Primeiro: para que, durante toda a vida, conheçamos cada vez melhor nossa natureza pecaminosa e, por isso, ainda mais desejemos buscar, em Cristo, o perdão dos pecados e a justiça. Segundo: para que sempre sejamos zelosos e oremos a Deus pela graça do Espírito Santo, a fim de que sejamos cada vez mais renovados segundo a imagem de Deus até que, depois desta vida, alcancemos o objetivo, a saber: a perfeição."
+        },
         {
           "q": "Por que a oração e necessária aos cristãos?",
-          "a": "Porque a oração é a parte principal da gratidão, que Deus requer de nós (1). Além disto, Deus quer conceder sua graça e seu Espírito Santo somente aos que continuamente Lhe pedem e agradecem, de todo o coração (2). (1) Sl 50:14,15. (2) Mt 7:7,8; Lc 11:9,10; 1Ts 5:17,18."
+          "a": "Porque a oração é a parte principal da gratidão, que Deus requer de nós. Além disto, Deus quer conceder sua graça e seu Espírito Santo somente aos que continuamente Lhe pedem e agradecem, de todo o coração."
         },
         {
           "q": "Como devemos orar, para que a oração seja agradável a Deus e Ele nos ouça?",
-          "a": "Primeiro: devemos invocar, de todo o coração (1) , o único e verdadeiro Deus, que se revelou a nós em sua palavra (2) , e orar por tudo o que Ele nos ordenou pedir (3). Segundo: devemos muito bem conhecer nossa necessidade e miséria (4) , a fim de nos humilharmos perante sua majestade (5). Terceiro: devemos ter a plena certeza (6) de que Deus, apesar de nossa indignidade, quer atender à nossa oração (7) , por causa de Cristo, como Ele prometeu em sua Palavra (8). (1) Sl 145:18-20; Tg 4:3,8. (2) Jo 4:22-24; Ap 19:10. (3) Rm 8:26; Tg 1:5; 1Jo 5:14. (4) 2Cr 20:12; Sl 143:2. (5) Sl 2:11; Sl 51:17; Is 66:2. (6) Rm 8:15,16; Rm 10:14; Tg 1:6-8. (7) Dn 9:17-19; Jo 14:13,14; Jo 15:16; Jo 16:23. (8) Sl 27:8; Sl 143:1; Mt 7:8."
+          "a": "Primeiro: devemos invocar, de todo o coração, o único e verdadeiro Deus, que se revelou a nós em sua palavra, e orar por tudo o que Ele nos ordenou pedir. Segundo: devemos muito bem conhecer nossa necessidade e miséria, a fim de nos humilharmos perante sua majestade. Terceiro: devemos ter a plena certeza de que Deus, apesar de nossa indignidade, quer atender à nossa oração, por causa de Cristo, como Ele prometeu em sua Palavra."
         },
         {
           "q": "O que Deus ordenou pedir a Ele?",
-          "a": "Tudo o que é necessário ao nosso corpo e a nossa alma (1) , como Cristo, o Senhor, o resumiu na oração que Ele mesmo nos ensinou. (1) Mt 6:33; Tg 1:17."
+          "a": "Tudo o que é necessário ao nosso corpo e a nossa alma, como Cristo, o Senhor, o resumiu na oração que Ele mesmo nos ensinou."
         },
         {
           "q": "Que diz esta oração?",
           "a": "\"Pai nosso, que estás nos céus, santificado seja o teu nome;venha o teu reino,faça-se a tua vontade, assim na terra como no céu;o pão nosso de cada dia dá-nos hoje;e perdoa-nos as nossas dívidas, assim como nós temos perdoado aos nossos devedores;e não nos deixes cair em tentação, mas livra nos do mal; pois teu é o reino, o poder e a glória para sempre. Amém\" (Mateus 6:9-13; Lucas 11:2-4)."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 46",
-      "items": [
-        {
-          "q": "Por que Cristo nos ordenou dizer a Deus \"Pai nosso\"?",
-          "a": "Porque Cristo quer despertar em nós, logo no início como base da oração, respeito e confiança, como uma criança para com Deus. Pois Deus se tornou nosso Pai, por Cristo. E muito menos do que nossos pais nos recusam bens materiais, Ele nos recusará o que Lhe pedirmos com verdadeira fé (1). (1) Mt 7:9-11; Lc 11:11-13"
         },
         {
-          "q": "Por que se acrescenta: \"que estás nos céus\"?",
-          "a": "Porque assim Cristo nos ensina a não ter idéia terrena da majestade celestial de Deus (1) e a esperar, da onipotência dEle, tudo o que é necessário ao nosso corpo e a nossa alma (2). (1) Jr 23:23,24; At 17:24-27. (2) Rm 10:12."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 48",
-      "items": [
+          "q": "Por que Cristo nos ordenou dizer a Deus\"Pai nosso\"?",
+          "a": "Porque Cristo quer despertar em nós, logo no início como base da oração, respeito e confiança, como uma criança para com Deus. Pois Deus se tornou nosso Pai, por Cristo. E muito menos do que nossos pais nos recusam bens materiais, Ele nos recusará o que Lhe pedirmos com verdadeira fé."
+        },
+        {
+          "q": "Por que se acrescenta:\"que estás nos céus\"?",
+          "a": "Porque assim Cristo nos ensina a não ter idéia terrena da majestade celestial de Deus e a esperar, da onipotência dEle, tudo o que é necessário ao nosso corpo e a nossa alma."
+        },
+        {
+          "q": "Qual e a primeira petição?",
+          "a": "\"Santificado seja o teu nome\". Quer dizer: Faze primeiro, com que Te conheçamos em verdade e Te santifiquemos, honremos e glorifiquemos em todas as tuas obras, em que brilham tua onipotência, sabedoria, bondade, justiça, misericórdia e verdade. Faze, também, com que dirijamos toda a nossa vida -nossos pensamentos, palavras e obras- de tal maneira que teu nome não seja blasfemado por nossa causa, mas honrado e glorificado."
+        },
         {
           "q": "Qual é a segunda petição?",
-          "a": "\"Venha o teu reino\". Quer dizer: Governa-nos por tua palavra e por teu Espírito, de tal maneira que, cada vez mais, nos submetamos a Ti (1) ;conserve e aumenta tua igreja (2) ;destrói as obras do diabo, e todo poder que se levanta contra Ti, e todos os maus planos que são inventados contra tua santa Palavra (3) ;até que venha a plenitude de teu reino (4) ,em que Tu serás tudo em todos (5). (1) Sl 119:5; Sl 143:10; Mt 6:33. (2) Sl 51:18; Sl 122:6,7. (3) Rm 16:20; 1Jo 3:8. (4) Rm 8:22,23; Ap 22:17,20. (5) 1Co 15:28."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 49",
-      "items": [
+          "a": "\"Venha o teu reino\". Quer dizer: Governa-nos por tua palavra e por teu Espírito, de tal maneira que, cada vez mais, nos submetamos a Ti;conserve e aumenta tua igreja;destrói as obras do diabo, e todo poder que se levanta contra Ti, e todos os maus planos que são inventados contra tua santa Palavra;até que venha a plenitude de teu reino,em que Tu serás tudo em todos."
+        },
         {
-          "q": "Qual é a terceira petição ?",
-          "a": "\"Faça-se a tua vontade, assim na terra como no céu\". Quer dizer: Faze com que nós e todos os homens renunciemos à nossa própria vontade (1) e obedeçamos, sem protestos, à tua vontade (2) , a única que é boa, para que cada um, assim, cumpra sua tarefa e vocação (3) , tão pronta e fielmente como os anjos no céu (4). (1) Mt 16:24; Tt 2:11,12. (2) Lc 22:42; Rm 12:2; Ef 5:10. (3) 1Co 7:22-24. (4) Sl 103:20,21."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 50",
-      "items": [
+          "q": "Qual é a terceira petição?",
+          "a": "\"Faça-se a tua vontade, assim na terra como no céu\". Quer dizer: Faze com que nós e todos os homens renunciemos à nossa própria vontade e obedeçamos, sem protestos, à tua vontade, a única que é boa, para que cada um, assim, cumpra sua tarefa e vocação, tão pronta e fielmente como os anjos no céu."
+        },
         {
           "q": "Qual é a quarta petição?",
-          "a": "\"O pão nosso de cada dia dá-nos hoje\". Quer dizer: Cuida de nós com tudo o que for necessário ao nosso corpo (1) , para que reconheçamos que Tu és a única fonte de todo o bem (2) e que, sem tua bênção, nem nosso cuidado e trabalho, nem teus dons nos são úteis (3). Faze também com que, por isso, não mais depositemos nossa confiança em qualquer criatura, mas somente em Ti (4). (1) Sl 104:27,28; Sl 145:15,16; Mt 6:25,26. (2) At 14:17; At 17:27,28; Tg 1:17. (3) Dt 8:3; Sl 37:3-7,16,17; Sl 127:1,2; 1Co 15:58. (4) Sl 55:22; Sl 62:10; Sl 146:3; Jr 17:5,7."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 51",
-      "items": [
+          "a": "\"O pão nosso de cada dia dá-nos hoje\". Quer dizer: Cuida de nós com tudo o que for necessário ao nosso corpo, para que reconheçamos que Tu és a única fonte de todo o bem e que, sem tua bênção, nem nosso cuidado e trabalho, nem teus dons nos são úteis. Faze também com que, por isso, não mais depositemos nossa confiança em qualquer criatura, mas somente em Ti."
+        },
         {
           "q": "Qual é a quinta petição?",
-          "a": "\"E perdoa-nos as nossas dividas, assim como nós temos perdoado aos nossos devedores\". Quer dizer: Por causa do sangue de Cristo, não cobres de nós, miseráveis pecadores que somos, nossas transgressões nem o mal que ainda há em nós (1) , assim como tua graça em nós fez com que tenhamos o firme propósito de perdoar nosso próximo, de todo o coração (2). (1) Sl 51:1; Sl 143:2; Rm 8:1; 1Jo 2:1. (2) Mt 6:14,15."
-        }
-      ]
-    },
-    {
-      "name": "Domingo 52",
-      "items": [
+          "a": "\"E perdoa-nos as nossas dividas, assim como nós temos perdoado aos nossos devedores\". Quer dizer: Por causa do sangue de Cristo, não cobres de nós, miseráveis pecadores que somos, nossas transgressões nem o mal que ainda há em nós, assim como tua graça em nós fez com que tenhamos o firme propósito de perdoar nosso próximo, de todo o coração."
+        },
         {
           "q": "Qual é a sexta petição?",
-          "a": "\"E não nos deixes cair em tentação, mas livra-nos do mal\". Quer dizer: Somos tão fracos que, por nós mesmos, não podemos subsistir por um só momento (1) ; além disto, nossos inimigos declarados: o diabo (2) , o mundo (3) e nossa própria carne (4) nos tentam continuamente. Por isso, Te pedimos: sustenta-nos e fortalece-nos, pelo poder de teu Espírito Santo, a fim de que neste combate espiritual não sejamos derrotados (5) , mas possamos fortemente resistir, até que finalmente alcancemos a vitória total (6). (1) Sl 103:14-16; Jo 15:5. (2) Ef 6:12; 1Pe 5:8. (3) Jo 15:19. (4) Rm 7:23; Gl 5:17. (5) Mt 26:41; Mc 13:33; 1Co 10:12,13. (6) 1Ts 3:13; 1Ts 5:23."
+          "a": "\"E não nos deixes cair em tentação, mas livra-nos do mal\". Quer dizer: Somos tão fracos que, por nós mesmos, não podemos subsistir por um só momento; além disto, nossos inimigos declarados: o diabo, o mundo e nossa própria carne nos tentam continuamente. Por isso, Te pedimos: sustenta-nos e fortalece-nos, pelo poder de teu Espírito Santo, a fim de que neste combate espiritual não sejamos derrotados, mas possamos fortemente resistir, até que finalmente alcancemos a vitória total."
         },
         {
           "q": "Como você termina sua oração?",
-          "a": "\"Pois teu é o reino, o poder e a glória, para sempre\". Quer dizer: Tudo isso Te pedimos, porque Tu queres e podes dar-nos todo o bem, pois és nosso Rei e tudo está em teu poder (1). Pedimos-Te isso também, para que não o nosso, mas teu santo nome seja eternamente glorificado (2). (1) 1Cr 29:10-12; Rm 10:11-13; 2Pe 2:9. (2) Sl 115:1; Jr 33:8,9; Jo 14:13."
+          "a": "\"Pois teu é o reino, o poder e a glória, para sempre\". Quer dizer: Tudo isso Te pedimos, porque Tu queres e podes dar-nos todo o bem, pois és nosso Rei e tudo está em teu poder. Pedimos-Te isso também, para que não o nosso, mas teu santo nome seja eternamente glorificado."
         },
         {
-          "q": "O que significa a palavra: \"amém\"?",
-          "a": "Amém quer dizer: é verdadeiro e certo. Pois Deus atende à minha oração com muito mais certeza do que o desejo que eu sinto, no coração, de ser ouvido por Ele (1). (1) 2Co 1:20; 2Tm 2:13. http://www.monergismo.com/ Este site da web é uma realização de Felipe Sabino de Araújo Neto &reg; Proclamando o Evangelho Genuíno de CRISTO JESUS, que é o poder de DEUS para salvação de todo aquele que crê. TOPO DA PÁGINA Estamos às ordens para comentários e sugestões. Livros Recomendados Recomendamos os sites abaixo: Monergism / Arquivo Spurgeon / Arthur Pink / IPCB / Solano Portela / Spurgeon em Espanhol / Thirdmill Editora Cultura Cristã / Editora Fiel / Editora Os Puritanos / Editora PES / Editora Vida Nova"
+          "q": "O que significa a palavra:\"amém\"?",
+          "a": "Amém quer dizer: é verdadeiro e certo. Pois Deus atende à minha oração com muito mais certeza do que o desejo que eu sinto, no coração, de ser ouvido por Ele."
         }
       ]
     }

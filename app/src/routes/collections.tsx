@@ -8,6 +8,7 @@ import { PageMeta } from '../components/page-meta'
 import { bundledCollections, verseRefToId } from '../data/collections'
 import { useSwipeToDelete } from '../hooks/use-swipe'
 import {
+  addCollectionAsBlock,
   addCollectionToMemory,
   addVersesToCollection,
   createUserCollection,
@@ -279,6 +280,8 @@ export function CollectionDetailPage() {
   const [verses, setVerses] = useState<{ verseId: string; reference: string; text: string; translation: string; memorized: boolean }[]>([])
   const [adding, setAdding] = useState(false)
   const [added, setAdded] = useState(false)
+  const [addingBlock, setAddingBlock] = useState(false)
+  const [addedBlock, setAddedBlock] = useState(false)
   const [loading, setLoading] = useState(true)
   const [showEdit, setShowEdit] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -341,6 +344,15 @@ export function CollectionDetailPage() {
     setAdded(true)
     setAdding(false)
     await load()
+  }
+
+  async function handleAddAsBlock() {
+    if (!col) return
+    setAddingBlock(true)
+    const userTranslation = (cachedGet('translation') as string | null) ?? DEFAULT_TRANSLATION
+    await addCollectionAsBlock(col.dbId, userTranslation, logProgressChange)
+    setAddedBlock(true)
+    setAddingBlock(false)
   }
 
   async function handleEdit(formData: CollectionFormData) {
@@ -502,6 +514,22 @@ export function CollectionDetailPage() {
               `Adicionar à memória (${col.total - col.memorized})`
             )}
           </button>
+          <button
+            type="button"
+            className={`btn btn-secondary btn-large ${addedBlock ? 'btn-added' : ''}`}
+            onClick={handleAddAsBlock}
+            disabled={addingBlock || addedBlock || col.total < 2}
+          >
+            {addingBlock ? (
+              'Adicionando…'
+            ) : addedBlock ? (
+              <>
+                <Check size={16} aria-hidden /> Bloco adicionado
+              </>
+            ) : (
+              'Memorizar como bloco'
+            )}
+          </button>
           <div className="collection-detail-actions-row">
             <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
               + Versículos
@@ -531,6 +559,22 @@ export function CollectionDetailPage() {
               'Sem versículos'
             ) : (
               `Adicionar todos (${col.total - col.memorized})`
+            )}
+          </button>
+          <button
+            type="button"
+            className={`btn btn-secondary btn-large ${addedBlock ? 'btn-added' : ''}`}
+            onClick={handleAddAsBlock}
+            disabled={addingBlock || addedBlock || col.total < 2}
+          >
+            {addingBlock ? (
+              'Adicionando…'
+            ) : addedBlock ? (
+              <>
+                <Check size={16} aria-hidden /> Bloco adicionado
+              </>
+            ) : (
+              'Memorizar como bloco'
             )}
           </button>
         </div>
