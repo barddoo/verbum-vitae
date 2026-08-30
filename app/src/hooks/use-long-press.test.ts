@@ -10,7 +10,12 @@ vi.mock('@capacitor/haptics', () => ({
 import { useLongPress } from './use-long-press'
 
 function makePointerEvent(type: string, x = 0, y = 0): React.PointerEvent<HTMLElement> {
-  return { clientX: x, clientY: y, pointerId: 1, currentTarget: { setPointerCapture: vi.fn() } } as unknown as React.PointerEvent<HTMLElement>
+  return {
+    clientX: x,
+    clientY: y,
+    pointerId: 1,
+    currentTarget: { setPointerCapture: vi.fn() },
+  } as unknown as React.PointerEvent<HTMLElement>
 }
 
 describe('useLongPress', () => {

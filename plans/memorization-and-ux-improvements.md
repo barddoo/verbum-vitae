@@ -15,11 +15,13 @@ Three findings are load-bearing and everything else is incremental on top:
 
 Items are grouped in tiers by payoff. Tier 1 are near one-liners with outsized effect.
 
+**Status:** items 1 and 2 are shipped. Item 3 is the next one up.
+
 ---
 
 ## Tier 1 — scheduler correctness
 
-### 1. Enable FSRS fuzz — `app/src/lib/scheduler.ts:7`
+### 1. Enable FSRS fuzz — `app/src/lib/scheduler.ts:7` — ✅ DONE
 
 `const scheduler = fsrs()` takes defaults, and `default_enable_fuzz = false`
 (verified in `node_modules/.bun/ts-fsrs@5.4.1/node_modules/ts-fsrs/dist/index.mjs:505`).
@@ -32,10 +34,14 @@ recurring 50-verse wall with no way out. Fuzz jitters intervals and spreads the 
 const scheduler = fsrs({ enable_fuzz: true })
 ```
 
-Consider also exposing `request_retention` as a user setting later (default `0.9`), phrased
-as "quer lembrar melhor? mais revisões" rather than a number.
+Shipped with a regression test in `app/src/lib/scheduler.test.ts`: it matures a card past the
+2.5-day fuzz floor and asserts the interval diverges from a plain `fsrs()` scheduler. Probed
+across 20 sample cards before writing it — all 20 diverge, so it is not flaky.
 
-### 2. Sort by due date before applying the session limit — `app/src/routes/review.tsx:190-193`
+Consider also exposing `request_retention` as a user setting later (default `0.9`), phrased
+as "quer lembrar melhor? mais revisões" rather than a number. **Still open.**
+
+### 2. Sort by due date before applying the session limit — `app/src/routes/review.tsx:190-193` — ✅ DONE
 
 ```ts
 const selected = filteredProgress.slice(sessionOffsetRef.current, end)
@@ -45,6 +51,12 @@ const cards = getDueCards(selected)   // sorts, but only within the already-slic
 `filteredProgress` preserves Dexie insertion (id) order. With `sessionLimit = 10` and 200
 verses due, the session is always the same 10 *earliest-added* verses; the most overdue
 never appear. Sort by `card.due` ascending **before** slicing.
+
+Shipped as a `byDueDate` comparator applied at both return paths of the `filteredProgress`
+memo (`review.tsx:116-158`), including the pinned-selection path. Sorts on the indexed
+`dueDate` column rather than parsing `cardJson` — `dueDate` is written at every create and
+grade site (`db.ts:485,554`, `browse.tsx:232,280`, `sync.ts:196`, `review.tsx:260`), so it
+stays in step with the card and costs no JSON parse per row.
 
 ### 3. Persist review logs — new table, `app/src/lib/db.ts` + `worker/db/schema.ts`
 
@@ -205,8 +217,11 @@ queue component and a session component.
 
 ## Suggested order
 
-1. Items 1, 2 — two small diffs, immediate scheduler correctness.
-2. Item 3 — data model change that unblocks stats and future optimization.
+1. ~~Items 1, 2 — two small diffs, immediate scheduler correctness.~~ ✅ Done. Verified with
+   `check:ts`, `check` and `test:unit` (198 passing). `check:layout` could not run on this
+   machine — Playwright browsers are not installed (`npx playwright install`), unrelated to
+   the change.
+2. Item 3 — data model change that unblocks stats and future optimization. **Next.**
 3. Item 7 — dead code already written, just needs wiring.
 4. Items 5, 6, 8 — deliberate practice loop, all building on existing `wordStats`.
 5. Item 4 — largest new feature, highest user-facing demand.

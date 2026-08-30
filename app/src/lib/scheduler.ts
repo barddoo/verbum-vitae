@@ -4,7 +4,10 @@ import { stateFromCard } from './srs'
 
 export { Rating }
 
-const scheduler = fsrs()
+// Fuzz jitters each interval by a small random amount. Without it, a collection added in one
+// tap (every card due at the same instant) advances in lockstep forever — a 50-verse
+// collection stays a recurring 50-verse wall. ts-fsrs defaults this to false.
+const scheduler = fsrs({ enable_fuzz: true })
 
 export function getNextCard(card: Card, rating: Grade, now: Date = new Date()) {
   const result = scheduler.next(card, now, rating)

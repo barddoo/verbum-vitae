@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Check } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { PageMeta } from '../components/page-meta'
-import { type CollectionVerse, db, fetchVersesBatch, parseTextKey } from '../lib/db'
+import { type CollectionVerse, db, fetchVersesBatch, type Progress, parseTextKey } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
 import { getNextCard } from '../lib/scheduler'
 import { type Card, type Grade, getDueCards, parseCardJson } from '../lib/srs'
@@ -17,6 +17,9 @@ type PracticeMode = 'flashcard' | 'fill-blank' | 'typing'
 type CardStateFilter = 'all' | 'new' | 'learning' | 'review'
 
 const LIMIT_OPTIONS = [5, 10, 20, 50] as const
+
+/** Most overdue first. `dueDate` mirrors `cardJson`'s due and is written on every create and grade. */
+const byDueDate = (a: Progress, b: Progress) => a.dueDate - b.dueDate
 
 interface DueItem {
   progressId: number
@@ -116,7 +119,7 @@ export function ReviewPage() {
     // pinned verse selection bypasses all other filters
     if (filterVerseIds !== null) {
       const idSet = new Set(filterVerseIds)
-      return allProgress.filter((p) => idSet.has(p.verseId))
+      return allProgress.filter((p) => idSet.has(p.verseId)).sort(byDueDate)
     }
 
     let base: typeof allProgress
@@ -148,7 +151,10 @@ export function ReviewPage() {
       })
     }
 
-    return base
+    // `startReview` slices this list to honour the session limit, so the order here decides which
+    // verses a capped session gets. Dexie hands rows back in id order, which would pin every
+    // capped session to the same earliest-added verses and never surface the most overdue ones.
+    return [...base].sort(byDueDate)
   }, [allProgress, filterVerseIds, filterStatus, filterCollectionId, collectionVerseIds, filterCardState])
 
   const reviewCount = sessionLimit ? Math.min(filteredProgress.length, sessionLimit) : filteredProgress.length

@@ -30,8 +30,12 @@ describe('useSwipeToDelete', () => {
   it('moves translateX left as pointer moves left', () => {
     const { result } = renderHook(() => useSwipeToDelete(vi.fn()))
 
-    act(() => { result.current.handlePointerDown(pe(100)) })
-    act(() => { result.current.handlePointerMove(pe(60)) })
+    act(() => {
+      result.current.handlePointerDown(pe(100))
+    })
+    act(() => {
+      result.current.handlePointerMove(pe(60))
+    })
 
     expect(result.current.translateX).toBe(-40)
   })
@@ -39,8 +43,12 @@ describe('useSwipeToDelete', () => {
   it('clamps translateX at -80 (MAX_TRANSLATE)', () => {
     const { result } = renderHook(() => useSwipeToDelete(vi.fn()))
 
-    act(() => { result.current.handlePointerDown(pe(200)) })
-    act(() => { result.current.handlePointerMove(pe(0)) })
+    act(() => {
+      result.current.handlePointerDown(pe(200))
+    })
+    act(() => {
+      result.current.handlePointerMove(pe(0))
+    })
 
     expect(result.current.translateX).toBe(-80)
   })
@@ -48,8 +56,12 @@ describe('useSwipeToDelete', () => {
   it('ignores rightward movement (translateX stays 0)', () => {
     const { result } = renderHook(() => useSwipeToDelete(vi.fn()))
 
-    act(() => { result.current.handlePointerDown(pe(100)) })
-    act(() => { result.current.handlePointerMove(pe(150)) })
+    act(() => {
+      result.current.handlePointerDown(pe(100))
+    })
+    act(() => {
+      result.current.handlePointerMove(pe(150))
+    })
 
     expect(result.current.translateX).toBe(0)
   })
@@ -58,8 +70,12 @@ describe('useSwipeToDelete', () => {
     const onDelete = vi.fn()
     const { result } = renderHook(() => useSwipeToDelete(onDelete))
 
-    act(() => { result.current.handlePointerDown(pe(200)) })
-    act(() => { result.current.handlePointerMove(pe(100)) })
+    act(() => {
+      result.current.handlePointerDown(pe(200))
+    })
+    act(() => {
+      result.current.handlePointerMove(pe(100))
+    })
     await act(async () => {
       result.current.handlePointerUp(pe(100))
       vi.advanceTimersByTime(200)
@@ -72,8 +88,12 @@ describe('useSwipeToDelete', () => {
     const onDelete = vi.fn()
     const { result } = renderHook(() => useSwipeToDelete(onDelete))
 
-    act(() => { result.current.handlePointerDown(pe(200)) })
-    act(() => { result.current.handlePointerMove(pe(160)) })
+    act(() => {
+      result.current.handlePointerDown(pe(200))
+    })
+    act(() => {
+      result.current.handlePointerMove(pe(160))
+    })
     await act(async () => {
       result.current.handlePointerUp(pe(160))
     })
@@ -85,9 +105,15 @@ describe('useSwipeToDelete', () => {
   it('resets translateX to 0 on pointer cancel', () => {
     const { result } = renderHook(() => useSwipeToDelete(vi.fn()))
 
-    act(() => { result.current.handlePointerDown(pe(100)) })
-    act(() => { result.current.handlePointerMove(pe(50)) })
-    act(() => { result.current.handlePointerCancel() })
+    act(() => {
+      result.current.handlePointerDown(pe(100))
+    })
+    act(() => {
+      result.current.handlePointerMove(pe(50))
+    })
+    act(() => {
+      result.current.handlePointerCancel()
+    })
 
     expect(result.current.translateX).toBe(0)
   })
@@ -95,11 +121,17 @@ describe('useSwipeToDelete', () => {
   it('ignores horizontal tracking after vertical scroll is detected', () => {
     const { result } = renderHook(() => useSwipeToDelete(vi.fn()))
 
-    act(() => { result.current.handlePointerDown(pe(100, 100)) })
+    act(() => {
+      result.current.handlePointerDown(pe(100, 100))
+    })
     // Move more vertically than horizontally — detected as vertical scroll
-    act(() => { result.current.handlePointerMove({ ...pe(102, 120) }) })
+    act(() => {
+      result.current.handlePointerMove({ ...pe(102, 120) })
+    })
     // Further horizontal movement should be ignored
-    act(() => { result.current.handlePointerMove(pe(50, 120)) })
+    act(() => {
+      result.current.handlePointerMove(pe(50, 120))
+    })
 
     expect(result.current.translateX).toBe(0)
   })
@@ -107,9 +139,15 @@ describe('useSwipeToDelete', () => {
   it('reset() returns translateX to 0', () => {
     const { result } = renderHook(() => useSwipeToDelete(vi.fn()))
 
-    act(() => { result.current.handlePointerDown(pe(100)) })
-    act(() => { result.current.handlePointerMove(pe(60)) })
-    act(() => { result.current.reset() })
+    act(() => {
+      result.current.handlePointerDown(pe(100))
+    })
+    act(() => {
+      result.current.handlePointerMove(pe(60))
+    })
+    act(() => {
+      result.current.reset()
+    })
 
     expect(result.current.translateX).toBe(0)
   })
