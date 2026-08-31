@@ -550,10 +550,7 @@ export function CollectionDetailPage() {
         )}
       </div>
 
-      <div
-        className="collection-detail-header"
-        style={col.color ? ({ '--col-accent': col.color } as React.CSSProperties) : undefined}
-      >
+      <div className="collection-detail-header" style={col.color ? ({ '--col-accent': col.color } as React.CSSProperties) : undefined}>
         <span className="collection-detail-icon">{col.icon}</span>
         <h2 className="collection-detail-name">{col.name}</h2>
         <p className="collection-detail-desc">{col.description}</p>
@@ -704,7 +701,15 @@ export function CollectionDetailPage() {
               onClick={handleAddAsBlock}
               disabled={addingBlock || addedBlock || col.total < 2}
             >
-              {addingBlock ? 'Adicionando…' : addedBlock ? <><Check size={14} aria-hidden /> Bloco</> : 'Como bloco'}
+              {addingBlock ? (
+                'Adicionando…'
+              ) : addedBlock ? (
+                <>
+                  <Check size={14} aria-hidden /> Bloco
+                </>
+              ) : (
+                'Como bloco'
+              )}
             </button>
             <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
               + Versículos

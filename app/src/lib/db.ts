@@ -739,7 +739,14 @@ export async function createUserCollection(data: {
   color: string | null
   verses: { verseId: string; translation: string }[]
 }): Promise<number> {
-  const slugValue = slugify(data.name) || `collection-${Date.now()}`
+  const baseSlug = slugify(data.name) || `collection-${Date.now()}`
+  // Names that slugify to the same value (e.g. "Coração" vs "Coracao") would collide on the
+  // unique `slug` index; append a counter instead of letting the insert throw.
+  let slugValue = baseSlug
+  for (let i = 2; ; i++) {
+    if (await db.collections.where({ slug: slugValue }).first()) slugValue = `${baseSlug}-${i}`
+    else break
+  }
   const createdAt = Date.now()
 
   const collectionId = await db.collections.put({

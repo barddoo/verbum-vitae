@@ -244,31 +244,35 @@ async function pullCollections() {
     const now = Date.now()
     const createdAt = serverCol.createdAt ? new Date(serverCol.createdAt as string).getTime() : now
 
-    let collectionId: number
-
-    if (localCol) {
-      collectionId = localCol.id!
-      await db.collections.update(collectionId, {
-        name: serverCol.name as string,
-        description: serverCol.description as string,
-        icon: serverCol.icon as string,
-        color: (serverCol.color as string) || undefined,
-        isBuiltin: (serverCol.isBuiltin as number) ?? 0,
-        createdAt,
-      })
-    } else {
-      const newId = await db.collections.put({
-        slug,
-        name: serverCol.name as string,
-        description: (serverCol.description as string) || '',
-        icon: (serverCol.icon as string) || '📖',
-        color: (serverCol.color as string) || undefined,
-        isBuiltin: (serverCol.isBuiltin as number) ?? 0,
-        createdAt,
-      })
-      if (!newId) continue
-      collectionId = newId
-    }
+    // Check+insert atomically: the collections page seeds bundled collections in an explicit
+    // transaction, so a concurrent sync pull putting the same slug would otherwise trip the
+    // unique `slug` index. A single explicit transaction serializes the two.
+    const collectionId = await db.transaction('rw', db.collections, async () => {
+      const existing = await db.collections.where({ slug }).first()
+      if (existing) {
+        await db.collections.update(existing.id!, {
+          name: serverCol.name as string,
+          description: serverCol.description as string,
+          icon: serverCol.icon as string,
+          color: (serverCol.color as string) || undefined,
+          isBuiltin: (serverCol.isBuiltin as number) ?? 0,
+          createdAt,
+        })
+        return existing.id!
+      }
+      return (
+        (await db.collections.put({
+          slug,
+          name: serverCol.name as string,
+          description: (serverCol.description as string) || '',
+          icon: (serverCol.icon as string) || '📖',
+          color: (serverCol.color as string) || undefined,
+          isBuiltin: (serverCol.isBuiltin as number) ?? 0,
+          createdAt,
+        })) ?? null
+      )
+    })
+    if (collectionId == null) continue
 
     const serverVerses = serverCol.verses as { verseId: string; translation: string; sortOrder: number }[] | undefined
     if (!serverVerses?.length) {
