@@ -14,8 +14,8 @@
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/auth/register` | Create account (email + password ≥ 8 chars) |
-| POST | `/api/auth/login` | Authenticate, return JWT |
+| POST | `/api/auth/register` | Create account (email + password ≥ 8 chars). **403** if the password was found in a data breach (Cloudflare leaked credentials) |
+| POST | `/api/auth/login` | Authenticate, return JWT. Response includes `leakedCredentials: boolean` |
 
 ### Password Hashing
 
@@ -36,6 +36,16 @@ Authorization: Bearer <token>
 ```
 - Extracts token, verifies with `hono/jwt` `verify()`
 - Returns `{ sub, email }` or `null` (→ 401)
+
+### Leaked Credentials (Cloudflare WAF)
+
+Origin-side handling of [Cloudflare leaked credentials detection](https://developers.cloudflare.com/waf/detections/leaked-credentials/):
+
+- Cloudflare scans auth requests and, when a leak is found, injects an `Exposed-Credential-Check` request header (value `1` pair / `2` username / `3` similar pair / `4` password). Requires the **Add Leaked Credentials Checks Header** managed transform to be enabled (Rules → Transform Rules → Managed transforms).
+- `worker/src/auth.ts` parses that header (`parseLeakedCheckHeader`) — no extra network call, no credits.
+- **Register** (`/register`): rejects with `403` when the password is password-related leak (values 1, 3, 4). Username-only leaks (2) don't block.
+- **Login** (`/login`): authenticates normally but returns `leakedCredentials: true`; the app shows a dismissible warning banner. Login is not blocked because there is no password-reset flow yet.
+- The check silently no-ops when the header is absent (transform off or no leak detected).
 
 ---
 

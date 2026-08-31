@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hashPassword, verifyPassword } from './auth'
+import { hashPassword, isPasswordLeaked, parseLeakedCheckHeader, verifyPassword } from './auth'
 
 describe('hashPassword', () => {
   it('returns salt:hash format', async () => {
@@ -35,5 +35,33 @@ describe('verifyPassword', () => {
     expect(h1).not.toBe(h2)
     expect(await verifyPassword('same', h1)).toBe(true)
     expect(await verifyPassword('same', h2)).toBe(true)
+  })
+})
+
+describe('parseLeakedCheckHeader', () => {
+  it('maps header values to match types', () => {
+    expect(parseLeakedCheckHeader('1')).toBe('pair')
+    expect(parseLeakedCheckHeader('2')).toBe('username')
+    expect(parseLeakedCheckHeader('3')).toBe('similar')
+    expect(parseLeakedCheckHeader('4')).toBe('password')
+  })
+
+  it('returns null when header is absent or unknown', () => {
+    expect(parseLeakedCheckHeader(undefined)).toBeNull()
+    expect(parseLeakedCheckHeader('0')).toBeNull()
+    expect(parseLeakedCheckHeader('')).toBeNull()
+  })
+})
+
+describe('isPasswordLeaked', () => {
+  it('is true for password-related leaks', () => {
+    expect(isPasswordLeaked('pair')).toBe(true)
+    expect(isPasswordLeaked('similar')).toBe(true)
+    expect(isPasswordLeaked('password')).toBe(true)
+  })
+
+  it('is false for username-only leak or no leak', () => {
+    expect(isPasswordLeaked('username')).toBe(false)
+    expect(isPasswordLeaked(null)).toBe(false)
   })
 })

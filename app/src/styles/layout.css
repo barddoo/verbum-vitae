@@ -324,6 +324,41 @@
   opacity: 1;
 }
 
+/* LEAKED CREDENTIALS BANNER */
+
+.leaked-credentials-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: calc(0.5rem + var(--safe-area-inset-top, 0px)) 1rem 0.5rem;
+  background: var(--gold-dim);
+  border-bottom: 1px solid var(--gold);
+  font-size: 0.8125rem;
+  color: var(--gold);
+  animation: slideDown 0.25s ease-out;
+}
+
+.leaked-credentials-banner-text {
+  font-weight: 600;
+}
+
+.leaked-credentials-banner-dismiss {
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
+  line-height: 1;
+  margin-left: 0.25rem;
+  opacity: 0.6;
+}
+
+.leaked-credentials-banner-dismiss:hover {
+  opacity: 1;
+}
+
 /* APP BODY */
 
 .app-body {

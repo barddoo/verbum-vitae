@@ -1,6 +1,7 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
 import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
 import { createContext, lazy, Suspense, useCallback, useEffect, useReducer, useState } from 'react'
+import { LeakedCredentialsBanner } from './components/leaked-credentials-banner'
 import { PresenceBadge } from './components/presence-badge'
 import { PwaInstallButton } from './components/pwa-install-button'
 import { SyncErrorBanner } from './components/sync-error-banner'
@@ -70,6 +71,7 @@ function RootLayout() {
   return (
     <div className="app-shell">
       <SyncErrorBanner />
+      <LeakedCredentialsBanner />
       <UpdateBanner />
       <header className="top-bar">
         <Link to="/" className="top-bar-logo">

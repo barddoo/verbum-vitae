@@ -12,6 +12,7 @@ Bun monorepo. Workspaces: `app`, `worker`, `packages/*`. PT-BR only. PWA + Capac
 
 - Frontend auth: React Context + localStorage JWT. No dedicated auth routes — modal overlay.
 - Cross-device sync: 30s interval + visibility/online events. Exponential backoff (max 120s).
+- Leaked credentials: origin reads the Cloudflare `Exposed-Credential-Check` header on `/auth/register` (blocks breached passwords, 403) and `/auth/login` (returns `leakedCredentials`, app shows warning banner). Requires the **Add Leaked Credentials Checks Header** managed transform. See [`AUTH.md`](../AUTH.md).
 
 ## Bible data
 

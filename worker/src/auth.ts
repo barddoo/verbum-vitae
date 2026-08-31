@@ -7,6 +7,29 @@ import { z } from 'zod'
 const PBKDF2_ITERATIONS = 100_000
 const PBKDF2_KEY_LENGTH = 32
 
+const LEAKED_CREDENTIALS_HEADER = 'Exposed-Credential-Check'
+
+export type LeakedCredentialMatch = 'pair' | 'username' | 'similar' | 'password'
+
+export function parseLeakedCheckHeader(value: string | undefined): LeakedCredentialMatch | null {
+  switch (value) {
+    case '1':
+      return 'pair'
+    case '2':
+      return 'username'
+    case '3':
+      return 'similar'
+    case '4':
+      return 'password'
+    default:
+      return null
+  }
+}
+
+export function isPasswordLeaked(leaked: LeakedCredentialMatch | null): boolean {
+  return leaked === 'pair' || leaked === 'similar' || leaked === 'password'
+}
+
 const authApp = new Hono<{ Bindings: { DB: D1Database; JWT_SECRET: string } }>()
 
 const registerSchema = z.object({
@@ -73,6 +96,11 @@ authApp.post('/register', zValidator('json', registerSchema), async (c) => {
   const existing = await c.env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first()
   if (existing) return c.json({ error: 'Email já registrado' }, 409)
 
+  const leaked = parseLeakedCheckHeader(c.req.header(LEAKED_CREDENTIALS_HEADER))
+  if (isPasswordLeaked(leaked)) {
+    return c.json({ error: 'Esta senha foi encontrada em um vazamento de dados. Escolha outra senha.' }, 403)
+  }
+
   const id = uuidv7()
   const passwordHash = await hashPassword(password)
   const now = new Date().toISOString()
@@ -98,8 +126,13 @@ authApp.post('/login', zValidator('json', loginSchema), async (c) => {
   const valid = await verifyPassword(password, user.password_hash)
   if (!valid) return c.json({ error: 'Credenciais inválidas' }, 401)
 
+  const leaked = parseLeakedCheckHeader(c.req.header(LEAKED_CREDENTIALS_HEADER))
   const token = await generateToken(user.id, user.email, secret)
-  return c.json({ token, user: { id: user.id, email: user.email, displayName: user.display_name ?? null } })
+  return c.json({
+    token,
+    user: { id: user.id, email: user.email, displayName: user.display_name ?? null },
+    leakedCredentials: isPasswordLeaked(leaked),
+  })
 })
 
 export { authApp as authRoutes }

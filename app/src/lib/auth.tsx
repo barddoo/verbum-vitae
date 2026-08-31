@@ -16,6 +16,8 @@ interface AuthContextType {
   logout: () => void
   updateDisplayName: (name: string) => Promise<void>
   isOnline: boolean
+  leakedCredentials: boolean
+  clearLeakedCredentials: () => void
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -24,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('auth_token'))
   const [displayName, setDisplayName] = useState<string | null>(() => localStorage.getItem('auth_display_name'))
   const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [leakedCredentials, setLeakedCredentials] = useState(false)
 
   const user = useMemo<User | null>(() => {
     if (!token) return null
@@ -60,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (dn) localStorage.setItem('auth_display_name', dn)
     setToken(data.token)
     setDisplayName(dn)
+    setLeakedCredentials(data.leakedCredentials === true)
   }
 
   const register = async (email: string, password: string) => {
@@ -67,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     cachedSet('auth_token', data.token)
     setToken(data.token)
     setDisplayName(null)
+    setLeakedCredentials(false)
   }
 
   const logout = () => {
@@ -74,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('auth_display_name')
     setToken(null)
     setDisplayName(null)
+    setLeakedCredentials(false)
   }
 
   const updateDisplayName = async (name: string) => {
@@ -82,9 +88,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setDisplayName(name)
   }
 
+  const clearLeakedCredentials = () => setLeakedCredentials(false)
+
   const value = useMemo(
-    () => ({ user, token, login, register, logout, updateDisplayName, isOnline }),
-    [user, token, login, register, logout, updateDisplayName, isOnline],
+    () => ({ user, token, login, register, logout, updateDisplayName, isOnline, leakedCredentials, clearLeakedCredentials }),
+    [user, token, login, register, logout, updateDisplayName, isOnline, leakedCredentials],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
