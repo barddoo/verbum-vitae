@@ -328,16 +328,16 @@ async function seedBibleText(translation: string) {
   let jsonData: { books: string[]; verses: { b: number; c: number; v: number; t: string }[] } | null = null
 
   try {
-    const res = await fetch(`/bible-${translation}.json.br`)
+    const res = await fetch(`/bible-${translation}.json.gz`)
     if (res.ok) {
       try {
         const buf = await res.arrayBuffer()
-        const ds = new DecompressionStream('br' as CompressionFormat)
+        const ds = new DecompressionStream('gzip')
         const blob = new Blob([buf])
         const decompressed = await new Response(blob.stream().pipeThrough(ds)).text()
         jsonData = JSON.parse(decompressed)
-      } catch {
-        console.warn('Brotli unsupported, using uncompressed fallback')
+      } catch (e: unknown) {
+        console.error('Gzip decompression failed, using uncompressed fallback', e)
       }
     }
   } catch {
