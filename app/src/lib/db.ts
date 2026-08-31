@@ -97,7 +97,12 @@ export interface SyncLog {
   createdAt: number
 }
 
-export const db = new Dexie('RememberBible') as Dexie & {
+// `cache: 'disabled'` turns off Dexie's optimisticOps machinery (see sync.ts). A failing
+// auto-increment write to a unique-indexed table pushes null into optimisticOps and then
+// every live query on that table crashes in applyOptimisticOps — "Cannot read properties of
+// null (reading 'type')". No upstream fix exists in 4.4.5. liveQuery still works; queries
+// just re-run instead of being patched from a cache.
+export const db = new Dexie('RememberBible', { cache: 'disabled' }) as Dexie & {
   verses: EntityTable<TextItem, 'id'>
   progress: EntityTable<Progress, 'id'>
   reviewLog: EntityTable<ReviewLog, 'id'>

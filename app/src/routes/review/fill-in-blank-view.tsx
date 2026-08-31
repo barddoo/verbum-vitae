@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useMemo, useState } from 'react'
-import { getWordHeat } from '../../lib/db'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import { getWordHeat, recordWordAccuracy } from '../../lib/db'
 import type { Grade } from '../../lib/srs'
 import { GradingButtons } from './grading-buttons'
 
@@ -20,6 +20,36 @@ function heatClass(accuracy: number): string {
   if (accuracy >= 0.8) return 'heat-good'
   if (accuracy >= 0.5) return 'heat-ok'
   return 'heat-bad'
+}
+
+function pickBlankIndices(pool: number[], count: number, heat: Map<number, number>, rand: () => number): Set<number> {
+  // Bias toward low-accuracy words, keeping seeded randomness so the selection does not
+  // ossify. Unknown heat defaults to neutral.
+  const weight = (i: number) => {
+    const acc = heat.get(i) ?? -1
+    const known = acc >= 0 ? acc : 0.5
+    return (1 - known) * (0.75 + 0.5 * rand())
+  }
+  const items = pool.map((i) => ({ i, w: weight(i) }))
+  const indices = new Set<number>()
+  while (indices.size < count && items.length > 0) {
+    let total = 0
+    for (const it of items) total += it.w
+    if (total <= 0) break
+    let pick = rand() * total
+    let k = 0
+    for (; k < items.length - 1; k++) {
+      pick -= items[k].w
+      if (pick <= 0) break
+    }
+    indices.add(items[k].i)
+    items.splice(k, 1)
+  }
+  for (const it of items) {
+    if (indices.size >= count) break
+    indices.add(it.i)
+  }
+  return indices
 }
 
 export function FillInBlankView({
@@ -43,6 +73,8 @@ export function FillInBlankView({
   const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set())
   const [revealedAll, setRevealedAll] = useState(false)
   const [heat, setHeat] = useState<Map<number, number>>(new Map())
+  const hasRecordedRef = useRef(false)
+  const interactedRef = useRef(false)
 
   const words = useMemo(() => verseText.trim().split(WORD_SPLIT), [verseText])
 
@@ -59,10 +91,18 @@ export function FillInBlankView({
       seed = (seed * 1103515245 + 12345) | 0
       return (seed >>> 0) / 4294967296
     }
-    const indices = new Set<number>()
-    while (indices.size < count) indices.add(pool[Math.floor(rand() * pool.length)])
-    return indices
-  }, [verseId, words, today])
+    return pickBlankIndices(pool, count, heat, rand)
+  }, [verseId, words, today, heat])
+
+  // The blank set re-picks once after the local heat query resolves. Follow it until the
+  // user taps, then freeze it: a mid-session resolve must not shift blanks under the user
+  // or misattribute recording against a set the user never saw.
+  const [stableBlanks, setStableBlanks] = useState<Set<number>>(blankIndices)
+
+  useEffect(() => {
+    if (interactedRef.current) return
+    setStableBlanks(blankIndices)
+  }, [blankIndices])
 
   useEffect(() => {
     getWordHeat(verseId, translation, words.length).then((h) => {
@@ -73,13 +113,32 @@ export function FillInBlankView({
     setRevealed(false)
     setRevealedIndices(new Set())
     setRevealedAll(false)
+    hasRecordedRef.current = false
+    interactedRef.current = false
+    setStableBlanks(blankIndices)
   }, [verseId, translation, words.length])
 
   const allRevealed = progressive
-    ? revealedAll || blankIndices.size === 0 || (blankIndices.size > 0 && revealedIndices.size === blankIndices.size)
+    ? revealedAll || stableBlanks.size === 0 || (stableBlanks.size > 0 && revealedIndices.size === stableBlanks.size)
     : revealed
 
+  useEffect(() => {
+    if (!progressive || !allRevealed || hasRecordedRef.current) return
+    hasRecordedRef.current = true
+    const incorrect = revealedIndices
+    if (revealedAll) {
+      // "Revelar todos" is a bulk give-up gesture: record only the blanks the user
+      // explicitly tapped as incorrect. Crediting the untapped blanks as correct (the
+      // individual-tap path) would pollute word heat with an optimistic bulk signal.
+      recordWordAccuracy(verseId, translation, new Set(), incorrect, words)
+    } else {
+      const correct = new Set([...stableBlanks].filter((i) => !incorrect.has(i)))
+      recordWordAccuracy(verseId, translation, correct, incorrect, words)
+    }
+  }, [progressive, allRevealed, revealedIndices, stableBlanks, revealedAll, verseId, translation, words])
+
   function revealWord(i: number) {
+    interactedRef.current = true
     setRevealedIndices((prev) => {
       const next = new Set(prev)
       next.add(i)
@@ -88,6 +147,7 @@ export function FillInBlankView({
   }
 
   function revealAll() {
+    interactedRef.current = true
     setRevealedAll(true)
   }
 
@@ -97,7 +157,7 @@ export function FillInBlankView({
       {question && <p className="flashcard-question">{question}</p>}
       <div className="fill-blank-text">
         {words.map((word, i) => {
-          const blank = blankIndices.has(i)
+          const blank = stableBlanks.has(i)
           const isRevealed = progressive ? revealedAll || revealedIndices.has(i) : revealed
           const hcls = isRevealed && !blank ? heatClass(heat.get(i) ?? -1) : ''
           if (blank && !isRevealed && progressive) {
@@ -125,7 +185,7 @@ export function FillInBlankView({
       </div>
       <div className="fill-blank-actions">
         {progressive ? (
-          blankIndices.size > 0 &&
+          stableBlanks.size > 0 &&
           !revealedAll && (
             <button type="button" className="btn btn-secondary" onClick={revealAll}>
               Revelar todos

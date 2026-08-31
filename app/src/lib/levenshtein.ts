@@ -9,3 +9,18 @@ export function levenshtein(a: string, b: string): number {
       dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1
   return dp[m][n]
 }
+
+export function normalizeForComparison(w: string): string {
+  return w
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '')
+}
+
+export function isNearMiss(target: string, typed: string): boolean {
+  const a = normalizeForComparison(target)
+  const b = normalizeForComparison(typed)
+  if (a === b) return true
+  return levenshtein(a, b) <= (a.length > 7 ? 2 : 1)
+}

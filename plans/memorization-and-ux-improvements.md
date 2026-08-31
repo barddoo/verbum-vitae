@@ -15,7 +15,8 @@ Three findings are load-bearing and everything else is incremental on top:
 
 Items are grouped in tiers by payoff. Tier 1 are near one-liners with outsized effect.
 
-**Status:** Tier 1 (items 1, 2, 3) is shipped. Item 7 is the next one up.
+**Status:** Tier 1 (items 1, 2, 3) is shipped. The deliberate-practice loop — items 7, 5, 6, 8 —
+is shipped. Item 4 (audio/TTS) is the next one up.
 
 ---
 
@@ -116,7 +117,7 @@ top-3 in what users ask for; the app's own tip list recommends reading aloud twi
 - Speak the verse on flashcard flip / on reveal.
 - A "modo escuta" that loops the day's queue hands-free.
 
-### 5. Weight blanks by word heat — `app/src/routes/review/fill-in-blank-view.tsx:51-65`
+### 5. Weight blanks by word heat — `app/src/routes/review/fill-in-blank-view.tsx:51-65` — ✅ DONE
 
 `blankIndices` picks 35% of eligible words with a day+verseId-seeded PRNG. Meanwhile
 `getWordHeat` is already fetched at line 68 and used only to *color* revealed words. The app
@@ -125,14 +126,23 @@ knows exactly which words the user fails and then blanks at random.
 Bias selection toward low-accuracy indices (keep some randomness so it doesn't ossify).
 Turns dice-rolling into deliberate practice.
 
-### 6. Record word accuracy in fill-blank mode — `fill-in-blank-view.tsx` + `db.ts:414`
+Shipped as weighted sampling inside the `blankIndices` memo: `weight = (1 − accuracy) ×
+(0.75 + 0.5 × seededRand())`, unknown heat defaults to 0.5. Same day+verseId seed, so the
+set stays stable within a day; the memo now depends on the fetched `heat` map, recomputing
+once after the local Dexie query resolves.
+
+### 6. Record word accuracy in fill-blank mode — `fill-in-blank-view.tsx` + `db.ts:414` — ✅ DONE
 
 Only typing mode calls `recordWordAccuracy`. In progressive mode a tap on a blank is an
 explicit "I gave up on this word" — a perfect implicit signal, currently discarded. Record
 tapped blanks as incorrect and blanks revealed without a tap as correct. Roughly doubles
 the heat corpus feeding item 5.
 
-### 7. Wire up `levenshtein.ts` — it is dead code
+Shipped with a `hasRecordedRef` guard: when `progressive && allRevealed`, tapped blanks
+(`revealedIndices`) are recorded incorrect and the rest of the blanks correct — once per
+verse. Non-progressive mode is unchanged (nothing recorded).
+
+### 7. Wire up `levenshtein.ts` — it is dead code — ✅ DONE
 
 `app/src/lib/levenshtein.ts` has zero production imports (only its own test). Typing mode
 (`typing-practice-view.tsx:73`) compares words with exact normalized equality, so a single
@@ -146,12 +156,24 @@ typo marks the word wrong. Worse, `norm()`'s `[^a-zA-ZÀ-ÿ0-9]` class *keeps* a
 Fast typists currently get punished for finger slips, self-grade lower, and get a schedule
 tuned to their keyboard rather than their memory.
 
-### 8. Derive the suggested grade from typing accuracy — `typing-practice-view.tsx:168`
+Shipped with `normalizeForComparison` (lowercase → NFD → strip combining marks → strip
+non-alphanumeric, so "coração" == "coracao") and `isNearMiss` (normalized Levenshtein ≤ 1,
+≤ 2 above 7 chars). `typing-practice-view` now classifies each aligned word as exact /
+near / miss: near-misses render `heat-near` amber in `HeatVerse` (optional `near` prop) and
+amber in the diff list, count toward accuracy (`(correct + near) / m`), and are recorded as
+*correct* in `recordWordAccuracy`. `levenshtein` itself is unchanged, so its raw-string
+tests still hold.
+
+### 8. Derive the suggested grade from typing accuracy — `typing-practice-view.tsx:168` — ✅ DONE
 
 Typing mode measures recall objectively, then hands off to the generic `GradingButtons` and
 asks the user to guess. The app's own tip #4 warns that dishonest self-rating breaks the
 schedule. Pre-select a grade (100% → Fácil, ≥85% → Bom, ≥60% → Difícil, <60% → Esqueci)
 with the user free to override.
+
+Shipped as an optional `suggested` prop on `GradingButtons` — the matching button gets a
+`grade-suggested` outline, nothing auto-submits. Other callers (flashcard, fill-blank) are
+unaffected.
 
 ### 9. First-letter practice mode — new mode
 
@@ -246,9 +268,12 @@ queue component and a session component.
    `check:ts` and `check` clean, `test:unit` 202 passing. Migration `0007` applied against the
    local D1 and the replay no-op verified there (a second insert of the same review leaves one
    row). Remote still needs `bun run db:migrate:remote`, which `bun run deploy` does first.
-3. Item 7 — dead code already written, just needs wiring. **Next.**
-4. Items 5, 6, 8 — deliberate practice loop, all building on existing `wordStats`.
-5. Item 4 — largest new feature, highest user-facing demand.
+3. ~~Item 7 — dead code already written, just needs wiring.~~ ✅ Done.
+4. ~~Items 5, 6, 8 — deliberate practice loop, all building on existing `wordStats`.~~ ✅ Done.
+   `check:ts` and `check` clean, `test:unit` 208 passing. `check:layout` still cannot run
+   on this machine (Playwright browsers not installed). Note `bun run check` also applied
+   Biome safe fixes to `collections.tsx` and `fonts.css` (unrelated, repo-wide).
+5. Item 4 — largest new feature, highest user-facing demand. **Next.**
 6. Tier 3 as capacity allows; item 20 alongside whichever file is being touched anyway.
 
 ## Decisions & Rationale

@@ -586,9 +586,14 @@
   font-weight: 600;
 }
 
+.heat-near {
+  color: var(--gold);
+}
+
 .heat-verse .heat-good::first-letter,
 .heat-verse .heat-ok::first-letter,
-.heat-verse .heat-bad::first-letter {
+.heat-verse .heat-bad::first-letter,
+.heat-verse .heat-near::first-letter {
   initial-letter: inherit;
   font-size: inherit;
   font-weight: inherit;
@@ -704,6 +709,11 @@
   color: var(--parchment);
 }
 
+.grade-suggested {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
 /* FILL IN BLANK */
 
 .fill-blank-text {
@@ -804,6 +814,11 @@
 .diff-typed {
   color: var(--rubric);
   text-decoration: line-through;
+  min-width: 4rem;
+}
+
+.diff-near {
+  color: var(--gold);
   min-width: 4rem;
 }
 

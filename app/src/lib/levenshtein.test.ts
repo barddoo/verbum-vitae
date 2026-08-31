@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { levenshtein } from './levenshtein'
+import { isNearMiss, levenshtein, normalizeForComparison } from './levenshtein'
 
 describe('levenshtein', () => {
   it('returns 0 for identical strings', () => {
@@ -41,5 +41,35 @@ describe('levenshtein', () => {
   it('handles accented characters', () => {
     expect(levenshtein('coração', 'coração')).toBe(0)
     expect(levenshtein('coracao', 'coração')).toBe(2)
+  })
+})
+
+describe('normalizeForComparison', () => {
+  it('strips diacritics and lowercases', () => {
+    expect(normalizeForComparison('Coração')).toBe('coracao')
+    expect(normalizeForComparison('À-ÿ')).toBe('ay')
+  })
+
+  it('strips punctuation but keeps letters and digits', () => {
+    expect(normalizeForComparison('João 3:16, "amém"')).toBe('joao316amem')
+  })
+})
+
+describe('isNearMiss', () => {
+  it('matches identical and accent-agnostic words', () => {
+    expect(isNearMiss('amor', 'amor')).toBe(true)
+    expect(isNearMiss('coração', 'coracao')).toBe(true)
+  })
+
+  it('forgives a single substitution on short words', () => {
+    expect(isNearMiss('casa', 'cara')).toBe(true)
+  })
+
+  it('does not forgive two edits on short words', () => {
+    expect(isNearMiss('casa', 'mesa')).toBe(false)
+  })
+
+  it('forgives two edits on words over 7 chars', () => {
+    expect(isNearMiss('testemunho', 'testemunhau')).toBe(true)
   })
 })

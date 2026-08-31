@@ -1,5 +1,4 @@
-import { ImpactStyle } from '@capacitor/haptics'
-import { Haptics } from '@capacitor/haptics'
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { Check, Pencil, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -528,7 +527,10 @@ export function CollectionDetailPage() {
         )}
       </div>
 
-      <div className="collection-detail-header">
+      <div
+        className="collection-detail-header"
+        style={col.color ? ({ '--col-accent': col.color } as React.CSSProperties) : undefined}
+      >
         <span className="collection-detail-icon">{col.icon}</span>
         <h2 className="collection-detail-name">{col.name}</h2>
         <p className="collection-detail-desc">{col.description}</p>
@@ -536,9 +538,12 @@ export function CollectionDetailPage() {
 
       <div className="collection-detail-progress">
         <div className="collection-detail-stats">
-          <span>
-            {col.memorized}/{col.total}
-          </span>
+          <div>
+            <span className="collection-detail-stat-num">
+              {col.memorized}/{col.total}
+            </span>
+            <span className="collection-detail-stat-label">memorizados</span>
+          </div>
           <span>{col.percent}%</span>
         </div>
         <div className="collection-progress-bar detail">
@@ -546,13 +551,24 @@ export function CollectionDetailPage() {
         </div>
       </div>
 
-      {isUserCollection && verses.length > 0 && !selectionMode && (
-        <p className="collection-swipe-hint">← Deslize para remover · Segure para selecionar</p>
-      )}
+      {!selectionMode &&
+        verses.length > 0 &&
+        (isUserCollection ? (
+          <p className="collection-swipe-hint">← Deslize para remover · Segure para selecionar</p>
+        ) : (
+          <p className="collection-swipe-hint">Segure um versículo para selecionar</p>
+        ))}
       {selectionMode && (
-        <p className="collection-swipe-hint">
-          {selectedVerses.size > 0 ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}` : 'Toque para selecionar'}
-        </p>
+        <div className="collection-select-header">
+          <span className="collection-select-label">
+            {selectedVerses.size > 0
+              ? `${selectedVerses.size} selecionado${selectedVerses.size !== 1 ? 's' : ''}`
+              : 'Toque para selecionar'}
+          </span>
+          <button type="button" className="collection-select-exit" aria-label="Sair do modo seleção" onClick={exitSelectionMode}>
+            <X size={16} aria-hidden />
+          </button>
+        </div>
       )}
 
       <div className="collection-verse-list">
@@ -635,46 +651,43 @@ export function CollectionDetailPage() {
 
       {!selectionMode && isUserCollection && (
         <div className="collection-detail-actions">
-          <button
-            type="button"
-            className={`btn btn-primary btn-large ${added ? 'btn-added' : ''}`}
-            onClick={handleAddAll}
-            disabled={adding || added || col.memorized === col.total}
-          >
-            {adding ? (
-              'Adicionando…'
-            ) : added ? (
-              <>
-                <Check size={16} aria-hidden /> Adicionado
-              </>
-            ) : col.total === 0 ? (
-              'Sem versículos'
-            ) : (
-              `Adicionar à memória (${col.total - col.memorized})`
-            )}
-          </button>
-          <button
-            type="button"
-            className={`btn btn-secondary btn-large ${addedBlock ? 'btn-added' : ''}`}
-            onClick={handleAddAsBlock}
-            disabled={addingBlock || addedBlock || col.total < 2}
-          >
-            {addingBlock ? (
-              'Adicionando…'
-            ) : addedBlock ? (
-              <>
-                <Check size={16} aria-hidden /> Bloco adicionado
-              </>
-            ) : (
-              'Memorizar como bloco'
-            )}
-          </button>
           <div className="collection-detail-actions-row">
+            <button
+              type="button"
+              className={`btn btn-primary btn-large ${added ? 'btn-added' : ''}`}
+              onClick={handleAddAll}
+              disabled={adding || added || col.memorized === col.total}
+            >
+              {adding ? (
+                'Adicionando…'
+              ) : added ? (
+                <>
+                  <Check size={16} aria-hidden /> Adicionado
+                </>
+              ) : col.total === 0 ? (
+                'Sem versículos'
+              ) : (
+                `Adicionar (${col.total - col.memorized})`
+              )}
+            </button>
+            <Link to="/review" className="btn btn-secondary btn-large" aria-label="Revisar esta coleção">
+              Revisar
+            </Link>
+          </div>
+          <div className="collection-detail-actions-row">
+            <button
+              type="button"
+              className={`btn btn-secondary ${addedBlock ? 'btn-added' : ''}`}
+              onClick={handleAddAsBlock}
+              disabled={addingBlock || addedBlock || col.total < 2}
+            >
+              {addingBlock ? 'Adicionando…' : addedBlock ? <><Check size={14} aria-hidden /> Bloco</> : 'Como bloco'}
+            </button>
             <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
               + Versículos
             </Link>
             <button type="button" className="btn btn-secondary" onClick={() => setShowMemorized(true)}>
-              Meus versículos
+              Meus vers.
             </button>
           </div>
         </div>
@@ -682,24 +695,29 @@ export function CollectionDetailPage() {
 
       {!selectionMode && !isUserCollection && (
         <div className="collection-detail-actions">
-          <button
-            type="button"
-            className={`btn btn-primary btn-large ${added ? 'btn-added' : ''}`}
-            onClick={handleAddAll}
-            disabled={adding || added || col.memorized === col.total}
-          >
-            {adding ? (
-              'Adicionando…'
-            ) : added ? (
-              <>
-                <Check size={16} aria-hidden /> Adicionado
-              </>
-            ) : col.total === 0 ? (
-              'Sem versículos'
-            ) : (
-              `Adicionar todos (${col.total - col.memorized})`
-            )}
-          </button>
+          <div className="collection-detail-actions-row">
+            <button
+              type="button"
+              className={`btn btn-primary btn-large ${added ? 'btn-added' : ''}`}
+              onClick={handleAddAll}
+              disabled={adding || added || col.memorized === col.total}
+            >
+              {adding ? (
+                'Adicionando…'
+              ) : added ? (
+                <>
+                  <Check size={16} aria-hidden /> Adicionado
+                </>
+              ) : col.total === 0 ? (
+                'Sem versículos'
+              ) : (
+                `Adicionar (${col.total - col.memorized})`
+              )}
+            </button>
+            <Link to="/review" className="btn btn-secondary btn-large" aria-label="Revisar esta coleção">
+              Revisar
+            </Link>
+          </div>
           <button
             type="button"
             className={`btn btn-secondary btn-large ${addedBlock ? 'btn-added' : ''}`}
