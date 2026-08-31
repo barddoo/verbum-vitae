@@ -78,12 +78,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id: string) {
-          if (
-            id.includes('node_modules/react-dom') ||
-            id.includes('node_modules/react/') ||
-            id.includes('node_modules/@tanstack/react-router')
-          )
-            return 'vendor'
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) return 'react'
+          if (id.includes('node_modules/@tanstack/react-router')) return 'router'
           if (id.includes('node_modules/ts-fsrs')) return 'srs'
           if (id.includes('node_modules/dexie')) return 'dexie'
         },

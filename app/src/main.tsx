@@ -1,5 +1,4 @@
-import '@fontsource-variable/fraunces'
-import '@fontsource-variable/nunito'
+import './styles/fonts.css'
 import { App as CapApp } from '@capacitor/app'
 import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core'
 import { Keyboard } from '@capacitor/keyboard'

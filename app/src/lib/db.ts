@@ -330,24 +330,20 @@ async function seedBibleText(translation: string) {
   try {
     const res = await fetch(`/bible-${translation}.json.gz`)
     if (res.ok) {
-      try {
-        const buf = await res.arrayBuffer()
-        const ds = new DecompressionStream('gzip')
-        const blob = new Blob([buf])
-        const decompressed = await new Response(blob.stream().pipeThrough(ds)).text()
-        jsonData = JSON.parse(decompressed)
-      } catch (e: unknown) {
-        console.error('Gzip decompression failed, using uncompressed fallback', e)
-      }
+      const buf = await res.arrayBuffer()
+      jsonData = JSON.parse(new TextDecoder().decode(buf))
     }
   } catch {
-    /* network error */
+    /* network error or decompression failure */
   }
 
   if (!jsonData) {
-    const fallback = await fetch(`/bible-${translation}.json`)
-    if (!fallback.ok) return
-    jsonData = (await fallback.json()) as typeof jsonData
+    try {
+      const res = await fetch(`/bible-${translation}.json`)
+      if (res.ok) jsonData = (await res.json()) as typeof jsonData
+    } catch {
+      /* network error */
+    }
   }
 
   if (!jsonData) return
@@ -534,6 +530,59 @@ export async function reviewTimestamps(): Promise<number[]> {
 /** Stable identity for one review, so a replayed sync entry cannot double-count a day. */
 export function reviewLogRowId(entry: Pick<ReviewLog, 'verseId' | 'translation' | 'reviewedAt'>) {
   return `${entry.verseId}|${entry.translation}|${entry.reviewedAt}`
+}
+
+export async function addVersesToMemory(
+  verses: { verseId: string; translation: string }[],
+  logChange: (entry: Omit<SyncLog, 'id' | 'userId' | 'synced' | 'createdAt'>) => void,
+): Promise<number> {
+  const { createEmptyCard } = await import('./srs')
+
+  const toAdd: Progress[] = []
+  await db.transaction('r', db.progress, async () => {
+    for (const v of verses) {
+      const existing = await db.progress.where({ verseId: v.verseId, translation: v.translation }).first()
+      if (!existing) {
+        const card = createEmptyCard()
+        toAdd.push({
+          verseId: v.verseId,
+          translation: v.translation,
+          cardJson: JSON.stringify(card),
+          state: 0,
+          dueDate: card.due.getTime(),
+          streak: 0,
+          updatedAt: Date.now(),
+        })
+      }
+    }
+  })
+
+  if (toAdd.length === 0) return 0
+
+  await db.transaction('rw', db.progress, async () => {
+    await db.progress.bulkAdd(toAdd)
+  })
+
+  for (const p of toAdd) {
+    const card = JSON.parse(p.cardJson)
+    logChange({
+      tableName: 'progress',
+      rowId: p.verseId,
+      operation: 'create',
+      data: JSON.stringify({
+        verseId: p.verseId,
+        translation: p.translation,
+        cardJson: p.cardJson,
+        state: p.state,
+        dueDate: p.dueDate,
+        streak: p.streak,
+        nextReview: new Date(card.due).toISOString(),
+        lastReview: null,
+      }),
+    })
+  }
+
+  return toAdd.length
 }
 
 export async function addCollectionToMemory(

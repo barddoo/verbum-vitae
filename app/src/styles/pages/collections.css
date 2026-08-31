@@ -672,6 +672,36 @@
   opacity: 0.5;
 }
 
+.collection-verse-row.selectable {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.875rem 0.625rem 0.875rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  transition: background-color 0.15s;
+}
+
+.collection-verse-row.selectable:not(:disabled):hover {
+  background: var(--leather-hover);
+}
+
+.collection-verse-row.selectable.selected {
+  background: var(--gold-dim);
+  border-bottom-color: rgba(201, 168, 76, 0.2);
+}
+
+.selected-badge {
+  color: var(--gold) !important;
+  background: rgba(201, 168, 76, 0.1) !important;
+  border-color: rgba(201, 168, 76, 0.3) !important;
+}
+
 /* ── Memorized badge ── */
 
 .memorized-badge {

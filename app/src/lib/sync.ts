@@ -189,7 +189,6 @@ async function pullRemote() {
 
         if (hasUnsynced > 0) continue
 
-        const existing = await db.progress.where({ verseId, translation }).first()
         const fields = {
           cardJson: row.cardJson as string,
           state: card.state ?? 0,
@@ -198,11 +197,20 @@ async function pullRemote() {
           updatedAt: new Date(row.updatedAt as string).getTime(),
         }
 
-        if (existing) {
-          await db.progress.update(existing.id!, fields)
-        } else {
-          await db.progress.put({ verseId, translation, ...fields })
-        }
+        // Wrap check+write atomically: prevents a race where a concurrent write
+        // inserts the record between our read and our put. A plain auto-increment
+        // put that fails with a unique-constraint violation causes Dexie 4.x to push
+        // null into optimisticOps, which crashes applyOptimisticOps in useLiveQuery.
+        // An explicit transaction also bypasses the cache middleware, so even a
+        // failure inside it never touches optimisticOps.
+        await db.transaction('rw', db.progress, async () => {
+          const existing = await db.progress.where({ verseId, translation }).first()
+          if (existing) {
+            await db.progress.update(existing.id!, fields)
+          } else {
+            await db.progress.put({ verseId, translation, ...fields })
+          }
+        })
       } catch (err) {
         console.warn('pull: skipping row', err)
       }
