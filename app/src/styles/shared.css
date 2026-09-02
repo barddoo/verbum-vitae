@@ -434,3 +434,68 @@
   margin-top: 0.75rem;
   opacity: 0.7;
 }
+
+/* DAILY REMINDER */
+
+.reminder-card {
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-body);
+}
+
+.reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.reminder-row input[type="checkbox"],
+.reminder-time-input {
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.reminder-label {
+  font-size: 0.8125rem;
+  color: var(--parchment);
+}
+
+.reminder-time-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+  font-size: 0.78rem;
+  color: var(--aged);
+}
+
+.reminder-time-input {
+  background: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  padding: 0.3125rem 0.5rem;
+  color-scheme: dark;
+}
+
+.reminder-status,
+.reminder-error {
+  margin: 0.5rem 0 0;
+  font-size: 0.7rem;
+  font-style: italic;
+}
+
+.reminder-status {
+  color: var(--sage);
+}
+
+.reminder-error {
+  color: var(--rubric);
+}

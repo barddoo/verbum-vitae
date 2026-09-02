@@ -3,7 +3,6 @@ import { Check, X } from 'lucide-react'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { PageMeta } from '../components/page-meta'
-import { useLongPress } from '../hooks/use-long-press'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
 import { db, ensureNonBibleTextSeeded, ensureTranslationSeeded, type TextSourceType, textKey } from '../lib/db'
 import { createEmptyCard } from '../lib/srs'
@@ -172,29 +171,41 @@ export function BrowsePage() {
     setSearchResults([])
   }
 
-  function handleLongPress(v: number) {
+  function enterSelectionMode() {
     setSelectionMode(true)
-    setSelectionAnchor(v)
-    setSelectedVerses(new Set([v]))
+    setSelectionAnchor(null)
+    setSelectedVerses(new Set())
   }
 
-  function handleTap(v: number) {
-    setSelectedVerses((prev) => {
-      const next = new Set(prev)
-      if (next.has(v)) {
-        next.delete(v)
-        if (v === selectionAnchor) setSelectionAnchor(null)
-      } else if (selectionAnchor !== null) {
-        const lo = Math.min(selectionAnchor, v)
-        const hi = Math.max(selectionAnchor, v)
-        for (let i = lo; i <= hi; i++) next.add(i)
-        setSelectionAnchor(v)
-      } else {
-        next.add(v)
-        setSelectionAnchor(v)
-      }
-      return next
-    })
+  // Tap the first verse to set the start, tap the last to select the range in between.
+  // On desktop, Shift+click extends the range from the anchor without clearing it.
+  function handleTap(v: number, shift = false) {
+    if (!selectionMode) return
+    const anchor = selectionAnchor
+    if (shift && anchor !== null && v !== anchor) {
+      const lo = Math.min(anchor, v)
+      const hi = Math.max(anchor, v)
+      const next = new Set<number>()
+      for (let i = lo; i <= hi; i++) next.add(i)
+      setSelectedVerses(next)
+      return
+    }
+    if (anchor === null) {
+      setSelectionAnchor(v)
+      setSelectedVerses(new Set([v]))
+      return
+    }
+    if (v === anchor) {
+      setSelectionAnchor(null)
+      setSelectedVerses(new Set())
+      return
+    }
+    const lo = Math.min(anchor, v)
+    const hi = Math.max(anchor, v)
+    const next = new Set<number>()
+    for (let i = lo; i <= hi; i++) next.add(i)
+    setSelectionAnchor(null)
+    setSelectedVerses(next)
   }
 
   function exitSelectionMode() {
@@ -202,12 +213,6 @@ export function BrowsePage() {
     setSelectionAnchor(null)
     setSelectedVerses(new Set())
   }
-
-  const longPress = useLongPress({
-    onLongPress: handleLongPress,
-    onTap: handleTap,
-    enabled: !selectionMode,
-  })
 
   async function memorizeSelected() {
     if (bookIndex === null || chapter === null || selectedVerses.size === 0) return
@@ -512,7 +517,9 @@ export function BrowsePage() {
                         ? source.name
                         : `${source.name} — ${source.sectionLabel} ${bookIndex! + 1}`}
                   </h3>
-                  <p className="verse-hint">Segure para selecionar</p>
+                  <button type="button" className="btn btn-sm btn-secondary" onClick={enterSelectionMode}>
+                    Selecionar
+                  </button>
                 </>
               )}
             </div>
@@ -529,10 +536,7 @@ export function BrowsePage() {
                       type="button"
                       key={i}
                       className={`verse-row ${mem ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                      onPointerDown={(e) => longPress.handlePointerDown(v, e)}
-                      onPointerMove={longPress.handlePointerMove}
-                      onPointerUp={() => longPress.handlePointerUp(v)}
-                      onPointerCancel={longPress.handlePointerCancel}
+                      onClick={(e) => handleTap(v, e.shiftKey)}
                     >
                       <span className={`verse-num ${sel ? 'verse-num-selected' : ''}`}>
                         {selectionMode ? sel ? <Check size={10} aria-hidden /> : '' : label}

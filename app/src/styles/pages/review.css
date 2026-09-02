@@ -85,7 +85,7 @@
 
 .review-mode-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -302,9 +302,34 @@
 
 .review-skip-row {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 0.75rem;
   margin-top: -0.25rem;
+}
+
+.review-skip-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.review-skip-warn {
+  font-size: 0.6rem;
+  color: var(--gold);
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.btn-undo {
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.btn-undo:hover {
+  color: var(--gold);
+  opacity: 1;
 }
 
 .btn-skip {
@@ -657,6 +682,14 @@
   letter-spacing: 0.05rem;
 }
 
+.grade-interval {
+  font-size: 0.55rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  opacity: 0.9;
+  margin-top: 0.125rem;
+}
+
 .grade-1 {
   border-color: rgba(139, 58, 58, 0.3);
   color: var(--rubric);
@@ -920,4 +953,86 @@
 }
 .grade-breakdown-4 {
   color: var(--sage);
+}
+
+/* VERSE CONTEXT */
+
+.review-context {
+  max-width: 40.625rem;
+  margin: 1.25rem auto 0;
+  text-align: left;
+}
+
+.review-context-toggle {
+  display: block;
+  margin: 0 auto;
+}
+
+.review-context-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.review-context-title {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: var(--aged);
+  text-transform: uppercase;
+  letter-spacing: 0.0938rem;
+  font-weight: 600;
+}
+
+.review-context-loading {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--aged);
+  font-style: italic;
+}
+
+.review-context-body {
+  background: var(--gold-dim);
+  border: 1px solid rgba(212, 168, 83, 0.12);
+  border-radius: var(--radius);
+  padding: 1rem 1.125rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--parchment);
+}
+
+.review-context-verse {
+  margin: 0 0 0.5rem;
+  text-align: justify;
+  overflow-wrap: break-word;
+}
+
+.review-context-verse:last-child {
+  margin-bottom: 0;
+}
+
+.review-context-num {
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  margin-right: 0.25rem;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.review-context-hidden {
+  opacity: 0.55;
+  margin-bottom: 0.5rem;
+  text-align: justify;
+  overflow-wrap: break-word;
+}
+
+.review-context-mask {
+  color: var(--aged);
+  font-family: var(--font-mono);
+  letter-spacing: 0.25em;
+  -webkit-user-select: none;
+  user-select: none;
 }

@@ -1,6 +1,6 @@
 import { fsrs } from 'ts-fsrs'
 import { describe, expect, it } from 'vitest'
-import { getNextCard, Rating } from './scheduler'
+import { formatInterval, getNextCard, previewGrades, Rating } from './scheduler'
 import type { Grade } from './srs'
 import { createEmptyCard } from './srs'
 
@@ -55,5 +55,42 @@ describe('getNextCard', () => {
     }
 
     expect(differing).toBeGreaterThan(0)
+  })
+})
+
+describe('previewGrades', () => {
+  it('returns a candidate for all four grades', () => {
+    const card = createEmptyCard(new Date('2026-01-01T00:00:00Z'))
+    const now = new Date('2026-01-01T00:00:00Z')
+    const preview = previewGrades(card, now)
+    for (const g of [Rating.Again, Rating.Hard, Rating.Good, Rating.Easy] as Grade[]) {
+      expect(preview[g].card).toBeDefined()
+      expect(preview[g].log).toBeDefined()
+      expect(preview[g].state).toBeGreaterThanOrEqual(0)
+    }
+  })
+
+  it('spreads a fresh card across distinct due times', () => {
+    const card = createEmptyCard(new Date('2026-01-01T00:00:00Z'))
+    const now = new Date('2026-01-01T00:00:00Z')
+    const preview = previewGrades(card, now)
+    const dues = [Rating.Again, Rating.Hard, Rating.Good, Rating.Easy].map((g) => preview[g as Grade].dueDate)
+    expect(new Set(dues).size).toBeGreaterThan(1)
+  })
+})
+
+describe('formatInterval', () => {
+  const now = new Date('2026-01-01T00:00:00Z').getTime()
+
+  it('formats minutes', () => {
+    expect(formatInterval(now + 10 * 60_000, now)).toBe('10min')
+  })
+
+  it('formats hours', () => {
+    expect(formatInterval(now + 5 * 3_600_000, now)).toBe('5h')
+  })
+
+  it('formats days', () => {
+    expect(formatInterval(now + 5 * 86_400_000, now)).toBe('5d')
   })
 })

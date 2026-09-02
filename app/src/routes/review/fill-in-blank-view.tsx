@@ -15,6 +15,15 @@ function blankFor(word: string): string {
   return pre + '_'.repeat(core.length) + suf
 }
 
+/** First-letter cue: "memória" → "m______". The bridge between reading and unaided recall. */
+function firstLetterFor(word: string): string {
+  const pre = word.match(PUNCT_PREFIX)?.[0] ?? ''
+  const suf = word.match(PUNCT_SUFFIX)?.[0] ?? ''
+  const core = word.slice(pre.length, word.length - suf.length)
+  if (!core) return pre + suf
+  return pre + core[0] + '_'.repeat(Math.max(core.length - 1, 0)) + suf
+}
+
 function heatClass(accuracy: number): string {
   if (accuracy < 0) return ''
   if (accuracy >= 0.8) return 'heat-good'
@@ -60,6 +69,8 @@ export function FillInBlankView({
   onGrade,
   question,
   progressive = false,
+  firstLetter = false,
+  intervals,
 }: {
   reference: string
   verseText: string
@@ -68,6 +79,9 @@ export function FillInBlankView({
   onGrade: (r: Grade) => void
   question?: string
   progressive?: boolean
+  /** Mask every word as a first-letter cue instead of blanking a weighted 35%. */
+  firstLetter?: boolean
+  intervals?: Partial<Record<Grade, string>>
 }) {
   const [revealed, setRevealed] = useState(false)
   const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set())
@@ -77,10 +91,12 @@ export function FillInBlankView({
   const interactedRef = useRef(false)
 
   const words = useMemo(() => verseText.trim().split(WORD_SPLIT), [verseText])
+  const tapReveal = progressive || firstLetter
 
   const today = Math.floor(Date.now() / 86400000)
 
   const blankIndices = useMemo(() => {
+    if (firstLetter) return new Set(words.map((_, i) => i))
     const eligible = words.map((_, i) => i).filter((i) => i !== 0 && words[i].replace(STRIP_NON_ALPHA, '').length >= 3)
     const pool = eligible.length > 0 ? eligible : words.map((_, i) => i).filter((i) => i !== 0)
     if (pool.length === 0) return new Set<number>()
@@ -92,7 +108,7 @@ export function FillInBlankView({
       return (seed >>> 0) / 4294967296
     }
     return pickBlankIndices(pool, count, heat, rand)
-  }, [verseId, words, today, heat])
+  }, [verseId, words, today, heat, firstLetter])
 
   // The blank set re-picks once after the local heat query resolves. Follow it until the
   // user taps, then freeze it: a mid-session resolve must not shift blanks under the user
@@ -116,14 +132,14 @@ export function FillInBlankView({
     hasRecordedRef.current = false
     interactedRef.current = false
     setStableBlanks(blankIndices)
-  }, [verseId, translation, words.length])
+  }, [verseId, translation, words.length, firstLetter])
 
-  const allRevealed = progressive
+  const allRevealed = tapReveal
     ? revealedAll || stableBlanks.size === 0 || (stableBlanks.size > 0 && revealedIndices.size === stableBlanks.size)
     : revealed
 
   useEffect(() => {
-    if (!progressive || !allRevealed || hasRecordedRef.current) return
+    if (!tapReveal || !allRevealed || hasRecordedRef.current) return
     hasRecordedRef.current = true
     const incorrect = revealedIndices
     if (revealedAll) {
@@ -135,7 +151,7 @@ export function FillInBlankView({
       const correct = new Set([...stableBlanks].filter((i) => !incorrect.has(i)))
       recordWordAccuracy(verseId, translation, correct, incorrect, words)
     }
-  }, [progressive, allRevealed, revealedIndices, stableBlanks, revealedAll, verseId, translation, words])
+  }, [tapReveal, allRevealed, revealedIndices, stableBlanks, revealedAll, verseId, translation, words])
 
   function revealWord(i: number) {
     interactedRef.current = true
@@ -151,6 +167,22 @@ export function FillInBlankView({
     setRevealedAll(true)
   }
 
+  // Desktop: Space reveals (per-word progressive/letter modes give up on the whole verse).
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.code !== 'Space' || e.repeat) return
+      const target = e.target as HTMLElement | null
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON')) return
+      e.preventDefault()
+      if (tapReveal) revealAll()
+      else setRevealed((r) => !r)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [tapReveal])
+
+  const mask = firstLetter ? firstLetterFor : blankFor
+
   return (
     <div className="fill-blank">
       <h2 className="view-ref">{reference}</h2>
@@ -158,9 +190,9 @@ export function FillInBlankView({
       <div className="fill-blank-text">
         {words.map((word, i) => {
           const blank = stableBlanks.has(i)
-          const isRevealed = progressive ? revealedAll || revealedIndices.has(i) : revealed
+          const isRevealed = tapReveal ? revealedAll || revealedIndices.has(i) : revealed
           const hcls = isRevealed && !blank ? heatClass(heat.get(i) ?? -1) : ''
-          if (blank && !isRevealed && progressive) {
+          if (blank && !isRevealed && tapReveal) {
             return (
               <Fragment key={i}>
                 <button
@@ -169,7 +201,7 @@ export function FillInBlankView({
                   onClick={() => revealWord(i)}
                   aria-label="Revelar palavra"
                 >
-                  {blankFor(word)}
+                  {mask(word)}
                 </button>{' '}
               </Fragment>
             )
@@ -177,14 +209,14 @@ export function FillInBlankView({
           return (
             <Fragment key={i}>
               <span className={`fill-blank-word ${blank ? 'blank-word' : ''} ${blank && isRevealed ? 'blank-revealed' : ''} ${hcls}`}>
-                {isRevealed || !blank ? word : '_'.repeat(word.length)}
+                {isRevealed || !blank ? word : mask(word)}
               </span>{' '}
             </Fragment>
           )
         })}
       </div>
       <div className="fill-blank-actions">
-        {progressive ? (
+        {tapReveal ? (
           stableBlanks.size > 0 &&
           !revealedAll && (
             <button type="button" className="btn btn-secondary" onClick={revealAll}>
@@ -197,7 +229,7 @@ export function FillInBlankView({
           </button>
         )}
       </div>
-      {allRevealed && <GradingButtons onGrade={onGrade} />}
+      {allRevealed && <GradingButtons onGrade={onGrade} intervals={intervals} />}
     </div>
   )
 }

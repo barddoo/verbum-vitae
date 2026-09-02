@@ -1,13 +1,11 @@
-import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { Check, Pencil, X } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DEFAULT_TRANSLATION } from 'shared/bible'
 import { type CollectionFormData, CollectionFormModal } from '../components/collection-form-modal'
 import { MemorizedVersePickerModal } from '../components/memorized-verse-picker-modal'
 import { PageMeta } from '../components/page-meta'
 import { bundledCollections, verseRefToId } from '../data/collections'
-import { useSwipeToDelete } from '../hooks/use-swipe'
 import {
   addCollectionAsBlock,
   addCollectionToMemory,
@@ -19,13 +17,13 @@ import {
   fetchVersesBatch,
   getCollectionProgress,
   removeVerseFromCollection,
+  removeVersesFromMemory,
   updateUserCollection,
 } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
 import { slugify } from '../lib/slugify'
 import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
-import { SelectionBar } from './browse/selection-bar'
 
 interface CollectionEntry {
   id: number
@@ -108,102 +106,6 @@ function ensureCollectionsSeeded(): Promise<void> {
 }
 
 const loadingSpinner = <div className="loading">Carregando…</div>
-
-function SwipeableVerseRow({
-  verseId,
-  reference,
-  text,
-  memorized,
-  collectionId,
-  translation,
-  onRemoved,
-  onLongPress,
-}: {
-  verseId: string
-  reference: string
-  text: string
-  memorized: boolean
-  collectionId: number
-  translation: string
-  onRemoved: (verseId: string, translation: string, wasMemoized: boolean) => void
-  onLongPress?: () => void
-}) {
-  const [removing, setRemoving] = useState(false)
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pointerStart = useRef({ x: 0, y: 0 })
-
-  const handleDelete = useCallback(async () => {
-    setRemoving(true)
-    await removeVerseFromCollection(collectionId, verseId, translation)
-    onRemoved(verseId, translation, memorized)
-  }, [collectionId, verseId, translation, memorized, onRemoved])
-
-  const swipe = useSwipeToDelete(handleDelete)
-
-  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (onLongPress) {
-      pointerStart.current = { x: e.clientX, y: e.clientY }
-      longPressTimer.current = setTimeout(() => {
-        longPressTimer.current = null
-        Haptics.impact({ style: ImpactStyle.Light }).catch(() => {})
-        onLongPress()
-      }, 500)
-    }
-    swipe.handlePointerDown(e)
-  }
-
-  function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (longPressTimer.current) {
-      const dx = e.clientX - pointerStart.current.x
-      const dy = e.clientY - pointerStart.current.y
-      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-        clearTimeout(longPressTimer.current)
-        longPressTimer.current = null
-      }
-    }
-    swipe.handlePointerMove(e)
-  }
-
-  function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current)
-      longPressTimer.current = null
-    }
-    swipe.handlePointerUp(e)
-  }
-
-  function onPointerCancel() {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current)
-      longPressTimer.current = null
-    }
-    swipe.handlePointerCancel()
-  }
-
-  if (removing) return null
-
-  return (
-    <div className="swipe-container">
-      <div className="swipe-action">Remover</div>
-      <div
-        className={`swipe-content collection-verse-row ${memorized ? 'memorized' : ''}`}
-        style={{ transform: `translateX(${swipe.translateX}px)`, transition: swipe.translateX === 0 ? 'transform 0.2s ease' : 'none' }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-      >
-        <span className="collection-verse-ref">{reference}</span>
-        <span className="collection-verse-text">{text}</span>
-        {memorized && (
-          <span className="memorized-badge">
-            <Check size={10} aria-hidden /> Memorizado
-          </span>
-        )}
-      </div>
-    </div>
-  )
-}
 
 export function CollectionsListPage() {
   const navigate = useNavigate()
@@ -448,16 +350,6 @@ export function CollectionDetailPage() {
     navigate({ to: '/collections' })
   }
 
-  function handleVerseRemoved(verseId: string, translation: string, wasMemoized: boolean) {
-    setVerses((prev) => prev.filter((v) => !(v.verseId === verseId && v.translation === translation)))
-    setCol((prev) => {
-      if (!prev) return prev
-      const newTotal = prev.total - 1
-      const newMemoized = wasMemoized ? prev.memorized - 1 : prev.memorized
-      return { ...prev, total: newTotal, memorized: newMemoized, percent: newTotal > 0 ? Math.round((newMemoized / newTotal) * 100) : 0 }
-    })
-  }
-
   async function handleMemorizedSave(versesToAdd: { verseId: string; translation: string }[]) {
     if (!col) return
     await addVersesToCollection(col.dbId, versesToAdd)
@@ -465,9 +357,9 @@ export function CollectionDetailPage() {
     await load()
   }
 
-  function enterSelectionWith(key: string) {
+  function enterSelectionMode() {
     setSelectionMode(true)
-    setSelectedVerses(new Set([key]))
+    setSelectedVerses(new Set())
   }
 
   function toggleVerse(key: string) {
@@ -484,20 +376,49 @@ export function CollectionDetailPage() {
     setSelectedVerses(new Set())
   }
 
+  function selectedVersesList() {
+    return verses.filter((v) => selectedVerses.has(`${v.verseId}|${v.translation}`))
+  }
+
   async function handleAddSelected() {
-    if (selectedVerses.size === 0) return
+    const toAdd = selectedVersesList().filter((v) => !v.memorized)
+    if (toAdd.length === 0) return
     setAddingSelected(true)
-    const toAdd = [...selectedVerses].map((key) => {
-      const sep = key.indexOf('|')
-      return { verseId: key.slice(0, sep), translation: key.slice(sep + 1) }
-    })
-    await addVersesToMemory(toAdd, logProgressChange)
+    await addVersesToMemory(
+      toAdd.map((v) => ({ verseId: v.verseId, translation: v.translation })),
+      logProgressChange,
+    )
+    setAddingSelected(false)
+    exitSelectionMode()
+    await load()
+  }
+
+  async function handleRemoveFromMemory() {
+    const toRemove = selectedVersesList().filter((v) => v.memorized)
+    if (toRemove.length === 0) return
+    setAddingSelected(true)
+    await removeVersesFromMemory(
+      toRemove.map((v) => ({ verseId: v.verseId, translation: v.translation })),
+      logProgressChange,
+    )
+    setAddingSelected(false)
+    exitSelectionMode()
+    await load()
+  }
+
+  async function handleRemoveFromCollection() {
+    if (!col || selectedVerses.size === 0) return
+    setAddingSelected(true)
+    const list = selectedVersesList()
+    await Promise.all(list.map((v) => removeVerseFromCollection(col.dbId, v.verseId, v.translation)))
     setAddingSelected(false)
     exitSelectionMode()
     await load()
   }
 
   const isUserCollection = col && !col.isBuiltin
+  const selectedMemorizedCount = selectedVersesList().filter((v) => v.memorized).length
+  const selectedNotMemorizedCount = selectedVersesList().length - selectedMemorizedCount
 
   if (loading) return <div className="page">{loadingSpinner}</div>
 
@@ -526,26 +447,35 @@ export function CollectionDetailPage() {
         <Link to="/collections" className="back-btn">
           ← Coleções
         </Link>
-        {isUserCollection && (
+        {!selectionMode && (
           <div className="collection-detail-actions-edit">
-            <button
-              type="button"
-              className="btn btn-sm btn-secondary"
-              onClick={() => setShowEdit(true)}
-              aria-label="Editar coleção"
-              title="Editar"
-            >
-              <Pencil size={14} aria-hidden />
-            </button>
-            <button
-              type="button"
-              className="btn btn-sm btn-secondary btn-danger"
-              onClick={() => setShowDeleteConfirm(true)}
-              aria-label="Excluir coleção"
-              title="Excluir"
-            >
-              <X size={14} aria-hidden />
-            </button>
+            {verses.length > 0 && (
+              <button type="button" className="btn btn-sm btn-secondary" onClick={enterSelectionMode}>
+                Selecionar
+              </button>
+            )}
+            {isUserCollection && (
+              <>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => setShowEdit(true)}
+                  aria-label="Editar coleção"
+                  title="Editar"
+                >
+                  <Pencil size={14} aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary btn-danger"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  aria-label="Excluir coleção"
+                  title="Excluir"
+                >
+                  <X size={14} aria-hidden />
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -571,13 +501,7 @@ export function CollectionDetailPage() {
         </div>
       </div>
 
-      {!selectionMode &&
-        verses.length > 0 &&
-        (isUserCollection ? (
-          <p className="collection-swipe-hint">← Deslize para remover · Segure para selecionar</p>
-        ) : (
-          <p className="collection-swipe-hint">Segure um versículo para selecionar</p>
-        ))}
+      {!selectionMode && verses.length > 0 && <p className="collection-swipe-hint">Use Selecionar para adicionar ou remover versículos</p>}
       {selectionMode && (
         <div className="collection-select-header">
           <span className="collection-select-label">
@@ -601,8 +525,7 @@ export function CollectionDetailPage() {
                 type="button"
                 key={key}
                 className={`collection-verse-row selectable ${v.memorized ? 'memorized' : ''} ${sel ? 'selected' : ''}`}
-                onClick={() => !v.memorized && toggleVerse(key)}
-                disabled={v.memorized}
+                onClick={() => toggleVerse(key)}
               >
                 <span className="collection-verse-ref">{v.reference}</span>
                 <span className="collection-verse-text">{v.text}</span>
@@ -618,35 +541,8 @@ export function CollectionDetailPage() {
               </button>
             )
           }
-          if (isUserCollection) {
-            return (
-              <SwipeableVerseRow
-                key={key}
-                verseId={v.verseId}
-                reference={v.reference}
-                text={v.text}
-                memorized={v.memorized}
-                collectionId={col.dbId}
-                translation={v.translation}
-                onRemoved={handleVerseRemoved}
-                onLongPress={() => enterSelectionWith(key)}
-              />
-            )
-          }
           return (
-            <div
-              key={key}
-              className={`collection-verse-row ${v.memorized ? 'memorized' : ''}`}
-              onPointerDown={() => {
-                const t = setTimeout(() => {
-                  Haptics.impact({ style: ImpactStyle.Light }).catch(() => {})
-                  enterSelectionWith(key)
-                }, 500)
-                const cancel = () => clearTimeout(t)
-                window.addEventListener('pointerup', cancel, { once: true })
-                window.addEventListener('pointercancel', cancel, { once: true })
-              }}
-            >
+            <div key={key} className={`collection-verse-row ${v.memorized ? 'memorized' : ''}`}>
               <span className="collection-verse-ref">{v.reference}</span>
               <span className="collection-verse-text">{v.text}</span>
               {v.memorized && (
@@ -660,13 +556,43 @@ export function CollectionDetailPage() {
       </div>
 
       {selectionMode && (
-        <SelectionBar
-          count={selectedVerses.size}
-          previewText={selectedVerses.size > 0 ? (verses.find((v) => selectedVerses.has(`${v.verseId}|${v.translation}`))?.text ?? '') : ''}
-          onClear={exitSelectionMode}
-          onMemorize={handleAddSelected}
-          actionLabel={addingSelected ? 'Adicionando…' : 'Adicionar à memória'}
-        />
+        <div className="selection-bar collection-selection-bar">
+          <div className="selection-bar-info">
+            <span className="selection-bar-count">{selectedVerses.size}</span>
+            <span className="selection-bar-preview">{selectedVerses.size === 1 ? 'versículo selecionado' : 'versículos selecionados'}</span>
+          </div>
+          <div className="selection-bar-actions">
+            <button type="button" className="btn btn-sm btn-secondary" onClick={exitSelectionMode}>
+              Cancelar
+            </button>
+            {selectedNotMemorizedCount > 0 && (
+              <button type="button" className="btn btn-sm btn-primary" onClick={() => void handleAddSelected()} disabled={addingSelected}>
+                Adicionar à memória
+              </button>
+            )}
+            {selectedMemorizedCount > 0 && (
+              <button
+                type="button"
+                className="btn btn-sm btn-danger"
+                onClick={() => void handleRemoveFromMemory()}
+                disabled={addingSelected}
+                title="Esquece os textos selecionados e os tira da fila de revisão"
+              >
+                Remover da memória
+              </button>
+            )}
+            {isUserCollection && selectedVerses.size > 0 && (
+              <button
+                type="button"
+                className="btn btn-sm btn-secondary"
+                onClick={() => void handleRemoveFromCollection()}
+                disabled={addingSelected}
+              >
+                Remover da coleção
+              </button>
+            )}
+          </div>
+        </div>
       )}
 
       {!selectionMode && isUserCollection && (
@@ -700,15 +626,16 @@ export function CollectionDetailPage() {
               className={`btn btn-secondary ${addedBlock ? 'btn-added' : ''}`}
               onClick={handleAddAsBlock}
               disabled={addingBlock || addedBlock || col.total < 2}
+              title="Junta versículos seguidos em um único texto"
             >
               {addingBlock ? (
                 'Adicionando…'
               ) : addedBlock ? (
                 <>
-                  <Check size={14} aria-hidden /> Bloco
+                  <Check size={14} aria-hidden /> Parágrafo
                 </>
               ) : (
-                'Como bloco'
+                'Por parágrafo'
               )}
             </button>
             <Link to="/collections/$slug/add" params={{ slug: col.slug }} className="btn btn-secondary">
@@ -718,6 +645,7 @@ export function CollectionDetailPage() {
               Meus vers.
             </button>
           </div>
+          <p className="collection-block-hint">“Por parágrafo” junta versículos seguidos em um único texto para revisar.</p>
         </div>
       )}
 
@@ -751,17 +679,19 @@ export function CollectionDetailPage() {
             className={`btn btn-secondary btn-large ${addedBlock ? 'btn-added' : ''}`}
             onClick={handleAddAsBlock}
             disabled={addingBlock || addedBlock || col.total < 2}
+            title="Junta versículos seguidos em um único texto"
           >
             {addingBlock ? (
               'Adicionando…'
             ) : addedBlock ? (
               <>
-                <Check size={16} aria-hidden /> Bloco adicionado
+                <Check size={16} aria-hidden /> Parágrafo adicionado
               </>
             ) : (
-              'Memorizar como bloco'
+              'Memorizar por parágrafo'
             )}
           </button>
+          <p className="collection-block-hint">“Por parágrafo” junta versículos seguidos em um único texto para revisar.</p>
         </div>
       )}
 

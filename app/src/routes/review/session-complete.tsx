@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react'
+import { NotificationType } from '@capacitor/haptics'
+import { useEffect, useMemo, useState } from 'react'
 import { VerseImageModal } from '../../components/verse-image/verse-image-modal'
+import { hapticNotify } from '../../lib/haptics'
 import { shareSession } from '../../lib/sharing'
 import type { Grade } from '../../lib/srs'
 
@@ -45,6 +47,10 @@ export function SessionComplete({
   })
 
   const [showImageModal, setShowImageModal] = useState(false)
+
+  useEffect(() => {
+    if (completed > 0) hapticNotify(NotificationType.Success)
+  }, [completed])
 
   function handleShare() {
     shareSession(completed)

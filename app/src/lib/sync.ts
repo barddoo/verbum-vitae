@@ -299,7 +299,7 @@ async function pullCollections() {
 
 export async function logProgressChange(entry: Omit<SyncLog, 'id' | 'userId' | 'synced' | 'createdAt'>) {
   const userId = getUserId()
-  await db.syncLog.put({
+  return db.syncLog.put({
     ...entry,
     userId,
     synced: 0,

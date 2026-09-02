@@ -86,6 +86,19 @@ export interface WordStats {
   incorrectCount: number
 }
 
+/**
+ * One row per "Pular" press in review. Skipping is a local-only gesture — it does not move the
+ * card, so it is never synced and never feeds the FSRS log; the row exists so repeated skipping
+ * stops being invisible to the user (stats can surface it).
+ */
+export interface SkipLog {
+  id?: number
+  verseId: string
+  translation: string
+  /** Epoch ms of the skip press. */
+  skippedAt: number
+}
+
 export interface SyncLog {
   id?: number
   userId: string
@@ -107,6 +120,7 @@ export const db = new Dexie('RememberBible', { cache: 'disabled' }) as Dexie & {
   progress: EntityTable<Progress, 'id'>
   reviewLog: EntityTable<ReviewLog, 'id'>
   wordStats: EntityTable<WordStats, 'id'>
+  skipLog: EntityTable<SkipLog, 'id'>
   collections: EntityTable<Collection, 'id'>
   collectionVerses: EntityTable<CollectionVerse, 'id'>
   syncLog: EntityTable<SyncLog, 'id'>
@@ -202,6 +216,10 @@ db.version(7)
 
     if (seeded.length > 0) await tx.table('reviewLog').bulkAdd(seeded)
   })
+
+db.version(8).stores({
+  skipLog: '++id, skippedAt, [verseId+translation]',
+})
 
 export type TextSourceType = 'bible' | 'creed' | 'catechism'
 
@@ -324,6 +342,32 @@ export async function fetchVersesBatch(keys: { verseId: string; translation: str
   )
 
   return new Map(results.flat())
+}
+
+/**
+ * The verses immediately before and after `verseId` inside the same chapter (bible only).
+ * Review shows a verse alone; reading the surrounding paragraph is what anchors its meaning.
+ * The verse being reviewed is deliberately *excluded* — it is the answer in progress, so the
+ * context must never spoil the recall attempt.
+ * Returns [] for non-bible sources, which have no chapter context to pull.
+ */
+export async function fetchChapterWindow(verseId: string, translation: string, pad = 3): Promise<{ number: number; text: string }[]> {
+  const p = parseTextKey(verseId)
+  if (p.sourceType !== 'bible') return []
+
+  const rows = await db.verses
+    .where('[sourceType+sourceId+bookNumber+chapter]')
+    .equals(['b', '', p.sectionIndex, p.blockIndex])
+    .filter((r) => r.translation === translation)
+    .sortBy('verse')
+
+  const start = p.itemIndex ?? 1
+  const end = p.itemEnd ?? start
+  const first = Math.max(1, start - pad)
+  const last = end + pad
+  return rows
+    .filter((r) => r.verse >= first && r.verse <= last && (r.verse < start || r.verse > end))
+    .map((r) => ({ number: r.verse, text: r.text }))
 }
 
 async function seedBibleText(translation: string) {
@@ -520,8 +564,20 @@ export async function getWordHeat(verseId: string, translation: string, wordCoun
  * Appends one review to the history. Never updates in place — `progress` already tracks current
  * state; this table exists precisely to keep the rows `progress` overwrites.
  */
-export async function recordReview(entry: Omit<ReviewLog, 'id'>) {
-  await db.reviewLog.add(entry)
+export async function recordReview(entry: Omit<ReviewLog, 'id'>): Promise<number | undefined> {
+  return db.reviewLog.add(entry)
+}
+
+/** Appends one skip. Local-only (see `SkipLog`). */
+export async function recordSkip(entry: Omit<SkipLog, 'id'>): Promise<number | undefined> {
+  return db.skipLog.add(entry)
+}
+
+/** How many verses were skipped since the start of the local day. */
+export async function skippedToday(): Promise<number> {
+  const startOfDay = new Date()
+  startOfDay.setHours(0, 0, 0, 0)
+  return db.skipLog.where('skippedAt').aboveOrEqual(startOfDay.getTime()).count()
 }
 
 /**
@@ -588,6 +644,33 @@ export async function addVersesToMemory(
   }
 
   return toAdd.length
+}
+
+/**
+ * Removes verses from memory (the review queue) entirely: deletes the FSRS `progress` row plus
+ * its per-word heat and review history, and queues a `progress` delete for sync. The verses stay
+ * in any collection they belong to — only their memorization is forgotten.
+ */
+export async function removeVersesFromMemory(
+  verses: { verseId: string; translation: string }[],
+  logChange: (entry: Omit<SyncLog, 'id' | 'userId' | 'synced' | 'createdAt'>) => void,
+): Promise<number> {
+  let removed = 0
+  for (const v of verses) {
+    const rows = await db.progress.where({ verseId: v.verseId, translation: v.translation }).toArray()
+    if (rows.length === 0) continue
+    await db.progress.where({ verseId: v.verseId, translation: v.translation }).delete()
+    await db.reviewLog.where({ verseId: v.verseId, translation: v.translation }).delete()
+    await db.wordStats.where({ verseId: v.verseId, translation: v.translation }).delete()
+    logChange({
+      tableName: 'progress',
+      rowId: v.verseId,
+      operation: 'delete',
+      data: JSON.stringify({ verseId: v.verseId, translation: v.translation }),
+    })
+    removed++
+  }
+  return removed
 }
 
 export async function addCollectionToMemory(

@@ -9,6 +9,9 @@
   "scripts": {
     "dev": "cd app && bun run dev",
     "build": "cd app && bun run build",
+    "release:bump": "bun scripts/bump-android-version.ts",
+    "release:bump:minor": "bun scripts/bump-android-version.ts minor",
+    "release:bump:major": "bun scripts/bump-android-version.ts major",
     "deploy": "bun run db:migrate:remote && cd app && bun run build && cd ../worker && bunx wrangler deploy --tag $(git rev-parse --short HEAD)",
     "db:migrate": "bun run db:migrate:local",
     "db:migrate:local": "cd worker && bunx wrangler d1 migrations apply verbum-vitae --local",

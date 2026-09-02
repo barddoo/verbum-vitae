@@ -1,5 +1,7 @@
+import { NotificationType } from '@capacitor/haptics'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { recordWordAccuracy } from '../../lib/db'
+import { hapticNotify } from '../../lib/haptics'
 import { isNearMiss, normalizeForComparison } from '../../lib/levenshtein'
 import { Rating } from '../../lib/scheduler'
 import type { Grade } from '../../lib/srs'
@@ -75,6 +77,7 @@ export function TypingPracticeView({
   verseId,
   onGrade,
   question,
+  intervals,
 }: {
   reference: string
   verseText: string
@@ -82,6 +85,7 @@ export function TypingPracticeView({
   verseId: string
   onGrade: (r: Grade) => void
   question?: string
+  intervals?: Partial<Record<Grade, string>>
 }) {
   const [input, setInput] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -128,6 +132,7 @@ export function TypingPracticeView({
     setNearWords(near)
     setDiffWords(diffs)
     setSubmitted(true)
+    if (acc === 100) hapticNotify(NotificationType.Success)
 
     if (!hasRecordedRef.current) {
       hasRecordedRef.current = true
@@ -197,7 +202,7 @@ export function TypingPracticeView({
               ))}
             </div>
           )}
-          <GradingButtons onGrade={onGrade} suggested={suggestedGrade} />
+          <GradingButtons onGrade={onGrade} suggested={suggestedGrade} intervals={intervals} />
         </>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Progress } from '../lib/db'
-import { db, fetchVersesBatch, parseTextKey } from '../lib/db'
+import { db, fetchVersesBatch, parseTextKey, removeVersesFromMemory } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
 import { logProgressChange } from '../lib/sync'
 import { VerseProgressCard } from './verse-progress-card'
@@ -69,22 +69,24 @@ export function MemorizedVersesTab() {
   }
 
   async function handleRemove(verseId: string) {
-    const progress = items.find((item) => item.progress.verseId === verseId)?.progress
-    if (!progress) return
-
-    await db.progress.where({ verseId: progress.verseId, translation: progress.translation }).delete()
-
-    logProgressChange({
-      tableName: 'progress',
-      rowId: progress.verseId,
-      operation: 'delete',
-      data: JSON.stringify({
-        verseId: progress.verseId,
-        translation: progress.translation,
-      }),
-    })
-
+    const target = items.filter((item) => item.progress.verseId === verseId)
+    if (target.length === 0) return
+    await removeVersesFromMemory(
+      target.map((item) => ({ verseId: item.progress.verseId, translation: item.progress.translation })),
+      logProgressChange,
+    )
     setItems((prev) => prev.filter((item) => item.progress.verseId !== verseId))
+  }
+
+  async function handleRemoveSelected() {
+    if (selectedIds.size === 0) return
+    const target = items.filter((item) => selectedIds.has(item.progress.verseId))
+    await removeVersesFromMemory(
+      target.map((item) => ({ verseId: item.progress.verseId, translation: item.progress.translation })),
+      logProgressChange,
+    )
+    setItems((prev) => prev.filter((item) => !selectedIds.has(item.progress.verseId)))
+    clearSelection()
   }
 
   const parseBookNumber = useCallback((verseId: string) => parseTextKey(verseId).sectionIndex, [])
@@ -100,7 +102,7 @@ export function MemorizedVersesTab() {
       const lower = search.toLowerCase()
       result = result.filter((item) => {
         const ref = verseIdToReference(item.progress.verseId).toLowerCase()
-        return ref.includes(lower)
+        return ref.includes(lower) || item.text.toLowerCase().includes(lower)
       })
     }
 
@@ -170,7 +172,7 @@ export function MemorizedVersesTab() {
         <input
           type="text"
           className="verse-search"
-          placeholder="Buscar…"
+          placeholder="Buscar por referência ou texto…"
           aria-label="Buscar"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -218,11 +220,19 @@ export function MemorizedVersesTab() {
             <span className="selection-bar-preview">{selectedIds.size === 1 ? 'versículo selecionado' : 'versículos selecionados'}</span>
           </div>
           <div className="selection-bar-actions">
-            <button type="button" className="btn btn-primary" onClick={reviewSelected}>
-              Revisar
-            </button>
             <button type="button" className="btn btn-secondary" onClick={clearSelection}>
               Cancelar
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => void handleRemoveSelected()}
+              title="Esquece os textos selecionados e os tira da fila de revisão"
+            >
+              Remover da memória
+            </button>
+            <button type="button" className="btn btn-primary" onClick={reviewSelected}>
+              Revisar
             </button>
           </div>
         </div>

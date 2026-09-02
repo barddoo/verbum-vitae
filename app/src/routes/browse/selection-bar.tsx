@@ -39,7 +39,7 @@ export function SelectionBar({
         )}
         {onMemorizeAsBlock && (
           <button type="button" className="btn btn-sm btn-secondary" onClick={onMemorizeAsBlock}>
-            Como bloco
+            Por parágrafo
           </button>
         )}
         <button type="button" className="btn btn-sm btn-primary" onClick={onMemorize}>

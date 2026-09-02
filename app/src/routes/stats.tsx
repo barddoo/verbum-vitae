@@ -1,11 +1,19 @@
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { computeStreak } from 'shared/streak'
 import { MemorizedVersesTab } from '../components/memorized-verses-tab'
 import { PageMeta } from '../components/page-meta'
-import { db, reviewTimestamps } from '../lib/db'
+import { db, reviewTimestamps, skippedToday } from '../lib/db'
 import { RankingTab } from './stats/ranking-tab'
 
 type Tab = 'resumo' | 'versiculos' | 'ranking'
+
+interface CalendarTip {
+  x: number
+  y: number
+  dateStr: string
+  dateLabel: string
+  count: number
+}
 
 export function StatsPage() {
   const [tab, setTab] = useState<Tab>('resumo')
@@ -14,7 +22,8 @@ export function StatsPage() {
     byState: Record<string, number>
     streak: number
     reviewsToday: number
-  }>({ total: 0, byState: {}, streak: 0, reviewsToday: 0 })
+    skipsToday: number
+  }>({ total: 0, byState: {}, streak: 0, reviewsToday: 0, skipsToday: 0 })
   const [reviewDays, setReviewDays] = useState<Map<string, number>>(new Map())
   const [confirming, setConfirming] = useState(false)
 
@@ -23,7 +32,7 @@ export function StatsPage() {
   }, [])
 
   async function loadStats() {
-    const [all, reviewedAts] = await Promise.all([db.progress.toArray(), reviewTimestamps()])
+    const [all, reviewedAts, todaySkips] = await Promise.all([db.progress.toArray(), reviewTimestamps(), skippedToday()])
     const today = new Date().toDateString()
     const stateNames = ['Novo', 'Aprendendo', 'Revisando', 'Reaprendendo']
     const byState: Record<string, number> = {}
@@ -50,12 +59,12 @@ export function StatsPage() {
       byState,
       streak: computeStreak(reviewedAts),
       reviewsToday,
+      skipsToday: todaySkips,
     })
   }
 
   async function clearProgress() {
-    await db.progress.clear()
-    await db.syncLog.clear()
+    await Promise.all([db.progress.clear(), db.reviewLog.clear(), db.skipLog.clear(), db.wordStats.clear(), db.syncLog.clear()])
     setConfirming(false)
     loadStats()
   }
@@ -117,6 +126,12 @@ export function StatsPage() {
           </div>
 
           <StreakCalendar reviewDays={reviewDays} />
+
+          {progress.skipsToday > 0 && (
+            <p className="stats-skip-note">
+              Pulados hoje: {progress.skipsToday} {progress.skipsToday === 1 ? 'texto' : 'textos'}
+            </p>
+          )}
 
           <div className="stats-breakdown">
             <h3>Por estágio</h3>
@@ -221,10 +236,56 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
     return d.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
   }
 
+  const scBodyRef = useRef<HTMLDivElement>(null)
+  const [tip, setTip] = useState<CalendarTip | null>(null)
+
+  // Close on tap-away and Esc. The popover must not be touch-dead the way a `title` attribute is.
+  useEffect(() => {
+    function close() {
+      setTip(null)
+    }
+    function onPointerAway(e: Event) {
+      const t = e.target as HTMLElement | null
+      if (t && (t.closest('.sc-cell') || t.closest('.sc-popover'))) return
+      close()
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') close()
+    }
+    document.addEventListener('mousedown', onPointerAway)
+    document.addEventListener('touchstart', onPointerAway)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onPointerAway)
+      document.removeEventListener('touchstart', onPointerAway)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [])
+
+  function showTip(e: React.MouseEvent<HTMLButtonElement>, cell: (typeof cells)[number]) {
+    e.stopPropagation()
+    if (tip?.dateStr === cell.dateStr) {
+      setTip(null)
+      return
+    }
+    const body = scBodyRef.current
+    if (!body) return
+    const bodyRect = body.getBoundingClientRect()
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = Math.min(rect.left - bodyRect.left, body.clientWidth - 170)
+    setTip({
+      x: Math.max(0, x),
+      y: rect.top - bodyRect.top + rect.height,
+      dateStr: cell.dateStr,
+      dateLabel: formatDate(cell.date),
+      count: cell.count,
+    })
+  }
+
   return (
     <div className="streak-calendar">
       <h3>Calendário de Revisões</h3>
-      <div className="sc-body">
+      <div className="sc-body" ref={scBodyRef}>
         <div className="sc-months">
           {monthLabels.map((ml) => (
             <span key={ml.cellIndex} className="sc-month" style={{ marginLeft: `${23 + Math.floor(ml.cellIndex / 7) * 16}px` }}>
@@ -244,23 +305,54 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
             {weeks_arr.map((week, wi) => (
               <div key={wi} className="sc-week">
                 {week.map((cell) => (
-                  <div
+                  <button
+                    type="button"
                     key={cell.dateStr}
                     className={`sc-cell ${color(cell.count)}`}
-                    title={`${formatDate(cell.date)} — ${cell.count} revisões`}
-                  />
+                    aria-label={`${formatDate(cell.date)} — ${cell.count} revisões`}
+                    onClick={(e) => showTip(e, cell)}
+                  >
+                    <span className="sc-cell-inner" aria-hidden="true" />
+                  </button>
                 ))}
               </div>
             ))}
           </div>
         </div>
+        {tip && (
+          <div className="sc-popover" style={{ left: tip.x, top: tip.y }} role="status">
+            {tip.count > 0 ? (
+              <>
+                <strong>{tip.dateLabel}</strong>
+                <span>
+                  {tip.count} {tip.count === 1 ? 'revisão' : 'revisões'}
+                </span>
+              </>
+            ) : (
+              <>
+                <strong>{tip.dateLabel}</strong>
+                <span>sem revisões</span>
+              </>
+            )}
+          </div>
+        )}
         <div className="sc-legend">
           <span>Menos</span>
-          <div className="sc-cell" />
-          <div className="sc-cell level-1" />
-          <div className="sc-cell level-2" />
-          <div className="sc-cell level-3" />
-          <div className="sc-cell level-4" />
+          <div className="sc-cell">
+            <span className="sc-cell-inner" aria-hidden="true" />
+          </div>
+          <div className="sc-cell level-1">
+            <span className="sc-cell-inner" aria-hidden="true" />
+          </div>
+          <div className="sc-cell level-2">
+            <span className="sc-cell-inner" aria-hidden="true" />
+          </div>
+          <div className="sc-cell level-3">
+            <span className="sc-cell-inner" aria-hidden="true" />
+          </div>
+          <div className="sc-cell level-4">
+            <span className="sc-cell-inner" aria-hidden="true" />
+          </div>
           <span>Mais</span>
         </div>
       </div>

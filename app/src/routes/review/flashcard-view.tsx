@@ -11,6 +11,7 @@ export function FlashcardView({
   verseId,
   onGrade,
   question,
+  intervals,
 }: {
   reference: string
   verseText: string
@@ -18,6 +19,7 @@ export function FlashcardView({
   verseId: string
   onGrade: (r: Grade) => void
   question?: string
+  intervals?: Partial<Record<Grade, string>>
 }) {
   const [flipped, setFlipped] = useState(false)
   const [hintLevel, setHintLevel] = useState(0)
@@ -44,6 +46,32 @@ export function FlashcardView({
       .join(' ')
   }, [verseText, hintLevel])
 
+  function advanceHint() {
+    if (hintLevel + 1 >= words.length) setFlipped(true)
+    else setHintLevel((h) => h + 1)
+  }
+
+  // Desktop: Space adds a hint word, Enter reveals. Guarded against inputs so typing mode's own
+  // Enter-to-submit is never hijacked.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault()
+        if (!flipped) {
+          if (hintLevel + 1 >= words.length) setFlipped(true)
+          else setHintLevel((h) => h + 1)
+        }
+      } else if (e.key === 'Enter' && !e.repeat) {
+        e.preventDefault()
+        if (!flipped) setFlipped(true)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [flipped, hintLevel, words.length])
+
   return (
     <div className="flashcard">
       <div className={`flip-card ${flipped ? 'flipped' : ''}`}>
@@ -59,14 +87,7 @@ export function FlashcardView({
               )}
             </div>
             <div className="flashcard-actions">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => {
-                  if (hintLevel + 1 >= words.length) setFlipped(true)
-                  else setHintLevel((h) => h + 1)
-                }}
-              >
+              <button type="button" className="btn btn-secondary" onClick={advanceHint}>
                 Dica {hintLevel === 0 ? '(1ª letra)' : hintLevel + 1 >= words.length ? '(revelar)' : '(mais palavras)'}
               </button>
               <button type="button" className="btn btn-primary" onClick={() => setFlipped(true)}>
@@ -82,7 +103,7 @@ export function FlashcardView({
           </div>
         </div>
       </div>
-      {flipped && <GradingButtons onGrade={onGrade} />}
+      {flipped && <GradingButtons onGrade={onGrade} intervals={intervals} />}
     </div>
   )
 }
