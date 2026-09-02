@@ -102,7 +102,7 @@ app.route('/api/sync', syncRoutes)
 app.route('/api/verses', versesRoutes)
 app.route('/api/leaderboard', leaderboardRoutes)
 
-app.get('/api/health', (c) => {
+app.get('/api/health', securityHeaders, (c) => {
   const { id: versionId, tag: versionTag } = c.env.CF_VERSION_METADATA
   return c.json({
     ok: true,
@@ -121,7 +121,7 @@ app.get('/ws/presence', async (c) => {
   return stub.fetch(c.req.raw)
 })
 
-app.get('/api/presence/count', async (c) => {
+app.get('/api/presence/count', securityHeaders, async (c) => {
   const stub = c.env.PRESENCE.get(c.env.PRESENCE.idFromName('global'))
   return stub.fetch(c.req.raw)
 })
@@ -136,7 +136,10 @@ app.get('/sitemap.xml', async (c) => {
 
 app.get('*', async (c) => {
   const url = new URL(c.req.url)
-  return c.env.ASSETS.fetch(new Request(`${url.origin}/index.html`))
+  const res = await c.env.ASSETS.fetch(new Request(`${url.origin}/index.html`))
+  const html = new Response(res.body, res)
+  html.headers.set('Cache-Control', 'no-cache')
+  return html
 })
 
 export default app
