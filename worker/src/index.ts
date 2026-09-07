@@ -22,11 +22,23 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 const ALLOWED_ORIGINS = ['https://verbum-vitae.pages.dev', 'https://verbum-vitae.workers.dev', 'https://vvitae.com']
 
+function isAllowedOrigin(origin: string | undefined): boolean {
+  if (!origin) return false
+  if (ALLOWED_ORIGINS.includes(origin)) return true
+  try {
+    // Capacitor WebViews (Android: https://localhost; iOS: vvitae://localhost) and
+    // local dev servers all run on localhost.
+    return new URL(origin).hostname === 'localhost'
+  } catch {
+    return false
+  }
+}
+
 app.use(
   '*',
   cors({
     origin: (origin) => {
-      if (!origin || ALLOWED_ORIGINS.includes(origin)) return origin
+      if (!origin || isAllowedOrigin(origin)) return origin
       return null
     },
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

@@ -25,6 +25,11 @@ async function fetchHealth(): Promise<HealthResponse | null> {
 }
 
 export function UpdateBanner() {
+  if (Capacitor.isNativePlatform()) return null
+  return <PwaUpdateBanner />
+}
+
+function PwaUpdateBanner() {
   const regRef = useRef<ServiceWorkerRegistration | null>(null)
 
   const {
@@ -82,7 +87,6 @@ export function UpdateBanner() {
     }
   }, [])
 
-  if (Capacitor.isNativePlatform()) return null
   if (offlineReady && !needRefresh) return null
   if (!needRefresh) return null
 
