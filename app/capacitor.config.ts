@@ -16,6 +16,9 @@ const config: CapacitorConfig = {
     iosScheme: 'vvitae',
   },
   plugins: {
+    CapacitorHttp: {
+      enabled: true,
+    },
     StatusBar: {
       style: 'DARK',
     },
