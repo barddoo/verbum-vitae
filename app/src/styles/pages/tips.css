@@ -1,0 +1,110 @@
+/* DICAS (memorization tips) */
+
+.dicas-page {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.dicas-back {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: var(--aged);
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+}
+
+.dicas-back:hover {
+  color: var(--gold);
+}
+
+.dicas-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--parchment);
+  margin: 0 0 0.25rem;
+}
+
+.dicas-intro {
+  font-size: 0.85rem;
+  color: var(--aged);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.dicas-group {
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.dicas-group-title {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--aged);
+  text-transform: uppercase;
+  letter-spacing: 0.125rem;
+  margin-bottom: 0.75rem;
+}
+
+.dicas-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.dicas-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.dicas-item-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--parchment);
+}
+
+.dicas-item-text {
+  font-size: 0.8rem;
+  color: var(--aged);
+  line-height: 1.55;
+}
+
+/* REVIEW TIP OF THE DAY */
+
+.review-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--aged);
+  background: var(--gold-dim);
+  border: 1px solid rgba(212, 168, 83, 0.18);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.875rem;
+  margin: 0 0 1rem;
+  line-height: 1.55;
+}
+
+.review-tip-icon {
+  flex-shrink: 0;
+  color: var(--gold);
+  margin-top: 0.125rem;
+}
+
+.review-tip a {
+  color: var(--gold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.review-tip a:hover {
+  text-decoration: underline;
+}

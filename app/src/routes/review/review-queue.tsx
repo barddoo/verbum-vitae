@@ -1,3 +1,4 @@
+import { TipOfTheDay } from '../../components/tip-of-the-day'
 import type { Collection } from '../../lib/db'
 import { type CardStateFilter, LIMIT_OPTIONS, PRACTICE_MODES, type PracticeMode } from './review-types'
 
@@ -65,6 +66,8 @@ export function ReviewQueue(props: ReviewQueueProps) {
         </span>
         {showTotalHint && <span className="review-queue-total-hint">{totalAll} total</span>}
       </div>
+
+      <TipOfTheDay />
 
       {filterVerseIds !== null ? (
         <div className="review-pinned-filter">

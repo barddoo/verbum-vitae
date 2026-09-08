@@ -11,6 +11,7 @@ export function DailyReminderCard() {
   const [reminder, setReminder] = useState<DailyReminder | null>(() => loadReminder())
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [inexact, setInexact] = useState(false)
 
   const available = remindersAvailable()
 
@@ -19,11 +20,13 @@ export function DailyReminderCard() {
 
   async function update(next: DailyReminder) {
     setError(null)
+    setInexact(false)
     setBusy(true)
     try {
-      await applyReminder(next)
+      const exact = await applyReminder(next)
       saveReminder(next)
       setReminder(next)
+      setInexact(exact === false)
     } catch {
       setError('Permissão de notificação negada — ative nas configurações do sistema.')
       saveReminder({ ...next, enabled: false })
@@ -64,7 +67,13 @@ export function DailyReminderCard() {
         </label>
       )}
       {error && <p className="reminder-error">{error}</p>}
-      {current.enabled && !error && <p className="reminder-status">Ativo todos os dias às {toHHMM(current)}</p>}
+      {inexact && (
+        <p className="reminder-error">
+          Lembrete agendado sem horário exato no Android — pode chegar alguns minutos depois. Ative &ldquo;Alarmes e lembretes&rdquo; nas
+          configurações do sistema para horário exato.
+        </p>
+      )}
+      {current.enabled && !error && !inexact && <p className="reminder-status">Ativo todos os dias às {toHHMM(current)}</p>}
     </div>
   )
 }

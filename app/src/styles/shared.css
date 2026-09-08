@@ -482,7 +482,6 @@
   font-family: var(--font-body);
   font-size: 0.8125rem;
   padding: 0.3125rem 0.5rem;
-  color-scheme: dark;
 }
 
 .reminder-status,

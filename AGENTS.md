@@ -33,8 +33,8 @@ single quotes, no semicolons (`asNeeded`), trailing commas, 140 line width, 2 sp
 - **Prefer native**. Use platform APIs over third-party libraries when possible. In Capacitor, prefer built-in plugins over third-party wrappers.
 - **Mobile-first design**. All UI built for mobile first, desktop as enhancement.
 - **No `any` type**. Use `unknown` + narrowing, or proper types.
-- **Tests exist**: Vitest (unit) + Playwright (layout/smoke). 113 unit tests, 54 layout tests across mobile + desktop.
-- **PWA testing workflow**: `bun run check:layout` (Playwright mobile smoke, 390x844) → `bun run test:unit` (Vitest) → actual iPhone PWA standalone.
+- **Tests exist**: Vitest unit tests (224, incl. React Testing Library). No Playwright/e2e layer.
+- **PWA testing workflow**: `bun run test:unit` (Vitest) → manual checks on real device (iPhone PWA standalone, Android/Capacitor app via `cap:sync`).
 - `app/.env`: `VITE_API_URL=http://localhost:8787` for local worker dev.
 - `worker/.dev.vars`: `JWT_SECRET` for local auth.
 

@@ -1,15 +1,13 @@
 import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
-import { BarChart2, BookOpen, Home, Layers, RotateCcw } from 'lucide-react'
+import { BarChart2, BookOpen, Home, Layers, RotateCcw, Settings } from 'lucide-react'
 import { createContext, lazy, Suspense, useCallback, useEffect, useReducer, useState } from 'react'
 import { LeakedCredentialsBanner } from './components/leaked-credentials-banner'
 import { PresenceBadge } from './components/presence-badge'
 import { PwaInstallButton } from './components/pwa-install-button'
 import { SyncErrorBanner } from './components/sync-error-banner'
 import { SyncIndicator } from './components/sync-indicator'
-import { ThemeToggle } from './components/theme-toggle'
 import { UpdateBanner } from './components/update-banner'
 
-const AuthModal = lazy(() => import('./components/auth-modal').then((m) => ({ default: m.AuthModal })))
 const DonateModal = lazy(() => import('./components/donate-modal').then((m) => ({ default: m.DonateModal })))
 const HelpModal = lazy(() => import('./components/help-modal').then((m) => ({ default: m.HelpModal })))
 const WelcomeModal = lazy(() => import('./components/welcome-modal').then((m) => ({ default: m.WelcomeModal })))
@@ -30,8 +28,10 @@ const AddVersesToCollectionPage = lazy(() =>
   import('./routes/collections.$slug.add').then((m) => ({ default: m.AddVersesToCollectionPage })),
 )
 const PrivacyPolicyPage = lazy(() => import('./routes/privacy-policy').then((m) => ({ default: m.PrivacyPolicyPage })))
+const SettingsPage = lazy(() => import('./routes/settings').then((m) => ({ default: m.SettingsPage })))
+const DicasPage = lazy(() => import('./routes/dicas').then((m) => ({ default: m.DicasPage })))
 
-type Modal = 'auth' | 'donate' | 'help' | 'welcome'
+type Modal = 'donate' | 'help' | 'welcome'
 
 function modalReducer(state: Modal[], action: { type: 'open'; modal: Modal } | { type: 'close'; modal: Modal }): Modal[] {
   switch (action.type) {
@@ -43,18 +43,16 @@ function modalReducer(state: Modal[], action: { type: 'open'; modal: Modal } | {
 }
 
 function RootLayout() {
-  const { user, isOnline, logout } = useAuth()
+  const { user, isOnline } = useAuth()
   const [modals, dispatch] = useReducer(
     modalReducer,
     (['welcome'] as Modal[]).filter(() => !localStorage.getItem('welcomed')),
   )
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 900px)').matches)
 
-  const setShowAuth = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'auth' })
   const setShowDonate = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'donate' })
   const setShowHelp = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'help' })
   const setShowWelcome = (v: boolean) => dispatch({ type: v ? 'open' : 'close', modal: 'welcome' })
-  const showAuth = modals.includes('auth')
   const showDonate = modals.includes('donate')
   const showHelp = modals.includes('help')
   const showWelcome = modals.includes('welcome')
@@ -83,19 +81,12 @@ function RootLayout() {
             ?
           </button>
           <PwaInstallButton />
-          <ThemeToggle />
           <PresenceBadge />
           {user && !isOnline && <span className="offline-badge">Offline</span>}
           {user && <SyncIndicator />}
-          {user ? (
-            <button type="button" className="btn btn-sm btn-secondary" onClick={logout}>
-              Sair
-            </button>
-          ) : (
-            <button type="button" className="btn btn-sm btn-secondary" onClick={() => setShowAuth(true)}>
-              Entrar
-            </button>
-          )}
+          <Link to="/ajustes" className="settings-btn" aria-label="Configurações" title="Ajustes">
+            <Settings size={18} strokeWidth={1.75} aria-hidden="true" />
+          </Link>
         </div>
       </header>
 
@@ -119,6 +110,9 @@ function RootLayout() {
               Progresso
             </Link>
             <div className="sidebar-rule" />
+            <Link to="/ajustes" className="nav-item" activeProps={{ className: 'nav-item active' }}>
+              Ajustes
+            </Link>
           </nav>
         )}
 
@@ -177,11 +171,6 @@ function RootLayout() {
         </nav>
       )}
 
-      {showAuth && (
-        <Suspense fallback={null}>
-          <AuthModal onClose={() => setShowAuth(false)} />
-        </Suspense>
-      )}
       {showDonate && (
         <Suspense fallback={null}>
           <DonateModal onClose={() => setShowDonate(false)} />
@@ -258,6 +247,18 @@ const privacyPolicyRoute = createRoute({
   component: PrivacyPolicyPage,
 })
 
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/ajustes',
+  component: SettingsPage,
+})
+
+const dicasRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/dicas',
+  component: DicasPage,
+})
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   browseRoute,
@@ -267,6 +268,8 @@ const routeTree = rootRoute.addChildren([
   addVersesRoute,
   statsRoute,
   privacyPolicyRoute,
+  settingsRoute,
+  dicasRoute,
 ])
 
 export const router = createRouter({ routeTree })

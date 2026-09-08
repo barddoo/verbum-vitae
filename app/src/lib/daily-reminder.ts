@@ -33,22 +33,24 @@ export function remindersAvailable(): boolean {
   return Capacitor.isNativePlatform()
 }
 
-/** Replace the daily reminder with `r`. Throws if permission is denied. */
-export async function applyReminder(r: DailyReminder) {
-  if (!remindersAvailable()) return
+/** Replace the daily reminder with `r`. Throws if permission is denied.
+ *  Returns `false` on Android when the OS only allowed an inexact alarm (may be late),
+ *  `true` when delivered exactly, and `undefined` when nothing was scheduled. */
+export async function applyReminder(r: DailyReminder): Promise<boolean | undefined> {
+  if (!remindersAvailable()) return undefined
 
   const pending = await LocalNotifications.getPending()
   const ids = pending.notifications.map((n) => ({ id: n.id }))
   if (ids.length > 0) await LocalNotifications.cancel({ notifications: ids })
 
-  if (!r.enabled) return
+  if (!r.enabled) return undefined
 
   const permission = await LocalNotifications.requestPermissions()
   if (permission.display !== 'granted') {
     throw new Error('permission-denied')
   }
 
-  await LocalNotifications.schedule({
+  const result = await LocalNotifications.schedule({
     notifications: [
       {
         id: REMINDER_NOTIFICATION_ID,
@@ -58,4 +60,5 @@ export async function applyReminder(r: DailyReminder) {
       },
     ],
   })
+  return !result.warning
 }

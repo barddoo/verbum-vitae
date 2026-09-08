@@ -11,9 +11,17 @@ import { syncNow } from './lib/sync'
 import { router } from './router'
 import './styles/index.css'
 
+function nativeBarsDark(): boolean {
+  const pref = localStorage.getItem('theme')
+  if (pref === 'light') return false
+  if (pref === 'dark') return true
+  return !window.matchMedia('(prefers-color-scheme: light)').matches
+}
+
 if (Capacitor.isNativePlatform()) {
-  StatusBar.setStyle({ style: Style.Dark }).catch(() => {})
-  SystemBars.setStyle({ style: SystemBarsStyle.Dark }).catch(() => {})
+  const barsDark = nativeBarsDark()
+  StatusBar.setStyle({ style: barsDark ? Style.Dark : Style.Light }).catch(() => {})
+  SystemBars.setStyle({ style: barsDark ? SystemBarsStyle.Dark : SystemBarsStyle.Light }).catch(() => {})
   Keyboard.setAccessoryBarVisible({ isVisible: false }).catch(() => {})
 
   CapApp.addListener('appStateChange', ({ isActive }) => {

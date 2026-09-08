@@ -4,10 +4,11 @@ import { useAuth } from '../lib/auth'
 
 interface AuthModalProps {
   onClose: () => void
+  initialTab?: 'login' | 'register'
 }
 
-export function AuthModal({ onClose }: AuthModalProps) {
-  const [tab, setTab] = useState<'login' | 'register'>('login')
+export function AuthModal({ onClose, initialTab = 'login' }: AuthModalProps) {
+  const [tab, setTab] = useState<'login' | 'register'>(initialTab)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')

@@ -4,7 +4,6 @@ import { BookOpen, Brain, WifiOff } from 'lucide-react'
 import { useContext, useEffect, useMemo } from 'react'
 import { computeStreak } from 'shared/streak'
 import { CommunityPresenceCard } from '../components/community-presence-card'
-import { DailyReminderCard } from '../components/daily-reminder-card'
 import { InstallGuideCard } from '../components/install-guide-card'
 import { PageMeta } from '../components/page-meta'
 import { db, reviewTimestamps } from '../lib/db'
@@ -131,8 +130,6 @@ export function HomePage() {
                 <span className="stat-label">Pendentes</span>
               </div>
             </div>
-
-            {memorized && <DailyReminderCard />}
 
             <div className="quick-actions">
               {memorized && dueCount === 0 ? (

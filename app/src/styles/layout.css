@@ -129,23 +129,6 @@
   }
 }
 
-.theme-toggle {
-  background: none;
-  border: none;
-  color: var(--aged);
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
-  transition: color 0.2s;
-}
-
-.theme-toggle:hover {
-  color: var(--gold);
-}
-
 .presence-badge {
   display: inline-flex;
   align-items: center;

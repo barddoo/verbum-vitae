@@ -1,0 +1,187 @@
+/* SETTINGS PAGE */
+
+.settings-page {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.settings-page-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--parchment);
+  margin: 0.5rem 0 1.25rem;
+}
+
+.settings-section {
+  margin-bottom: 1.5rem;
+}
+
+.settings-section-title {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--aged);
+  text-transform: uppercase;
+  letter-spacing: 0.125rem;
+  margin-bottom: 0.625rem;
+}
+
+.settings-card {
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  font-family: var(--font-body);
+}
+
+.settings-hint {
+  font-size: 0.78rem;
+  color: var(--aged);
+  line-height: 1.55;
+  margin-bottom: 0.75rem;
+}
+
+.settings-hint:last-child {
+  margin-bottom: 0;
+}
+
+/* ACCOUNT */
+
+.settings-account-email {
+  font-size: 0.9rem;
+  color: var(--parchment);
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.settings-account-name {
+  font-size: 0.78rem;
+  color: var(--aged);
+  margin-top: 0.25rem;
+}
+
+.settings-account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.settings-logout {
+  background: transparent;
+  color: var(--rubric);
+  border: 1px solid var(--rubric);
+}
+
+.settings-logout:hover:not(:disabled) {
+  background: var(--rubric-dim);
+  color: var(--rubric);
+}
+
+/* APPEARANCE */
+
+.settings-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.settings-fieldset-legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.settings-theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-theme-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "radio label"
+    "radio hint";
+  column-gap: 0.75rem;
+  align-items: center;
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.875rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.settings-theme-option.selected {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+
+.settings-theme-option input[type="radio"] {
+  grid-area: radio;
+  accent-color: var(--gold);
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.settings-theme-label {
+  grid-area: label;
+  font-size: 0.85rem;
+  color: var(--parchment);
+  font-weight: 600;
+}
+
+.settings-theme-hint {
+  grid-area: hint;
+  font-size: 0.7rem;
+  color: var(--aged);
+}
+
+/* FOOTER */
+
+.settings-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.settings-footer a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.settings-footer a:hover {
+  opacity: 0.75;
+}
+
+/* TOP BAR SETTINGS BUTTON */
+
+.settings-btn {
+  background: none;
+  border: none;
+  color: var(--aged);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  transition: color 0.2s;
+}
+
+.settings-btn:hover {
+  color: var(--gold);
+}

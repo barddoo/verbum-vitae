@@ -7,6 +7,8 @@
 @import "./pages/stats.css";
 @import "./pages/misc.css";
 @import "./pages/privacy-policy.css";
+@import "./pages/settings.css";
+@import "./pages/tips.css";
 @import "./components/modal.css";
 @import "./components/verse-image-modal.css";
 @import "./responsive.css";
