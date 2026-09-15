@@ -1,12 +1,13 @@
 import { Link } from '@tanstack/react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { BookOpen, Brain, WifiOff } from 'lucide-react'
+import { BookOpen, Brain, Flame, WifiOff } from 'lucide-react'
 import { useContext, useEffect, useMemo } from 'react'
 import { computeStreak } from 'shared/streak'
 import { CommunityPresenceCard } from '../components/community-presence-card'
 import { InstallGuideCard } from '../components/install-guide-card'
 import { PageMeta } from '../components/page-meta'
 import { db, reviewTimestamps } from '../lib/db'
+import { streakMessage } from '../lib/streak-message'
 import { WelcomeModalContext } from '../router'
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -67,6 +68,12 @@ export function HomePage() {
                   <img src="/illustrations/pray.svg" alt="" aria-hidden="true" className="hero-illus" width={176} height={176} />
                 )}
                 <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} para revisar` : 'Nada pendente!'}</h2>
+                {streak > 0 && (
+                  <p className="hero-streak">
+                    <Flame size={15} strokeWidth={1.75} aria-hidden="true" />
+                    {streakMessage(streak)}
+                  </p>
+                )}
                 {dueCount > 0 && (
                   <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
                     Revisar Agora ({nf.format(dueCount)})

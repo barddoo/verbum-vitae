@@ -1,3 +1,4 @@
+import { Flame } from 'lucide-react'
 import type { LeaderboardEntry } from 'shared/types'
 
 const MEDALS = ['🥇', '🥈', '🥉']
@@ -17,7 +18,7 @@ export function EntryRow({ entry, highlight }: { entry: LeaderboardEntry; highli
       </span>
       {entry.currentStreak > 0 && (
         <span className="ranking-streak" title="Dias seguidos">
-          🔥{entry.currentStreak}
+          <Flame size={13} strokeWidth={1.75} aria-hidden="true" />{entry.currentStreak}
         </span>
       )}
     </div>

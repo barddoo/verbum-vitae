@@ -114,6 +114,17 @@
   content: none;
 }
 
+.hero-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin: 0.5rem 0 0.75rem;
+}
+
 .hero-greeting {
   font-family: var(--font-display);
   font-size: clamp(1.65rem, 6.5vw, 2.25rem);

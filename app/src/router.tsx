@@ -3,7 +3,6 @@ import { BarChart2, BookOpen, Home, Layers, RotateCcw, Settings } from 'lucide-r
 import { createContext, lazy, Suspense, useCallback, useEffect, useReducer, useState } from 'react'
 import { LeakedCredentialsBanner } from './components/leaked-credentials-banner'
 import { PresenceBadge } from './components/presence-badge'
-import { PwaInstallButton } from './components/pwa-install-button'
 import { SyncErrorBanner } from './components/sync-error-banner'
 import { SyncIndicator } from './components/sync-indicator'
 import { UpdateBanner } from './components/update-banner'
@@ -72,15 +71,14 @@ function RootLayout() {
       <LeakedCredentialsBanner />
       <UpdateBanner />
       <header className="top-bar">
-        <Link to="/" className="top-bar-logo">
+        <Link to="/" className="top-bar-logo" aria-label="Início">
           <img src="/favicon-32x32.png" alt="" width={22} height={22} />
-          <h1 className="top-bar-title">Verbum Vitae</h1>
         </Link>
+        <Link to="/" className="top-bar-title">Verbum Vitae</Link>
         <div className="top-bar-right">
           <button type="button" className="btn-help" onClick={() => setShowHelp(true)} aria-label="Ajuda">
             ?
           </button>
-          <PwaInstallButton />
           <PresenceBadge />
           {user && !isOnline && <span className="offline-badge">Offline</span>}
           {user && <SyncIndicator />}
