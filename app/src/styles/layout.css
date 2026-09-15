@@ -81,6 +81,14 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .update-banner,
+  .sync-error-banner,
+  .leaked-credentials-banner {
+    animation: none;
+  }
+}
+
 /* TOP BAR */
 
 .top-bar {
@@ -110,16 +118,15 @@
 
 .top-bar-title {
   position: absolute;
-  left: 0;
-  right: 0;
-  text-align: center;
+  left: 50%;
+  transform: translateX(-50%);
   font-family: var(--font-display);
   font-size: 1.15rem;
   color: var(--parchment);
   font-weight: 600;
   letter-spacing: -0.01em;
-  pointer-events: none;
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .top-bar-right {
@@ -534,8 +541,8 @@
 }
 
 .app-footer-donate:hover {
-  background: rgba(212, 168, 83, 0.15);
-  border-color: rgba(212, 168, 83, 0.4);
+  background: var(--gold-dim);
+  border-color: var(--gold);
 }
 
 /* HELP BUTTON */

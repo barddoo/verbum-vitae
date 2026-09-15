@@ -20,6 +20,8 @@ export default defineConfig({
         description: 'Memorização bíblica com repetição espaçada',
         theme_color: '#0f1117',
         background_color: '#0f1117',
+        start_url: '/',
+        scope: '/',
         display: 'standalone',
         orientation: 'portrait',
         icons: [

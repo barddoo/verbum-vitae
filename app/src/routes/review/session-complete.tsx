@@ -59,6 +59,9 @@ export function SessionComplete({
   return (
     <div className="page review-page">
       <div className="session-complete">
+        <span className="session-complete-icon" aria-hidden="true">
+          ✝
+        </span>
         <h2>Sessão concluída!</h2>
         <p className="session-complete-count">
           {completed} {completed === 1 ? 'texto revisado' : 'textos revisados'}

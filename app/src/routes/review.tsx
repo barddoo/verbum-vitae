@@ -488,6 +488,7 @@ export function ReviewPage() {
     return (
       <div className="page review-page">
         <div className="empty-state">
+          <img src="/illustrations/pray.svg" alt="" aria-hidden="true" className="empty-state-illus" width={224} height={224} />
           <h2>Nada para revisar!</h2>
           <p>{filterStatus === 'due' ? 'Todos os textos estão em dia.' : 'Nenhum texto encontrado.'}</p>
           <div className="empty-actions">

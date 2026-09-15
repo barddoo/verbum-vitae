@@ -33,6 +33,12 @@ export function SettingsPage() {
         <p className="settings-footer">
           <Link to="/privacidade">Política de Privacidade</Link>
         </p>
+        <p className="settings-footer settings-footer-credits">
+          Ilustrações por{' '}
+          <a href="https://storyset.com" target="_blank" rel="noopener noreferrer">
+            Storyset
+          </a>
+        </p>
       </div>
     </>
   )

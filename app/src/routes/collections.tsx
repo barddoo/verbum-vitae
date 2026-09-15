@@ -236,6 +236,7 @@ export function CollectionsListPage() {
 
       {collections.length === 0 && (
         <div className="empty-state">
+          <img src="/illustrations/nativity.svg" alt="" aria-hidden="true" className="empty-state-illus" width={224} height={224} />
           <p>Nenhuma coleção encontrada.</p>
         </div>
       )}

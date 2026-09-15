@@ -361,7 +361,7 @@
 }
 
 .review-progress-bar {
-  height: 0.1875rem;
+  height: 0.25rem;
   background: var(--border);
   border-radius: 0.125rem;
   overflow: hidden;
@@ -373,6 +373,12 @@
   background: var(--teal);
   border-radius: 0.125rem;
   transition: width 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-progress-fill {
+    transition: none;
+  }
 }
 
 .practice-mode-selector {
@@ -425,6 +431,12 @@
 
 .flip-card.flipped .flip-card-inner {
   transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-card-inner {
+    transition: none;
+  }
 }
 
 .flip-card-front,
@@ -851,12 +863,37 @@
 
 .session-complete {
   text-align: center;
-  padding: 3.75rem 1rem;
+  padding: 3rem 1rem 4.5rem;
+}
+
+.session-complete-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+  display: block;
+  margin-bottom: 1rem;
+  animation: celebPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes celebPop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-complete-icon {
+    animation: none;
+  }
 }
 
 .session-complete h2 {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 2.25rem;
   color: var(--gold);
   letter-spacing: -0.02em;
   margin-bottom: 0.5rem;

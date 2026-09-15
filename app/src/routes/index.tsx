@@ -63,6 +63,9 @@ export function HomePage() {
           <>
             {memorized ? (
               <div className="hero-card">
+                {dueCount === 0 && (
+                  <img src="/illustrations/pray.svg" alt="" aria-hidden="true" className="hero-illus" width={176} height={176} />
+                )}
                 <h2 className="hero-greeting">{dueCount > 0 ? `${nf.format(dueCount)} para revisar` : 'Nada pendente!'}</h2>
                 {dueCount > 0 && (
                   <Link to="/review" search={{ autostart: '1' }} className="btn btn-primary btn-large">
@@ -72,6 +75,7 @@ export function HomePage() {
               </div>
             ) : (
               <div className="welcome-hero">
+                <img src="/illustrations/pray.svg" alt="" aria-hidden="true" className="hero-illus" width={176} height={176} />
                 <h2 className="welcome-headline">
                   Memorize a Bíblia com <span className="welcome-headline-accent">repetição espaçada</span>
                 </h2>

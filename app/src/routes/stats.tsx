@@ -7,6 +7,24 @@ import { RankingTab } from './stats/ranking-tab'
 
 type Tab = 'resumo' | 'versiculos' | 'ranking'
 
+const MONTH_NAMES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+
+export function buildMonthLabels(cells: { date: Date }[]): { label: string; cellIndex: number }[] {
+  const labels: { label: string; cellIndex: number }[] = []
+  let lastMonth = -1
+  let lastCol = -4
+  cells.forEach((cell, ci) => {
+    const m = cell.date.getMonth()
+    const col = Math.floor(ci / 7)
+    if (m !== lastMonth && col - lastCol >= 3) {
+      labels.push({ label: MONTH_NAMES[m], cellIndex: ci })
+      lastMonth = m
+      lastCol = col
+    }
+  })
+  return labels
+}
+
 interface CalendarTip {
   x: number
   y: number
@@ -184,7 +202,7 @@ export function StatsPage() {
   )
 }
 
-const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
+export const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays: Map<string, number> }) {
   const cells = useMemo(() => {
     const weeks = 20
     const today = new Date()
@@ -208,18 +226,7 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
     return w
   }, [cells])
 
-  const monthLabels = useMemo(() => {
-    const labels: { label: string; cellIndex: number }[] = []
-    let lastMonth = -1
-    cells.forEach((cell, ci) => {
-      const m = cell.date.getMonth()
-      if (m !== lastMonth) {
-        labels.push({ label: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][m], cellIndex: ci })
-        lastMonth = m
-      }
-    })
-    return labels
-  }, [cells])
+  const monthLabels = useMemo(() => buildMonthLabels(cells), [cells])
 
   const maxCount = useMemo(() => Math.max(1, ...cells.map((c) => c.count)), [cells])
 
@@ -336,25 +343,6 @@ const StreakCalendar = memo(function StreakCalendar({ reviewDays }: { reviewDays
             )}
           </div>
         )}
-        <div className="sc-legend">
-          <span>Menos</span>
-          <div className="sc-cell">
-            <span className="sc-cell-inner" aria-hidden="true" />
-          </div>
-          <div className="sc-cell level-1">
-            <span className="sc-cell-inner" aria-hidden="true" />
-          </div>
-          <div className="sc-cell level-2">
-            <span className="sc-cell-inner" aria-hidden="true" />
-          </div>
-          <div className="sc-cell level-3">
-            <span className="sc-cell-inner" aria-hidden="true" />
-          </div>
-          <div className="sc-cell level-4">
-            <span className="sc-cell-inner" aria-hidden="true" />
-          </div>
-          <span>Mais</span>
-        </div>
       </div>
     </div>
   )
