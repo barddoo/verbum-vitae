@@ -94,7 +94,7 @@
 }
 
 .sc-cell:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--teal);
   outline-offset: 1px;
 }
 
@@ -241,7 +241,7 @@
   height: 100%;
   border-radius: 0.125rem;
   transition: width 0.4s ease;
-  background: var(--gold);
+  background: var(--teal);
 }
 
 .breakdown-count {
@@ -292,7 +292,7 @@
 /* FOCUS STATES */
 
 .stats-page button:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
 
@@ -319,24 +319,28 @@
 
 .stats-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1.125rem;
+  background: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 0.25rem;
+  gap: 0.25rem;
+  margin-bottom: 1.375rem;
 }
 
 .stats-tab {
   flex: 1;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-radius: 9999px;
   font-family: var(--font-body);
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--aged);
   cursor: pointer;
   transition:
-    color 0.2s,
-    border-color 0.2s;
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .stats-tab:hover {
@@ -344,8 +348,9 @@
 }
 
 .stats-tab.active {
-  color: var(--gold);
-  border-bottom-color: var(--gold);
+  background: var(--teal);
+  color: #fff;
+  font-weight: 600;
 }
 
 /* RANKING TAB */
@@ -399,7 +404,7 @@
 }
 
 .ranking-edit-btn:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
 
@@ -424,7 +429,7 @@
 .ranking-visibility-toggle input[type="checkbox"] {
   width: 1rem;
   height: 1rem;
-  accent-color: var(--gold);
+  accent-color: var(--teal);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -466,7 +471,7 @@
 }
 
 .ranking-name-input:focus {
-  border-color: var(--gold);
+  border-color: var(--teal);
 }
 
 .ranking-name-input::placeholder {
@@ -629,14 +634,14 @@
 }
 
 .filter-chip:hover {
-  border-color: var(--gold-dim);
+  border-color: var(--teal-dim);
   color: var(--parchment);
 }
 
 .filter-chip.active {
-  background: var(--gold);
-  color: var(--ink);
-  border-color: var(--gold);
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
 }
 
 /* VERSE CONTROLS */
@@ -661,7 +666,7 @@
 }
 
 .verse-search:focus {
-  border-color: var(--gold);
+  border-color: var(--teal);
 }
 
 .verse-search::placeholder {
@@ -683,7 +688,7 @@
 }
 
 .sort-select:focus {
-  border-color: var(--gold);
+  border-color: var(--teal);
 }
 
 /* VERSE LIST */
@@ -711,7 +716,7 @@
 }
 
 .verse-card:hover {
-  border-color: var(--gold-dim);
+  border-color: var(--teal-dim);
 }
 
 .verse-card--selectable {
@@ -721,17 +726,17 @@
 }
 
 .verse-card--selectable:hover {
-  border-color: rgba(212, 168, 83, 0.3);
+  border-color: var(--teal-dim);
   background: var(--leather-hover);
 }
 
 .verse-card--selected {
-  border-color: rgba(212, 168, 83, 0.5);
-  background: var(--gold-dim);
+  border-color: var(--teal);
+  background: var(--teal-dim);
 }
 
 .verse-card--selected:hover {
-  border-color: var(--gold);
+  border-color: var(--teal);
 }
 
 .verse-card-check {
@@ -743,7 +748,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--gold);
+  color: var(--teal);
   font-weight: 700;
   flex-shrink: 0;
   transition:
@@ -752,9 +757,9 @@
 }
 
 .verse-card-check.checked {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: var(--ink);
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
 }
 
 .verse-card-header {
@@ -825,7 +830,7 @@
 .verse-card-ref {
   font-family: var(--font-body);
   font-size: 0.72rem;
-  color: var(--gold);
+  color: var(--teal);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.0313rem;
@@ -881,8 +886,8 @@
 }
 
 .state-badge.state-learning {
-  background: var(--gold-dim);
-  color: var(--gold);
+  background: var(--teal-dim);
+  color: var(--teal);
 }
 
 .state-badge.state-review {

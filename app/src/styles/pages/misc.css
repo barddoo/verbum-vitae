@@ -2,28 +2,30 @@
 
 .empty-state {
   text-align: center;
-  padding: 3.75rem 1rem;
+  padding: 4.5rem 1.75rem;
 }
 
 .empty-state h2 {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.4rem;
   color: var(--parchment);
-  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.625rem;
 }
 
 .empty-state p {
   font-family: var(--font-body);
   color: var(--aged);
-  font-size: 0.82rem;
-  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
 }
 
 .empty-actions {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-width: 14rem;
+  max-width: 16rem;
   margin: 0 auto;
 }
 

@@ -7,10 +7,11 @@
 
 .settings-page-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--parchment);
-  margin: 0.5rem 0 1.25rem;
+  letter-spacing: -0.02em;
+  margin: 0.5rem 0 1.5rem;
 }
 
 .settings-section {
@@ -125,13 +126,13 @@
 }
 
 .settings-theme-option.selected {
-  border-color: var(--gold);
-  background: var(--gold-dim);
+  border-color: var(--teal);
+  background: var(--teal-dim);
 }
 
 .settings-theme-option input[type="radio"] {
   grid-area: radio;
-  accent-color: var(--gold);
+  accent-color: var(--teal);
   width: 1rem;
   height: 1rem;
   cursor: pointer;
@@ -159,7 +160,7 @@
 }
 
 .settings-footer a {
-  color: var(--gold);
+  color: var(--teal);
   text-decoration: none;
 }
 
@@ -183,5 +184,5 @@
 }
 
 .settings-btn:hover {
-  color: var(--gold);
+  color: var(--teal);
 }

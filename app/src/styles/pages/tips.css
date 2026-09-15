@@ -14,14 +14,15 @@
 }
 
 .dicas-back:hover {
-  color: var(--gold);
+  color: var(--teal);
 }
 
 .dicas-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--parchment);
+  letter-spacing: -0.02em;
   margin: 0 0 0.25rem;
 }
 
@@ -85,8 +86,8 @@
   gap: 0.5rem;
   font-size: 0.78rem;
   color: var(--aged);
-  background: var(--gold-dim);
-  border: 1px solid rgba(212, 168, 83, 0.18);
+  background: var(--teal-dim);
+  border: 1px solid rgba(26, 155, 140, 0.18);
   border-radius: var(--radius);
   padding: 0.625rem 0.875rem;
   margin: 0 0 1rem;
@@ -95,12 +96,12 @@
 
 .review-tip-icon {
   flex-shrink: 0;
-  color: var(--gold);
+  color: var(--teal);
   margin-top: 0.125rem;
 }
 
 .review-tip a {
-  color: var(--gold);
+  color: var(--teal);
   text-decoration: none;
   white-space: nowrap;
 }

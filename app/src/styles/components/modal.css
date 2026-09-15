@@ -107,7 +107,7 @@
 .donate-btc-label {
   font-size: 0.55rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--teal);
   letter-spacing: 0.08rem;
   text-transform: uppercase;
   display: block;
@@ -131,9 +131,9 @@
 
 .donate-copy-btn {
   flex-shrink: 0;
-  background: var(--gold-dim);
-  border: 1px solid rgba(212, 168, 83, 0.2);
-  color: var(--gold);
+  background: var(--teal-dim);
+  border: 1px solid var(--teal-dim);
+  color: var(--teal);
   font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 600;
@@ -145,7 +145,7 @@
 }
 
 .donate-copy-btn:hover {
-  background: rgba(212, 168, 83, 0.15);
+  background: var(--teal-glow);
 }
 
 .donate-church {
@@ -220,8 +220,8 @@
 }
 
 .modal-tab.active {
-  color: var(--gold);
-  border-bottom-color: var(--gold);
+  color: var(--teal);
+  border-bottom-color: var(--teal);
   font-weight: 600;
 }
 
@@ -250,8 +250,8 @@
 }
 
 .auth-form input:focus-visible {
-  border-color: var(--gold);
-  outline: 2px solid var(--gold);
+  border-color: var(--teal);
+  outline: 2px solid var(--teal);
   outline-offset: 1px;
 }
 
@@ -265,8 +265,8 @@
 .auth-free-notice {
   margin-top: 1.25rem;
   padding: 0.625rem 0.75rem;
-  background: var(--gold-dim);
-  border: 1px solid rgba(212, 168, 83, 0.12);
+  background: var(--teal-dim);
+  border: 1px solid var(--teal-dim);
   border-radius: var(--radius);
   font-family: var(--font-body);
   font-size: 0.7rem;
@@ -276,7 +276,7 @@
 }
 
 .auth-free-notice strong {
-  color: var(--gold);
+  color: var(--teal);
 }
 
 /* HELP MODAL */
@@ -353,7 +353,7 @@
 }
 
 .help-feedback a {
-  color: var(--gold);
+  color: var(--teal);
   text-decoration: none;
   font-weight: 600;
 }
@@ -414,8 +414,8 @@
 .welcome-verse {
   margin: 0 0 1.75rem;
   padding: 1rem 1.25rem;
-  border-left: 3px solid var(--gold);
-  background: rgba(0, 0, 0, 0.15);
+  border-left: 3px solid var(--teal);
+  background: var(--teal-dim);
   border-radius: 0 var(--radius) var(--radius) 0;
   text-align: left;
 }
@@ -430,15 +430,15 @@
 
 .welcome-verse-ref {
   font-size: 0.75rem;
-  color: var(--gold);
+  color: var(--teal);
   font-style: normal;
 }
 
 .welcome-tip {
   margin-bottom: 1.5rem;
   padding: 0.875rem 1rem;
-  background: var(--gold-dim);
-  border: 1px solid rgba(212, 168, 83, 0.15);
+  background: var(--teal-dim);
+  border: 1px solid var(--teal-dim);
   border-radius: var(--radius);
   text-align: left;
 }
@@ -451,7 +451,7 @@
 }
 
 .welcome-tip-text strong {
-  color: var(--gold);
+  color: var(--teal);
   font-weight: 600;
 }
 

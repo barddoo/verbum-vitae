@@ -6,8 +6,8 @@ import { cachedGet, cachedSet } from './storage'
 export type ThemePref = 'light' | 'dark' | 'system'
 export type Theme = 'light' | 'dark'
 
-const LIGHT_COLOR = '#f8f7fb'
-const DARK_COLOR = '#0f1117'
+const LIGHT_COLOR = '#f9f4f2'
+const DARK_COLOR = '#1c1b1a'
 
 function isThemePref(value: unknown): value is ThemePref {
   return value === 'light' || value === 'dark' || value === 'system'
