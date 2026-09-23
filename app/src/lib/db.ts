@@ -1,5 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie'
+import { DEFAULT_TRANSLATION } from 'shared/bible'
 import type { VerseRow } from 'shared/types'
+import { bundledCollections, verseRefToId } from '../data/collections'
 import { slugify } from './slugify'
 
 export interface TextItem extends VerseRow {
@@ -292,6 +294,72 @@ export async function ensureNonBibleTextSeeded(sourceType: TextSourceType, sourc
     seedingByKey.set(key, seedNonBibleText(sourceType, sourceId))
   }
   return seedingByKey.get(key)!
+}
+
+let collectionsSeeding: Promise<void> | null = null
+
+async function seedCollections() {
+  // One explicit rw transaction: StrictMode double-invokes load(), so two concurrent
+  // runs would otherwise both `put` the same bundled slug and trip the unique index
+  // ("Unable to add key to index 'slug'"). A single transaction plus slug/name lookups
+  // inside makes seeding idempotent no matter how many times or from where it runs.
+  await db.transaction('rw', db.collections, db.collectionVerses, async () => {
+    const bundledSlugByName = new Map(bundledCollections.map((c) => [c.name, c.id]))
+
+    // Backfill slugs for rows created before the slug index existed; never steal a slug
+    // another row already owns.
+    const slugless = (await db.collections.toArray()).filter((c) => !c.slug)
+    for (const c of slugless) {
+      const slug = bundledSlugByName.get(c.name) || slugify(c.name)
+      if (!slug) continue
+      if (await db.collections.where({ slug }).first()) continue
+      await db.collections.update(c.id!, { slug })
+    }
+
+    for (const c of bundledCollections) {
+      if (await db.collections.where({ slug: c.id }).first()) continue
+      const nameRow = await db.collections.where({ name: c.name }).first()
+      if (nameRow) {
+        if (nameRow.slug !== c.id) await db.collections.update(nameRow.id!, { slug: c.id })
+        continue
+      }
+      const cId = (await db.collections.put({
+        slug: c.id,
+        name: c.name,
+        description: c.description,
+        icon: c.icon,
+        isBuiltin: 1,
+        createdAt: Date.now(),
+      }))!
+      let order = 0
+      const entries: { collectionId: number; verseId: string; translation: string; sortOrder: number }[] = []
+      for (const ref of c.verses) {
+        const verseId = verseRefToId(ref)
+        if (Array.isArray(ref.verse)) {
+          for (let v = ref.verse[0]; v <= ref.verse[1]; v++) {
+            entries.push({
+              collectionId: cId,
+              verseId: `b:${ref.book}:${ref.chapter}:${v}`,
+              translation: DEFAULT_TRANSLATION,
+              sortOrder: order++,
+            })
+          }
+        } else {
+          entries.push({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
+        }
+      }
+      await db.collectionVerses.bulkPut(entries)
+    }
+  })
+}
+
+export function ensureCollectionsSeeded(): Promise<void> {
+  if (!collectionsSeeding) {
+    collectionsSeeding = seedCollections().finally(() => {
+      collectionsSeeding = null
+    })
+  }
+  return collectionsSeeding
 }
 
 export async function fetchVersesBatch(keys: { verseId: string; translation: string }[]): Promise<Map<string, string>> {

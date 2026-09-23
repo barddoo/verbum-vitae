@@ -186,6 +186,14 @@
   justify-content: center;
   border-radius: var(--radius);
   transition: color 0.2s;
+  position: relative;
+}
+
+/* Keeps the compact icon but restores the 44px touch target. */
+.settings-btn::after {
+  content: "";
+  position: absolute;
+  inset: -0.5625rem;
 }
 
 .settings-btn:hover {

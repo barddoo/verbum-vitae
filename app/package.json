@@ -15,7 +15,7 @@
     "cap:strip:gz:android": "rm -f android/app/src/main/assets/public/bible-*.json.gz",
     "cap:open:ios": "bunx cap open ios",
     "cap:open:android": "bunx cap open android",
-    "cap:assets": "bunx capacitor-assets generate"
+    "cap:assets": "bunx @capacitor/assets generate"
   },
   "dependencies": {
     "@capacitor/android": "8.5.0",

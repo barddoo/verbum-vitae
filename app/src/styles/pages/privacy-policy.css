@@ -3,7 +3,7 @@
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
   font-family: var(--font-body);
-  color: var(--text);
+  color: var(--parchment);
   line-height: 1.7;
 }
 
@@ -11,7 +11,7 @@
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--parchment);
   margin-bottom: 0.25rem;
 }
 
@@ -25,7 +25,7 @@
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--parchment);
   margin-top: 2rem;
   margin-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
@@ -35,7 +35,7 @@
 .privacy-policy h3 {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--parchment);
   margin-top: 1rem;
   margin-bottom: 0.25rem;
 }
@@ -43,7 +43,7 @@
 .privacy-policy p,
 .privacy-policy li {
   font-size: 0.85rem;
-  color: var(--text-secondary, var(--text));
+  color: var(--aged);
   margin-bottom: 0.75rem;
 }
 

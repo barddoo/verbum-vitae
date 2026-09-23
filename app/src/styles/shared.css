@@ -2,7 +2,7 @@
 
 .page {
   padding: 1.25rem 1.25rem;
-  animation: fadeUp 0.3s ease;
+  animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeUp {
@@ -95,6 +95,18 @@
 
 .quick-actions .btn {
   flex: 1;
+}
+
+/* On a phone the three labels cannot share a row without collapsing into
+   circles, so they stack full-width where a thumb can reach them. */
+@media (max-width: 32.5rem) {
+  .quick-actions {
+    flex-direction: column;
+  }
+
+  .quick-actions .btn {
+    flex: none;
+  }
 }
 
 /* HERO / HOME */
@@ -231,6 +243,12 @@
   line-height: 1;
   padding: 0.125rem;
   transition: color 0.15s;
+}
+
+.install-guide-close::after {
+  content: "";
+  position: absolute;
+  inset: -0.625rem;
 }
 
 .install-guide-close:hover {

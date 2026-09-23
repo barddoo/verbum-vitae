@@ -353,6 +353,21 @@
   opacity: 1;
 }
 
+/* Banner dismiss controls stay visually small but hold a 44px touch target. */
+.update-banner-dismiss,
+.sync-error-banner-dismiss,
+.leaked-credentials-banner-dismiss {
+  position: relative;
+}
+
+.update-banner-dismiss::after,
+.sync-error-banner-dismiss::after,
+.leaked-credentials-banner-dismiss::after {
+  content: "";
+  position: absolute;
+  inset: -0.625rem -0.5rem;
+}
+
 /* APP BODY */
 
 .app-body {
@@ -563,6 +578,15 @@
     color 0.2s,
     border-color 0.2s;
   flex-shrink: 0;
+  position: relative;
+}
+
+/* Keeps the compact visual but restores the 44px touch target. */
+.btn-help::after {
+  content: "";
+  position: absolute;
+  inset: -0.5rem;
+  border-radius: 50%;
 }
 
 .btn-help:hover {

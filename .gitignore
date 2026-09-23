@@ -8,11 +8,16 @@ dist/
 *.tsbuildinfo
 test-results
 
-# Capacitor (native platforms generated at app/ level)
-app/android/
-app/ios/
+# Capacitor native projects (app/android, app/ios) are tracked as source.
+# Their build outputs, local config, and copied web assets stay ignored via the
+# per-platform .gitignore files (app/android/.gitignore, app/ios/.gitignore).
 *.apk
 *.aab
 *.ipa
+
+# Signing secrets — never commit
+keystore.properties
+*.jks
+*.keystore
 
 .playwright-mcp

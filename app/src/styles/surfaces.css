@@ -1,0 +1,45 @@
+/* BROWSER SURFACES
+   The parts we do not draw still carry the design: text selection, the caret,
+   scrollbars, focus rings, and the native form-control accents. */
+
+::selection {
+  background: var(--teal-selection);
+  color: var(--parchment);
+}
+
+html {
+  caret-color: var(--teal);
+  scrollbar-color: var(--border) transparent;
+}
+
+input,
+select,
+textarea {
+  accent-color: var(--teal);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--aged);
+  opacity: 1;
+}
+
+/* One focus ring for everything the default outline was stripped from.
+   Inputs and rows that define their own treatment out-specify this rule. */
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* BALANCED HEADINGS */
+
+.hero-greeting,
+.welcome-headline,
+.empty-state h2,
+.collections-title,
+.collection-detail-name,
+.settings-page-title,
+.dicas-title,
+.stats-page > h2 {
+  text-wrap: balance;
+}

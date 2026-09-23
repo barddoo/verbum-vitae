@@ -5,7 +5,6 @@ import { DEFAULT_TRANSLATION } from 'shared/bible'
 import { type CollectionFormData, CollectionFormModal } from '../components/collection-form-modal'
 import { MemorizedVersePickerModal } from '../components/memorized-verse-picker-modal'
 import { PageMeta } from '../components/page-meta'
-import { bundledCollections, verseRefToId } from '../data/collections'
 import {
   addCollectionAsBlock,
   addCollectionToMemory,
@@ -14,6 +13,7 @@ import {
   createUserCollection,
   db,
   deleteUserCollection,
+  ensureCollectionsSeeded,
   fetchVersesBatch,
   getCollectionProgress,
   removeVerseFromCollection,
@@ -21,7 +21,6 @@ import {
   updateUserCollection,
 } from '../lib/db'
 import { verseIdToReference } from '../lib/format'
-import { slugify } from '../lib/slugify'
 import { cachedGet } from '../lib/storage'
 import { logProgressChange } from '../lib/sync'
 
@@ -37,72 +36,6 @@ interface CollectionEntry {
   total: number
   memorized: number
   percent: number
-}
-
-let collectionsSeeding: Promise<void> | null = null
-
-async function seedCollections() {
-  // One explicit rw transaction: StrictMode double-invokes load(), so two concurrent
-  // runs would otherwise both `put` the same bundled slug and trip the unique index
-  // ("Unable to add key to index 'slug'"). A single transaction plus slug/name lookups
-  // inside makes seeding idempotent no matter how many times or from where it runs.
-  await db.transaction('rw', db.collections, db.collectionVerses, async () => {
-    const bundledSlugByName = new Map(bundledCollections.map((c) => [c.name, c.id]))
-
-    // Backfill slugs for rows created before the slug index existed; never steal a slug
-    // another row already owns.
-    const slugless = (await db.collections.toArray()).filter((c) => !c.slug)
-    for (const c of slugless) {
-      const slug = bundledSlugByName.get(c.name) || slugify(c.name)
-      if (!slug) continue
-      if (await db.collections.where({ slug }).first()) continue
-      await db.collections.update(c.id!, { slug })
-    }
-
-    for (const c of bundledCollections) {
-      if (await db.collections.where({ slug: c.id }).first()) continue
-      const nameRow = await db.collections.where({ name: c.name }).first()
-      if (nameRow) {
-        if (nameRow.slug !== c.id) await db.collections.update(nameRow.id!, { slug: c.id })
-        continue
-      }
-      const cId = (await db.collections.put({
-        slug: c.id,
-        name: c.name,
-        description: c.description,
-        icon: c.icon,
-        isBuiltin: 1,
-        createdAt: Date.now(),
-      }))!
-      let order = 0
-      const entries: { collectionId: number; verseId: string; translation: string; sortOrder: number }[] = []
-      for (const ref of c.verses) {
-        const verseId = verseRefToId(ref)
-        if (Array.isArray(ref.verse)) {
-          for (let v = ref.verse[0]; v <= ref.verse[1]; v++) {
-            entries.push({
-              collectionId: cId,
-              verseId: `b:${ref.book}:${ref.chapter}:${v}`,
-              translation: DEFAULT_TRANSLATION,
-              sortOrder: order++,
-            })
-          }
-        } else {
-          entries.push({ collectionId: cId, verseId, translation: DEFAULT_TRANSLATION, sortOrder: order++ })
-        }
-      }
-      await db.collectionVerses.bulkPut(entries)
-    }
-  })
-}
-
-function ensureCollectionsSeeded(): Promise<void> {
-  if (!collectionsSeeding) {
-    collectionsSeeding = seedCollections().finally(() => {
-      collectionsSeeding = null
-    })
-  }
-  return collectionsSeeding
 }
 
 const loadingSpinner = <div className="loading">Carregando…</div>
@@ -265,8 +198,14 @@ export function CollectionDetailPage() {
   const [addingSelected, setAddingSelected] = useState(false)
 
   const load = useCallback(async () => {
+    // A deep link or reload lands here before the list page ever ran, so seed first;
+    // otherwise the lookup misses and the page spins forever.
+    await ensureCollectionsSeeded()
     const c = await db.collections.where({ slug }).first()
-    if (!c) return
+    if (!c) {
+      setLoading(false)
+      return
+    }
 
     const dbId = c.id!
     const [progressResult, cvs, allProgress] = await Promise.all([

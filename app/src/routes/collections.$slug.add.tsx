@@ -4,7 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BOOKS, DEFAULT_TRANSLATION, TRANSLATION_LABELS, TRANSLATIONS, type Translation } from 'shared/bible'
 import { PageMeta } from '../components/page-meta'
 import { CHAPTER_COUNTS } from '../lib/chapter-counts'
-import { addVersesToCollection, db, ensureNonBibleTextSeeded, ensureTranslationSeeded, type TextSourceType, textKey } from '../lib/db'
+import {
+  addVersesToCollection,
+  db,
+  ensureCollectionsSeeded,
+  ensureNonBibleTextSeeded,
+  ensureTranslationSeeded,
+  type TextSourceType,
+  textKey,
+} from '../lib/db'
 import { cachedGet, cachedSet } from '../lib/storage'
 import { AVAILABLE_SOURCES, type SourceOption } from '../lib/text-sources'
 import { SelectionBar } from './browse/selection-bar'
@@ -55,6 +63,7 @@ export function AddVersesToCollectionPage() {
 
   useEffect(() => {
     async function loadCollection() {
+      await ensureCollectionsSeeded()
       const col = await db.collections.where({ slug }).first()
       if (!col) {
         navigate({ to: '/collections' })
