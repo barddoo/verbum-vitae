@@ -2,7 +2,7 @@
 
 import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import { StreakCalendar, buildMonthLabels } from './stats'
+import { buildMonthLabels, StreakCalendar } from './stats'
 
 // ──────────────────────────────────────────────
 // StreakCalendar rendering
@@ -157,10 +157,7 @@ describe('StreakCalendar', () => {
 
 describe('buildMonthLabels — edge cases', () => {
   it('handles year boundary (Dec → Jan)', () => {
-    const cells = makeCells([
-      ...daysFrom(date(2024, 12, 1), 31),
-      ...daysFrom(date(2025, 1, 1), 31),
-    ])
+    const cells = makeCells([...daysFrom(date(2024, 12, 1), 31), ...daysFrom(date(2025, 1, 1), 31)])
     const labels = buildMonthLabels(cells)
     expect(labels.map((l) => l.label)).toContain('Dez')
     expect(labels.map((l) => l.label)).toContain('Jan')
@@ -168,20 +165,14 @@ describe('buildMonthLabels — edge cases', () => {
 
   it('shows second month when gap is exactly 3 columns', () => {
     // First month: 21 cells → cols 0, 1, 2 (last col = 2). Second month starts at cellIndex 21 → col 3. Gap = 3 - 0 = 3 ≥ 3.
-    const cells = makeCells([
-      ...daysFrom(date(2025, 4, 1), 21),
-      ...daysFrom(date(2025, 5, 1), 7),
-    ])
+    const cells = makeCells([...daysFrom(date(2025, 4, 1), 21), ...daysFrom(date(2025, 5, 1), 7)])
     const labels = buildMonthLabels(cells)
     expect(labels.map((l) => l.label)).toContain('Mai')
   })
 
   it('skips second month when gap is exactly 2 columns', () => {
     // First month: 14 cells → cols 0, 1. Second month at cellIndex 14 → col 2. Gap = 2 < 3.
-    const cells = makeCells([
-      ...daysFrom(date(2025, 4, 25), 14),
-      ...daysFrom(date(2025, 5, 9), 7),
-    ])
+    const cells = makeCells([...daysFrom(date(2025, 4, 25), 14), ...daysFrom(date(2025, 5, 9), 7)])
     const labels = buildMonthLabels(cells)
     expect(labels.map((l) => l.label)).not.toContain('Mai')
   })
@@ -234,39 +225,26 @@ describe('buildMonthLabels', () => {
 
   it('shows both months when they are at least 3 columns apart', () => {
     // Apr starts at col 0, May starts at cellIndex 30 → col 4 (gap = 4 >= 3)
-    const cells = makeCells([
-      ...daysFrom(date(2025, 4, 1), 30),
-      ...daysFrom(date(2025, 5, 1), 10),
-    ])
+    const cells = makeCells([...daysFrom(date(2025, 4, 1), 30), ...daysFrom(date(2025, 5, 1), 10)])
     const labels = buildMonthLabels(cells)
     expect(labels.map((l) => l.label)).toEqual(['Abr', 'Mai'])
   })
 
   it('skips a month label when fewer than 3 columns from the previous', () => {
     // Apr gets 7 cells (col 0 only), May starts at col 1 → gap = 1 < 3, skipped
-    const cells = makeCells([
-      ...daysFrom(date(2025, 4, 25), 7),
-      ...daysFrom(date(2025, 5, 2), 14),
-    ])
+    const cells = makeCells([...daysFrom(date(2025, 4, 25), 7), ...daysFrom(date(2025, 5, 2), 14)])
     const labels = buildMonthLabels(cells)
     expect(labels.map((l) => l.label)).toEqual(['Abr'])
   })
 
   it('shows all months when spread across many columns', () => {
-    const cells = makeCells([
-      ...daysFrom(date(2025, 1, 1), 31),
-      ...daysFrom(date(2025, 2, 1), 28),
-      ...daysFrom(date(2025, 3, 1), 31),
-    ])
+    const cells = makeCells([...daysFrom(date(2025, 1, 1), 31), ...daysFrom(date(2025, 2, 1), 28), ...daysFrom(date(2025, 3, 1), 31)])
     const labels = buildMonthLabels(cells)
     expect(labels.map((l) => l.label)).toEqual(['Jan', 'Fev', 'Mar'])
   })
 
   it('cellIndex points to the first cell of that month', () => {
-    const cells = makeCells([
-      ...daysFrom(date(2025, 4, 1), 30),
-      ...daysFrom(date(2025, 5, 1), 10),
-    ])
+    const cells = makeCells([...daysFrom(date(2025, 4, 1), 30), ...daysFrom(date(2025, 5, 1), 10)])
     const labels = buildMonthLabels(cells)
     const mayLabel = labels.find((l) => l.label === 'Mai')
     expect(mayLabel?.cellIndex).toBe(30)

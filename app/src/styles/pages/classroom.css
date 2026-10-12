@@ -1,0 +1,650 @@
+/* ── Sala de Aula — TV presentation mode (uses app theme tokens) ── */
+
+.cl-overlay {
+  min-height: 100dvh;
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+  padding: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+}
+
+/* ── Player accents, cycled by index ── */
+.cl-p0 {
+  --cl-accent: var(--teal);
+}
+.cl-p1 {
+  --cl-accent: var(--gold);
+}
+.cl-p2 {
+  --cl-accent: var(--rubric);
+}
+.cl-p3 {
+  --cl-accent: var(--sage);
+}
+.cl-p4 {
+  --cl-accent: oklch(62% 0.1 255);
+}
+.cl-p5 {
+  --cl-accent: oklch(62% 0.1 295);
+}
+.cl-p6 {
+  --cl-accent: oklch(70% 0.13 60);
+}
+.cl-p7 {
+  --cl-accent: oklch(62% 0.09 180);
+}
+.cl-p8 {
+  --cl-accent: var(--aged);
+}
+
+/* ── Setup ── */
+.cl-setup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  padding: 1.25rem;
+  max-width: 38rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cl-setup-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.cl-setup-icon {
+  color: var(--teal);
+}
+
+.cl-setup-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 600;
+  color: var(--parchment);
+  line-height: 1.1;
+}
+
+.cl-setup-subtitle {
+  font-size: 0.9rem;
+  color: var(--aged);
+}
+
+.cl-setup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.cl-setup-teams,
+.cl-setup-players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+}
+
+.cl-setup-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.cl-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--aged);
+}
+
+.cl-select,
+.cl-input {
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--parchment);
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.7rem 0.9rem;
+  min-height: 2.75rem;
+  width: 100%;
+  min-width: 0;
+  touch-action: manipulation;
+  transition: border-color 0.2s;
+}
+
+.cl-input[class*="cl-p"] {
+  border-left: 3px solid var(--cl-accent);
+}
+
+.cl-select:focus-visible,
+.cl-input:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.cl-textarea {
+  min-height: 10rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.cl-player-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.cl-icon-btn,
+.cl-add-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--aged);
+  cursor: pointer;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.cl-icon-btn {
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+}
+
+.cl-add-btn {
+  grid-column: 1 / -1;
+  min-height: 2.75rem;
+  padding: 0.6875rem 1.375rem;
+  border-radius: 9999px;
+}
+
+.cl-icon-btn:hover,
+.cl-add-btn:hover {
+  color: var(--teal);
+  border-color: var(--teal);
+  background: var(--teal-dim);
+}
+
+.cl-icon-btn:focus-visible,
+.cl-add-btn:focus-visible,
+.cl-mode-btn:focus-visible,
+.cl-btn-start:focus-visible,
+.cl-ctrl-btn:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.cl-mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  margin: 0;
+  min-width: 0;
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+}
+
+.cl-mode-btn {
+  background: transparent;
+  color: var(--aged);
+  border: none;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-height: 2.5rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.cl-mode-btn[aria-pressed="true"] {
+  background: var(--teal-dim);
+  color: var(--teal);
+}
+
+.cl-error {
+  color: var(--rubric);
+  font-size: 0.9rem;
+}
+
+.cl-btn-start {
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  min-height: 2.75rem;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 0 1.25rem var(--teal-dim);
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s,
+    opacity 0.2s;
+}
+
+.cl-btn-start:hover:not(:disabled) {
+  background: var(--teal-hover);
+  box-shadow: 0 0 1.75rem var(--teal-glow);
+}
+
+.cl-btn-start:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cl-setup-hint {
+  font-size: 0.8rem;
+  color: var(--aged);
+  text-align: center;
+}
+
+.cl-text-hint {
+  text-align: left;
+}
+
+.cl-setup-hint kbd {
+  display: inline-block;
+  background: var(--leather);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  padding: 0.1em 0.4em;
+  font-size: 0.85em;
+  font-family: var(--font-mono);
+}
+
+/* ── Presentation ── */
+.cl-present {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.cl-header {
+  flex: 0 0 18%;
+  background: var(--leather);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.cl-team {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.cl-team-a {
+  flex-direction: row;
+}
+.cl-team-b {
+  flex-direction: row-reverse;
+}
+
+.cl-team .cl-team-name {
+  font-size: clamp(0.9rem, 2vw, 1.5rem);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--cl-accent);
+}
+
+.cl-team .cl-team-score {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 4rem);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--cl-accent);
+}
+
+.cl-strip {
+  flex: 1;
+  display: flex;
+  gap: clamp(0.5rem, 2vw, 2rem);
+  justify-content: space-around;
+  min-width: 0;
+}
+
+.cl-strip-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+  color: var(--cl-accent);
+}
+
+.cl-strip-name {
+  font-size: clamp(0.7rem, 1.4vw, 1.1rem);
+  font-weight: 700;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cl-strip-score {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.5vw, 3rem);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.cl-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 0.1rem;
+}
+
+.cl-app-name {
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+  color: var(--aged);
+}
+
+.cl-progress {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--aged);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Verse area ── */
+.cl-verse-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1.5rem;
+  text-align: center;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.cl-reference {
+  display: inline-block;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: clamp(0.75rem, 1.4vw, 1rem);
+  padding: 0.3rem 1.1rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cl-verse-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--parchment);
+  max-width: 80ch;
+  text-wrap: pretty;
+}
+
+.cl-verse-long {
+  font-size: clamp(1.1rem, 2.2vw, 1.9rem);
+}
+
+.cl-word {
+  display: inline;
+}
+
+.cl-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.05em 0.45em;
+  border-radius: 0.375rem;
+  vertical-align: baseline;
+  margin: 0 0.1em;
+  min-width: 2em;
+}
+
+.cl-tile-hidden {
+  background: var(--rubric-dim);
+  color: var(--rubric);
+  border: 1px solid var(--rubric);
+}
+
+.cl-tile-revealed {
+  background: var(--sage-dim);
+  color: var(--sage);
+  border: 1px solid var(--sage);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cl-tile {
+    transition:
+      background-color 0.3s ease,
+      color 0.15s ease,
+      border-color 0.3s ease;
+  }
+}
+
+.cl-complete-badge {
+  font-weight: 700;
+  color: var(--sage);
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  padding: 0.4rem 1.25rem;
+  border: 1px solid var(--sage);
+  background: var(--sage-dim);
+  border-radius: 9999px;
+}
+
+/* ── Teacher controls ── */
+.cl-controls {
+  flex: 0 0 18%;
+  background: var(--leather);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0 1rem;
+  flex-wrap: wrap;
+  min-height: 0;
+}
+
+.cl-ctrl-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.9rem;
+  min-height: 2.75rem;
+  min-width: 4.5rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  color: var(--parchment);
+  font-family: inherit;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s,
+    opacity 0.2s;
+}
+
+.cl-ctrl-btn:hover:not(:disabled) {
+  border-color: var(--teal);
+  background: var(--teal-dim);
+}
+
+.cl-ctrl-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cl-ctrl-reveal {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+
+.cl-ctrl-reveal:hover:not(:disabled) {
+  background: var(--teal-hover);
+  border-color: var(--teal-hover);
+}
+
+.cl-ctrl-reveal .cl-ctrl-key {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.cl-ctrl-score {
+  border-color: var(--cl-accent);
+}
+
+.cl-ctrl-score:hover:not(:disabled) {
+  border-color: var(--cl-accent);
+  background: var(--leather-hover);
+}
+
+.cl-ctrl-key {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--aged);
+}
+
+.cl-ctrl-label {
+  font-size: clamp(0.65rem, 1.1vw, 0.85rem);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Celebration ── */
+.cl-celebration {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.cl-celebration-trophy {
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 1;
+}
+
+.cl-celebration-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 600;
+  color: var(--gold);
+  text-wrap: balance;
+}
+
+.cl-celebration-scores {
+  display: flex;
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cl-cel-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cl-cel-score {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.cl-cel-name {
+  font-weight: 700;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.cl-cel-team .cl-cel-score,
+.cl-cel-team .cl-cel-name {
+  color: var(--cl-accent);
+}
+
+.cl-question {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.6rem);
+  color: var(--gold);
+  max-width: 60ch;
+  text-wrap: balance;
+}
+
+.cl-check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--parchment);
+  min-height: 2.75rem;
+  cursor: pointer;
+}
+
+.cl-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--teal);
+}

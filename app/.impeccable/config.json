@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "luckiest guy",
+        "createdAt": "2026-09-28T13:23:45.104Z",
+        "reason": "Gincana Escolar classroom direction: seed key 7aba03fb, user-chosen visual world, defined in .impeccable/surfaces/src-pages-classroom.md"
+      }
+    ]
+  }
+}

@@ -180,7 +180,7 @@ export function CollectionsListPage() {
 }
 
 export function CollectionDetailPage() {
-  const { slug } = useParams({ from: '/collections/$slug' })
+  const { slug } = useParams({ from: '/_shell/collections/$slug' })
   const navigate = useNavigate()
   const [col, setCol] = useState<CollectionEntry | null>(null)
   const [verses, setVerses] = useState<{ verseId: string; reference: string; text: string; translation: string; memorized: boolean }[]>([])

@@ -39,7 +39,7 @@ function SourcePicker({ current, onChange }: { current: SourceOption; onChange: 
 const loadingSpinner = <div className="loading">Carregando…</div>
 
 export function AddVersesToCollectionPage() {
-  const { slug } = useParams({ from: '/collections/$slug/add' })
+  const { slug } = useParams({ from: '/_shell/collections/$slug/add' })
   const navigate = useNavigate()
 
   const [collectionName, setCollectionName] = useState('')

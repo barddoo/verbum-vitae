@@ -37,7 +37,7 @@ interface GradeSnapshot {
 const loadingSpinner = <div className="loading">Carregando…</div>
 
 export function ReviewPage() {
-  const { autostart } = useSearch({ from: '/review' })
+  const { autostart } = useSearch({ from: '/_shell/review' })
   const autostartFired = useRef(false)
   const [phase, setPhase] = useState<'queue' | 'session'>('queue')
   const [items, setItems] = useState<DueItem[]>([])

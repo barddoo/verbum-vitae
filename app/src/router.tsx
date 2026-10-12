@@ -29,6 +29,7 @@ const AddVersesToCollectionPage = lazy(() =>
 const PrivacyPolicyPage = lazy(() => import('./routes/privacy-policy').then((m) => ({ default: m.PrivacyPolicyPage })))
 const SettingsPage = lazy(() => import('./routes/settings').then((m) => ({ default: m.SettingsPage })))
 const DicasPage = lazy(() => import('./routes/dicas').then((m) => ({ default: m.DicasPage })))
+const ClassroomPage = lazy(() => import('./routes/sala').then((m) => ({ default: m.ClassroomPage })))
 
 type Modal = 'donate' | 'help' | 'welcome'
 
@@ -41,7 +42,7 @@ function modalReducer(state: Modal[], action: { type: 'open'; modal: Modal } | {
   }
 }
 
-function RootLayout() {
+function AppShell() {
   const { user, isOnline } = useAuth()
   const [modals, dispatch] = useReducer(
     modalReducer,
@@ -74,7 +75,9 @@ function RootLayout() {
         <Link to="/" className="top-bar-logo" aria-label="Início">
           <img src="/favicon-32x32.png" alt="" width={22} height={22} />
         </Link>
-        <Link to="/" className="top-bar-title">Verbum Vitae</Link>
+        <Link to="/" className="top-bar-title">
+          Verbum Vitae
+        </Link>
         <div className="top-bar-right">
           <button type="button" className="btn-help" onClick={() => setShowHelp(true)} aria-label="Ajuda">
             ?
@@ -188,16 +191,24 @@ function RootLayout() {
   )
 }
 
-const rootRoute = createRootRoute({ component: RootLayout })
+const rootRoute = createRootRoute({
+  component: () => (
+    <Suspense fallback={loadingSpinner}>
+      <Outlet />
+    </Suspense>
+  ),
+})
+
+const shellRoute = createRoute({ getParentRoute: () => rootRoute, id: '_shell', component: AppShell })
 
 const homeRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/',
   component: HomePage,
 })
 
 const browseRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/browse',
   validateSearch: (search: Record<string, unknown>): { book?: string; chapter?: string } => ({
     book: typeof search.book === 'string' ? search.book : undefined,
@@ -207,7 +218,7 @@ const browseRoute = createRoute({
 })
 
 const reviewRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/review',
   validateSearch: (search: Record<string, unknown>): { autostart?: '1' } => ({
     autostart: search.autostart === '1' ? '1' : undefined,
@@ -216,58 +227,67 @@ const reviewRoute = createRoute({
 })
 
 const statsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/stats',
   component: StatsPage,
 })
 
 const collectionsListRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/collections',
   component: CollectionsListPage,
 })
 
 const collectionDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/collections/$slug',
   component: CollectionDetailPage,
 })
 
 const addVersesRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/collections/$slug/add',
   component: AddVersesToCollectionPage,
 })
 
 const privacyPolicyRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/privacidade',
   component: PrivacyPolicyPage,
 })
 
 const settingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/ajustes',
   component: SettingsPage,
 })
 
 const dicasRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: '/dicas',
   component: DicasPage,
 })
 
+const salaRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sala',
+  component: ClassroomPage,
+})
+
 const routeTree = rootRoute.addChildren([
-  homeRoute,
-  browseRoute,
-  reviewRoute,
-  collectionsListRoute,
-  collectionDetailRoute,
-  addVersesRoute,
-  statsRoute,
-  privacyPolicyRoute,
-  settingsRoute,
-  dicasRoute,
+  shellRoute.addChildren([
+    homeRoute,
+    browseRoute,
+    reviewRoute,
+    collectionsListRoute,
+    collectionDetailRoute,
+    addVersesRoute,
+    statsRoute,
+    privacyPolicyRoute,
+    settingsRoute,
+    dicasRoute,
+  ]),
+  salaRoute,
 ])
 
 export const router = createRouter({ routeTree })

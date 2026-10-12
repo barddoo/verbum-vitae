@@ -240,7 +240,7 @@ async function pullCollections() {
 
     if (hasUnsynced > 0) continue
 
-    const localCol = await db.collections.where({ slug }).first()
+    const _localCol = await db.collections.where({ slug }).first()
     const now = Date.now()
     const createdAt = serverCol.createdAt ? new Date(serverCol.createdAt as string).getTime() : now
 

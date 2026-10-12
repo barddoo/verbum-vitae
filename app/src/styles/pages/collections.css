@@ -748,9 +748,9 @@
 }
 
 .selected-badge {
-  color: var(--teal) !important;
-  background: var(--teal-dim) !important;
-  border-color: var(--teal-dim) !important;
+  color: var(--teal);
+  background: var(--teal-dim);
+  border-color: var(--teal-dim);
 }
 
 /* ── Memorized badge ── */

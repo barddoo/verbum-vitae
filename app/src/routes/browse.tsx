@@ -43,7 +43,7 @@ function SourcePicker({ current, onChange }: { current: SourceOption; onChange: 
 }
 
 export function BrowsePage() {
-  const search = useSearch({ from: '/browse' })
+  const search = useSearch({ from: '/_shell/browse' })
   const [source, setSource] = useState<SourceOption>(() => AVAILABLE_SOURCES[0])
   const [translation, setTranslation] = useState<Translation>(() => (cachedGet('translation') as Translation | null) ?? DEFAULT_TRANSLATION)
   const [bookIndex, setBookIndex] = useState<number | null>(() => {
